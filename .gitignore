@@ -1,0 +1,17 @@
+# SQLite (on-disk mode — see docs/design/01_tech.md)
+data/
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Env
+.env
+.env*.local
+
+# OS / editor
+.DS_Store
+*.log

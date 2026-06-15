@@ -1,0 +1,34 @@
+# Git hooks for hearth — see docs/design/01_tech.md
+# Install: pnpm exec lefthook install
+
+min_version: 1.6.0
+
+pre-commit:
+  commands:
+    lint:
+      glob: "*.{js,ts,jsx,tsx,mjs,cjs}"
+      run: pnpm exec eslint --max-warnings=0 {staged_files}
+      skip:
+        - merge
+        - rebase
+    format:
+      glob: "*.{js,ts,jsx,tsx,mjs,cjs,json,md,yml,yaml}"
+      run: pnpm exec prettier --check {staged_files}
+      skip:
+        - merge
+        - rebase
+    typecheck:
+      run: pnpm typecheck
+      skip:
+        - merge
+        - rebase
+
+commit-msg:
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  commands:
+    test:
+      run: pnpm test
