@@ -1,14 +1,16 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { events, projects, restaurants, streamEntries, trackerEntries } from "@/db/schema";
+import { events, metricEntries, projects, restaurants, streamEntries } from "@/db/schema";
+import { inventoryItems } from "@/db/schema/inventory";
 import type { EntityType } from "@/lib/notifications/emit";
 
 export const ATTACHMENT_ENTITY_TYPES = [
   "stream_entry",
   "restaurant",
   "project",
-  "tracker_entry",
+  "metric_entry",
   "event",
+  "inventory_item",
 ] as const;
 
 export type AttachmentEntityType = (typeof ATTACHMENT_ENTITY_TYPES)[number];
@@ -48,11 +50,11 @@ export async function entityExists(
         .limit(1);
       return Boolean(row);
     }
-    case "tracker_entry": {
+    case "metric_entry": {
       const [row] = await db
-        .select({ id: trackerEntries.id })
-        .from(trackerEntries)
-        .where(eq(trackerEntries.id, entityId))
+        .select({ id: metricEntries.id })
+        .from(metricEntries)
+        .where(eq(metricEntries.id, entityId))
         .limit(1);
       return Boolean(row);
     }
@@ -61,6 +63,14 @@ export async function entityExists(
         .select({ id: events.id })
         .from(events)
         .where(eq(events.id, entityId))
+        .limit(1);
+      return Boolean(row);
+    }
+    case "inventory_item": {
+      const [row] = await db
+        .select({ id: inventoryItems.id })
+        .from(inventoryItems)
+        .where(eq(inventoryItems.id, entityId))
         .limit(1);
       return Boolean(row);
     }

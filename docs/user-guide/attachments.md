@@ -1,8 +1,10 @@
 # Attachments
 
-Attach photos to notes and entries across hearth — stream notes, restaurant reviews, project updates, tracker entries, and event details.
+Attach photos to notes and entries across hearth — stream notes, restaurant reviews, project updates, metric entries, event details, and inventory items. Inventory additionally accepts **PDF documents** (manuals, receipts, warranties).
 
 ## Supported formats
+
+### Images (all entities)
 
 | Type | Extensions |
 | ---- | ---------- |
@@ -11,34 +13,39 @@ Attach photos to notes and entries across hearth — stream notes, restaurant re
 | WebP | `.webp` |
 | GIF | `.gif` |
 
-**Limits:**
+**Limits:** 10 MB per image, up to 10 files per item.
 
-- 10 MB per file
-- Up to 10 photos per item
+### Documents (inventory only)
 
-## Uploading photos
+| Type | Extensions |
+| ---- | ---------- |
+| PDF | `.pdf` |
 
-1. Open the detail page or edit form for an item (stream entry, restaurant, project, etc.)
-2. Use the photo upload control
-3. Select one or more images
+**Limits:** 25 MB per document, counted toward the 10-file-per-item limit.
 
-The item must exist before you can attach photos — create the entry first, then add images on edit.
+## Uploading files
 
-## Viewing photos
+1. Open the detail page or edit form for an item
+2. Use the upload control
+3. Select images (or PDFs on inventory items)
 
-Photos appear as a thumbnail grid on detail views. Click a thumbnail to open a full-size lightbox.
+The item must exist before you can attach files — create the entry first, then add files on edit.
+
+## Viewing attachments
+
+Photos appear as a thumbnail grid on detail views. Click a thumbnail to open a full-size lightbox. PDFs show a document icon with filename — click to download or open.
 
 ## Security
 
-Photos are stored on the hearth instance (not external hosting). Access requires login — URLs are not publicly shareable.
+Files are stored on the hearth instance (not external hosting). Access requires login (or a valid API token for programmatic access) — URLs are not publicly shareable.
 
 ## Storage location
 
-On the server, photos live in `data/uploads/` alongside the SQLite database. Operators should include this directory in backups — see [Backup & restore](../operations/backup-restore.md).
+On the server, files live in `data/uploads/` alongside the SQLite database. Operators should include this directory in backups — see [Backup & restore](../operations/backup-restore.md).
 
-## Removing photos
+## Removing attachments
 
-Delete individual attachments from the detail page. Removing a photo deletes the file from storage.
+Delete individual attachments from the detail page. Removing a file deletes it from storage.
 
 !!! note
-    Deleting a parent item (e.g. a stream entry) does not automatically delete attached photos in v1. Orphan cleanup may be added later.
+    Deleting a parent item (e.g. a stream entry) does not automatically delete attached files in v1. Orphan cleanup may be added later.

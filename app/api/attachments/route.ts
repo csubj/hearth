@@ -1,5 +1,5 @@
 import { unauthorizedResponse, validateApiSession } from "@/lib/attachments/auth";
-import { MAX_ATTACHMENT_BYTES } from "@/lib/attachments/config";
+import { getMaxBytesForEntity, MAX_ATTACHMENT_BYTES_DOCUMENT } from "@/lib/attachments/config";
 import { isAttachmentEntityType } from "@/lib/attachments/entity";
 import { uploadAttachment } from "@/lib/attachments/upload";
 
@@ -12,11 +12,11 @@ function rejectOversizeRequest(request: Request): Response | null {
   }
 
   const size = Number.parseInt(contentLength, 10);
-  if (!Number.isFinite(size) || size <= MAX_ATTACHMENT_BYTES) {
+  if (!Number.isFinite(size) || size <= MAX_ATTACHMENT_BYTES_DOCUMENT) {
     return null;
   }
 
-  return Response.json({ error: "File exceeds the 10 MB limit." }, { status: 413 });
+  return Response.json({ error: "File exceeds the 25 MB limit." }, { status: 413 });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -45,16 +45,18 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "File is required." }, { status: 400 });
   }
 
-  if (file.size > MAX_ATTACHMENT_BYTES) {
-    return Response.json({ error: "File exceeds the 10 MB limit." }, { status: 413 });
-  }
-
   if (typeof entityType !== "string" || !isAttachmentEntityType(entityType)) {
     return Response.json({ error: "Invalid entity type." }, { status: 400 });
   }
 
   if (typeof entityId !== "string" || entityId.length === 0) {
     return Response.json({ error: "Entity id is required." }, { status: 400 });
+  }
+
+  const maxBytes = getMaxBytesForEntity(entityType);
+  if (file.size > maxBytes) {
+    const limitMb = Math.round(maxBytes / (1024 * 1024));
+    return Response.json({ error: `File exceeds the ${limitMb} MB limit.` }, { status: 413 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

@@ -82,8 +82,9 @@ Your note appears in the chronological list. Other household members will see it
 | ------- | ----------------- |
 | Restaurants | Add a place someone mentioned: "Emily said the pasta is great" |
 | Projects | Log something around the house: "fix the back gate latch" |
-| Trackers | Create one tracker (e.g. pet weight) and add a first entry |
+| Metrics | Create one metric (e.g. pet weight), add an entry, and watch the chart |
 | Events | Add something with a date: "vet appointment — next Tuesday 3pm" |
+| Inventory | Add an appliance with its model and manual link |
 
 Each feature has a dedicated page in the [User guide](../user-guide/index.md).
 

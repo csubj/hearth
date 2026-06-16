@@ -1,4 +1,4 @@
-import { EventCreateForm } from "@/components/events/EventCreateForm";
+import { EventCreateCollapsible } from "@/components/events/EventCreateCollapsible";
 import { EventList } from "@/components/events/EventList";
 import { listPastEvents, listUpcomingEvents } from "@/lib/actions/events";
 import { loadMentionUsers } from "@/lib/users/mention-users";
@@ -12,14 +12,15 @@ export default async function EventsPage() {
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="font-serif text-2xl text-text">Events</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Upcoming plans and past occasions, sorted by date.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl text-text">Events</h1>
+          <p className="mt-1 text-sm text-text-muted">
+            Upcoming plans and past occasions, sorted by date.
+          </p>
+        </div>
+        <EventCreateCollapsible users={mentionUsers} />
       </header>
-
-      <EventCreateForm users={mentionUsers} />
 
       <EventList
         title="Upcoming"

@@ -18,7 +18,9 @@ There is no audience beyond the household. No public profiles, no social feed, n
 
 **Glanceable first.** The home page should answer "what's going on?" in a few seconds. Detail lives one click deeper; the landing view stays calm.
 
-**Low friction to capture.** Adding a thought should be as easy as writing on a sticky note. Stream-of-consciousness entries don't need categories or due dates unless someone chooses to add them later. @-mentions are optional and lightweight — a nudge, not an assignment system.
+**Show what exists first.** Every page leads with what's already there — the list, the history, the items. Adding something new is a deliberate, secondary affordance (a compact "Add" button or an expandable form near the header), never the first element in view. People open hearth to _see_ what's on the board, not to fill out a form.
+
+**Low friction to capture.** When someone does want to add a thought, it should be as easy as writing on a sticky note — capture sits one tap away, behind the content rather than in front of it. Stream-of-consciousness entries don't need categories or due dates unless someone chooses to add them later. @-mentions are optional and lightweight — a nudge, not an assignment system.
 
 **Shared by default.** Everything in hearth is visible to everyone in the household. Private notes belong elsewhere.
 
@@ -66,13 +68,13 @@ A list of things to fix, build, or improve around the home.
 
 Projects can linger. The goal is visibility, not velocity.
 
-### Other trackers
+### Metrics
 
 Flexible lists for recurring or ongoing measurements and observations.
 
-- Named tracker (e.g. Flora's weight) with dated entries over time
+- Named metric (e.g. Flora's weight) with dated entries over time
 - Simple numeric or text values; optional note per entry
-- Lightweight chart or table view when history matters
+- **Chart view:** numeric metrics render as a line/point graph over time so trends are visible at a glance; a table view backs it up when exact values matter
 - Same pattern works for anything the household wants to watch: plant watering, medication schedules, utility readings
 
 Start with one concrete use case; generalize the pattern as needed.
@@ -87,6 +89,18 @@ A date-ordered list of things to go to or remember by calendar date.
 
 Complements the stream-of-consciousness list for anything that is inherently tied to a specific day.
 
+### Inventory
+
+A searchable catalog of the household's physical things — appliances, electronics, tools, furniture — so details are findable when you actually need them: a model number for a warranty claim, the paint color in the garage, the manual for the dishwasher.
+
+- Item record: name, brand, model, serial number, item type, location, purchase date, store, price, warranty notes, and free-form notes
+- **Tags** for flexible grouping ("kitchen", "needs-repair", "under-warranty") and **links** (label + URL) for manuals, product pages, or receipts
+- **Photos and documents:** attach pictures of the item plus PDFs, manuals, and receipts — inventory is the one place documents are allowed, not just images
+- **Search** across name, brand, model, serial, location, and notes; filter by tag or type
+- **Import/export:** bulk-load an existing spreadsheet and export the catalog for backup or a move
+
+Unlike the stream, inventory is reference data — it changes rarely and is read often. The page leads with the searchable list, not a capture box.
+
 ---
 
 ## Home page (concept)
@@ -98,8 +112,9 @@ The landing page aggregates what needs attention across all features:
 | Stream      | Recent additions, pinned items, things marked active                |
 | Restaurants | A few "want to try" suggestions (v1: list; later: nearby on map)    |
 | Projects    | Items in progress or recently touched                               |
-| Trackers    | Latest entry or reminder if something hasn't been logged in a while |
+| Metrics     | Latest entry or reminder if something hasn't been logged in a while |
 | Events      | Upcoming within the next week or two                                |
+| Inventory   | Quick search box; a few recently added or edited items              |
 
 Each section links to its full view. The page should feel like a summary, not a dashboard with widgets.
 
@@ -114,7 +129,14 @@ Each hearth instance serves **one household**. There is no multi-tenant signup f
 - No self-service registration; new members are added by the admin
 - All authenticated users see the same shared data
 
-Authentication implementation details: see `02_auth.md`.
+### Access modes
+
+hearth runs in one of two web access modes, chosen per instance:
+
+- **Required (default):** everyone signs in; each write is attributed to the logged-in user.
+- **Open:** the login gate is skipped — suited to a trusted private network — and web activity is attributed to a single shared household identity. Admin pages still require a logged-in admin.
+
+Regardless of mode, the [programmatic API](#programmatic-api) always requires its own token. Authentication implementation details, including the `AUTH_MODE` setting: see `02_auth.md`.
 
 ---
 
@@ -135,15 +157,29 @@ Push notifications and email digests are out of scope for v1; the in-app stream 
 
 Photos can be attached to notes and other user inputs across features.
 
-- Stream entries, restaurant reviews, project updates, tracker notes, event details — anywhere freeform text appears
+- Stream entries, restaurant reviews, project updates, metric notes, event details — anywhere freeform text appears
 - Multiple photos per entry when useful (e.g. before/after for a house project, menu pics after a restaurant visit)
+- **Inventory items** additionally accept documents (PDFs, manuals, receipts), not just images — see `07_attachments.md` for the per-entity file policy
 - Stored as part of the instance; no external photo hosting required for v1
+
+---
+
+## Programmatic API
+
+hearth exposes a small REST API so the household can manage its data outside the web UI — scripts, home-automation glue, bulk edits, or a future companion app.
+
+- Every resource the UI manages is reachable over REST under `/api/v1/` — stream, restaurants, projects, metrics (and their definitions), events, and inventory (with its tags and types)
+- Requests authenticate with a **bearer API token**, separate from web login; tokens are created and revoked by an admin
+- The API is **self-describing**: an OpenAPI spec is served at `/api/openapi.json` with interactive docs at `/api/docs`
+- The web UI keeps using its own server actions; REST is an additional surface, not a replacement
+
+Implementation details: see `02_auth.md` (API tokens) and `04_routes.md` (`/api/v1` layout).
 
 ---
 
 ## Out of scope (for now)
 
-- Multiple households per instance or guest/read-only access
+- Multiple households per instance, or fine-grained per-user permissions (open mode shares one identity — it is not read-only or guest access)
 - Self-service user registration
 - Mobile-native apps (responsive web is enough initially)
 - Push notifications, email digests, or SMS reminders

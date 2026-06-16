@@ -2,6 +2,26 @@
 
 All notable changes to hearth. Versioning follows [Semantic Versioning](https://semver.org/) for tagged releases.
 
+## Unreleased
+
+Documentation and design updates for upcoming features (implementation in progress):
+
+### Added (documented)
+
+- **REST API** — `/api/v1/*` programmatic access with bearer token auth
+- **OpenAPI** — self-describing spec at `/api/openapi.json` and interactive docs at `/api/docs`
+- **API tokens** — admin-managed bearer tokens (`api_tokens` table)
+- **Configurable auth** — `AUTH_MODE=required|open` with `OPEN_MODE_USERNAME` for trusted networks
+- **Metrics** — renamed from Trackers; line charts for numeric values (Recharts)
+- **Inventory** — searchable household catalog with tags, links, photos, PDF documents, import/export
+- **Existing-data-first layout** — list pages lead with content; compact create in header
+
+### Changed (documented)
+
+- Trackers renamed to **Metrics** across schema, routes, and UI (`/metrics`)
+- Attachments generalized — inventory accepts PDF documents; other entities remain images-only
+- MVP phases extended to 0–10 (auth modes, API, graphing, inventory)
+
 ## v1.0.0 — 2026-06
 
 Initial release. MVP phases 0–7 complete.
@@ -13,9 +33,9 @@ Initial release. MVP phases 0–7 complete.
 - **Stream** — quick-capture notes with pin, done, rough when, @-mentions
 - **Restaurants** — wishlist, visit status, 1–5 star ratings, visit notes
 - **Projects** — idea / in progress / done statuses
-- **Trackers** — named trackers with dated entries
+- **Metrics** — named metrics with dated entries (formerly Trackers)
 - **Events** — date-ordered calendar items
-- **Attachments** — photo upload on stream, restaurants, projects, trackers, events
+- **Attachments** — photo upload on stream, restaurants, projects, metrics, events
 - **Notifications** — in-app activity feed, @-mention delivery, unread badge
 - **Docker** — multi-stage Dockerfile, Compose, GHCR image publishing
 - **CI** — GitHub Actions lint, format, typecheck, test
@@ -28,10 +48,6 @@ Initial release. MVP phases 0–7 complete.
 - Tailwind CSS v4, Radix UI
 - Lucia v3 + Argon2id
 - Vitest, ESLint, Prettier, Lefthook
-
-## Unreleased
-
-Changes on `main` after the latest tag appear here until the next release.
 
 ---
 

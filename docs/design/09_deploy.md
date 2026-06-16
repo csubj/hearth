@@ -37,15 +37,34 @@ Document all in `.env.example`:
 | Variable                        | Required  | Default                 | Purpose                                  |
 | ------------------------------- | --------- | ----------------------- | ---------------------------------------- |
 | `DATABASE_URL`                  | yes       | `file:./data/hearth.db` | SQLite path                              |
+| `AUTH_MODE`                     | no        | `required`              | Web access: `required` \| `open`         |
+| `OPEN_MODE_USERNAME`            | when open | —                       | Shared identity username for open mode   |
 | `SESSION_SECRET`                | no        | —                       | Reserved / unused (not read by Lucia)    |
 | `NODE_ENV`                      | auto      | `development`           |                                          |
 | `PORT`                          | no        | `3000`                  | Next.js listen port                      |
-| `UPLOADS_DIR`                   | no        | `data/uploads`          | Photo storage root                       |
+| `UPLOADS_DIR`                   | no        | `data/uploads`          | Photo and document storage root          |
 | `HEARTH_BOOTSTRAP_USERNAME`     | bootstrap | —                       | First admin (non-interactive)            |
 | `HEARTH_BOOTSTRAP_PASSWORD`     | bootstrap | —                       |                                          |
 | `HEARTH_BOOTSTRAP_DISPLAY_NAME` | no        | —                       |                                          |
 
 `SESSION_SECRET` may appear in older examples but is not used — Lucia stores opaque session IDs in SQLite.
+
+### Auth modes
+
+| `AUTH_MODE` | Behavior |
+| ----------- | -------- |
+| `required` (default) | All app pages require login; each write attributed to the logged-in user |
+| `open` | App pages skip login gate; writes attributed to `OPEN_MODE_USERNAME` user. Admin routes still require a logged-in admin. REST API always requires a bearer token regardless of mode. |
+
+`OPEN_MODE_USERNAME` must match an existing, active user. Create that user during bootstrap or via admin before enabling open mode.
+
+### API tokens
+
+Tokens are managed via `/admin/api-tokens` or `pnpm run auth:create-token`. They are stored hashed in `api_tokens` — not in env vars. Document token handling for operators: create, copy once, revoke when compromised.
+
+### Inventory import/export
+
+Bulk inventory operations use `POST /api/inventory/import` and `GET /api/inventory/export`. Import accepts JSON (same shape as export). File attachments are not inlined — back up `data/uploads/` separately for full restore.
 
 Never commit `.env` — already gitignored.
 
@@ -238,6 +257,8 @@ deploy:
   scaling: vertical_only
   env:
     required: [DATABASE_URL]
-    optional: [PORT, UPLOADS_DIR, HEARTH_BOOTSTRAP_*]
+    optional: [PORT, UPLOADS_DIR, AUTH_MODE, OPEN_MODE_USERNAME, HEARTH_BOOTSTRAP_*]
     reserved_unused: [SESSION_SECRET]
+  api_tokens: admin_ui_and_cli # not env vars
+  inventory_bulk: [/api/inventory/import, /api/inventory/export]
 ```

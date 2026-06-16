@@ -9,7 +9,8 @@ const navLinks = [
   { href: "/stream", label: "Stream" },
   { href: "/restaurants", label: "Restaurants" },
   { href: "/projects", label: "Projects" },
-  { href: "/trackers", label: "Trackers" },
+  { href: "/metrics", label: "Metrics" },
+  { href: "/inventory", label: "Inventory" },
   { href: "/events", label: "Events" },
 ] as const;
 

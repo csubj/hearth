@@ -2,11 +2,14 @@
 
 A shared wishlist of places to eat — and a household food journal after you visit.
 
+## Browsing restaurants
+
+Go to **Restaurants** (`/restaurants`). The list leads the page — what you want to try and where you've been. Adding a restaurant is a compact **New** button in the header, so the existing list stays the focus.
+
 ## Adding a restaurant
 
-1. Go to **Restaurants** (`/restaurants`)
-2. Click to add a new restaurant
-3. Fill in:
+1. Use the **New restaurant** button in the header
+2. Fill in:
 
 | Field | Required | Notes |
 | ----- | -------- | ----- |

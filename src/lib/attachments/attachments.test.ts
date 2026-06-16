@@ -9,7 +9,7 @@ import { createTestUser, loginAs } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import { GET, DELETE } from "../../../app/api/attachments/[id]/route";
 import { POST } from "../../../app/api/attachments/route";
-import { MAX_ATTACHMENT_BYTES } from "./config";
+import { MAX_ATTACHMENT_BYTES_DOCUMENT } from "./config";
 import { detectImageMime, filenameExtensionMatchesDetected } from "./mime";
 import { getAttachmentById } from "./queries";
 import { resolveUploadPath } from "./storage";
@@ -363,7 +363,7 @@ describe("attachments API routes", () => {
       new Request("http://localhost/api/attachments", {
         method: "POST",
         headers: {
-          "Content-Length": String(MAX_ATTACHMENT_BYTES + 1),
+          "Content-Length": String(MAX_ATTACHMENT_BYTES_DOCUMENT + 1),
         },
         body: new Uint8Array([1, 2, 3]),
       }),

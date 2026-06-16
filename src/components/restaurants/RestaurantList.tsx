@@ -5,7 +5,8 @@ export function RestaurantList({ restaurants }: { restaurants: RestaurantListIte
   if (restaurants.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">
-        No restaurants yet. Add one above to get started.
+        No restaurants yet. Use <span className="font-medium text-text">Add restaurant</span> above
+        to get started.
       </p>
     );
   }

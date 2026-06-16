@@ -111,23 +111,23 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ---
 
-## Phase 4 — Projects, Events, Trackers
+## Phase 4 — Projects, Events, Metrics
 
-**Goal:** remaining feature lists.
+**Goal:** remaining feature lists (metrics without charting yet).
 
-| Deliverable                                                    | Notes                      |
-| -------------------------------------------------------------- | -------------------------- |
-| `projects`, `trackers`, `tracker_entries`, `events` migrations |                            |
-| Routes per `04_routes.md`                                      | all list + detail pages    |
-| Home sections                                                  | one block per feature      |
-| Tracker history                                                | table/cards on detail page |
+| Deliverable                                         | Notes                      |
+| --------------------------------------------------- | -------------------------- |
+| `projects`, `metrics`, `metric_entries`, `events` migrations |                            |
+| Routes per `04_routes.md`                           | all list + detail pages    |
+| Home sections                                       | one block per feature      |
+| Metric history                                      | table/cards on detail page |
 
 **Done when:**
 
 - [ ] Each feature: create, view list, view detail, update
-- [ ] Tracker accepts dated entries with value + note
+- [ ] Metric accepts dated entries with value + note
 - [ ] Events sort by `starts_at`; past events visible on full page
-- [ ] Home summarizes all five feature areas
+- [ ] Home summarizes all feature areas (through metrics + events)
 
 ---
 
@@ -139,7 +139,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 | --------------------------- | ------------------------------------------------- |
 | `attachments` migration     |                                                   |
 | `POST/GET /api/attachments` | per `07_attachments.md`                           |
-| Upload UI on detail forms   | stream, restaurant, project, tracker entry, event |
+| Upload UI on detail forms   | stream, restaurant, project, metric entry, event  |
 | Thumbnail grid + lightbox   | Radix Dialog                                      |
 
 **Done when:**
@@ -194,6 +194,74 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ---
 
+## Phase 8 — Configurable auth & API tokens
+
+**Goal:** optional open web mode and programmatic REST access.
+
+| Deliverable                              | Notes                                    |
+| ---------------------------------------- | ---------------------------------------- |
+| `AUTH_MODE`, `OPEN_MODE_USERNAME` env    | per `02_auth.md`                         |
+| Middleware open-mode branch              | shared identity attribution              |
+| `api_tokens` migration + admin UI        | `/admin/api-tokens`                      |
+| `pnpm run auth:create-token` CLI         | non-interactive token creation           |
+| `/api/v1/*` REST handlers                | all resources per `04_routes.md`         |
+| Zod schemas + OpenAPI registry           | `@asteasolutions/zod-to-openapi`         |
+| `GET /api/openapi.json`, `/api/docs`     | Scalar or Redoc UI                       |
+| Bearer auth middleware for `/api/v1/*`   | always required                          |
+
+**Done when:**
+
+- [ ] `AUTH_MODE=open` skips login gate; writes attributed to `OPEN_MODE_USERNAME`
+- [ ] Admin routes still require logged-in admin in open mode
+- [ ] Create token → curl `/api/v1/stream` with bearer header succeeds
+- [ ] Revoked token returns 401
+- [ ] `/api/openapi.json` validates; `/api/docs` renders
+
+---
+
+## Phase 9 — Metrics graphing & existing-data-first layout
+
+**Goal:** charts for metrics and UX shift to content-first pages.
+
+| Deliverable                              | Notes                                    |
+| ---------------------------------------- | ---------------------------------------- |
+| Recharts `MetricChart` component         | per `05_styling.md`                      |
+| Chart on `/metrics/[id]`                 | numeric values only                      |
+| Compact create pattern                   | header button / Collapsible on list pages |
+| Refactor list pages                      | existing content leads, capture secondary |
+
+**Done when:**
+
+- [ ] Numeric metric shows line chart on detail page
+- [ ] Text metric falls back to entry list (no chart)
+- [ ] List pages lead with existing items, not create form
+- [ ] Home metrics section unchanged (latest entry per metric)
+
+---
+
+## Phase 10 — Inventory
+
+**Goal:** searchable household catalog with import/export.
+
+| Deliverable                                         | Notes                                    |
+| --------------------------------------------------- | ---------------------------------------- |
+| `inventory_*` migrations                            | per `03_schema.md`                       |
+| `/inventory`, `/inventory/[id]` routes            | search, tags, links                      |
+| Document attachments for inventory                  | PDF per `07_attachments.md`              |
+| `inventory.created` / `inventory.updated` notifications | per `06_notifications.md`            |
+| `POST /api/inventory/import`, `GET /api/inventory/export` | bulk ops                           |
+| `/api/v1/inventory` + types + tags REST             | per `04_routes.md`                       |
+| Home inventory section                              | recent items preview                     |
+
+**Done when:**
+
+- [ ] Create item with tags, links, photo, and PDF manual
+- [ ] Search by name/model/serial/location works
+- [ ] Export → import round-trip preserves items
+- [ ] API token can CRUD inventory via `/api/v1/inventory`
+
+---
+
 ## Phase map (machine-readable)
 
 ```yaml
@@ -212,22 +280,32 @@ mvp:
       name: restaurants
       depends_on: [2]
     - id: 4
-      name: projects_events_trackers
+      name: projects_events_metrics
       depends_on: [3]
     - id: 5
       name: attachments
       depends_on: [4]
     - id: 6
       name: notifications_mentions
-      depends_on: [4] # can parallel with 5 if needed
+      depends_on: [4]
     - id: 7
       name: polish_deploy
       depends_on: [5, 6]
+    - id: 8
+      name: configurable_auth_api_tokens
+      depends_on: [7]
+    - id: 9
+      name: metrics_graphing_ux
+      depends_on: [8]
+    - id: 10
+      name: inventory
+      depends_on: [9]
   v1_excludes:
     - google_maps
     - push_notifications
     - dark_mode
     - oauth
+    - scoped_api_tokens
 ```
 
 ---

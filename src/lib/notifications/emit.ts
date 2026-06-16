@@ -7,9 +7,10 @@ export type EntityType =
   | "stream_entry"
   | "restaurant"
   | "project"
-  | "tracker"
-  | "tracker_entry"
-  | "event";
+  | "metric"
+  | "metric_entry"
+  | "event"
+  | "inventory_item";
 
 export interface EmitHouseholdActivityInput {
   type: string;
@@ -31,9 +32,10 @@ const ENTITY_MENTION_LABEL: Record<EntityType, string> = {
   stream_entry: "a stream note",
   restaurant: "a restaurant",
   project: "a project",
-  tracker: "a tracker",
-  tracker_entry: "a tracker entry",
+  metric: "a metric",
+  metric_entry: "a metric entry",
   event: "an event",
+  inventory_item: "an inventory item",
 };
 
 async function loadActiveUsers(): Promise<MentionCandidate[]> {

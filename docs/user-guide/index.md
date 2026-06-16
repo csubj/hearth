@@ -10,12 +10,13 @@ hearth is organized around a **home page** that summarizes what needs attention,
 | Stream | `/stream` | Full list + quick capture |
 | Restaurants | `/restaurants` | Wishlist and visit history |
 | Projects | `/projects` | House projects by status |
-| Trackers | `/trackers` | Named trackers with dated entries |
+| Metrics | `/metrics` | Named metrics with dated entries and charts |
+| Inventory | `/inventory` | Searchable household items, manuals, and photos |
 | Events | `/events` | Upcoming and past events |
 | Notifications | `/notifications` | Activity feed and @-mentions |
 | Settings | `/settings` | Change your password |
 
-Admins also see **Admin** → `/admin/users` for user management.
+Admins also see **Admin** → `/admin/users` and `/admin/api-tokens`.
 
 ## Home page
 
@@ -26,7 +27,8 @@ The landing page aggregates recent activity from each area:
 | Stream | Pinned items and recent open notes |
 | Restaurants | A few "want to try" suggestions |
 | Projects | Items in progress or recently touched |
-| Trackers | Latest entry per tracker |
+| Metrics | Latest entry per metric |
+| Inventory | Recently added or updated items |
 | Events | Upcoming within the next two weeks |
 | Since last visit | Notifications since you last opened hearth |
 
@@ -51,7 +53,8 @@ Adding something should feel like writing on a sticky note:
 - [Stream](stream.md) — notes, reminders, and thoughts
 - [Restaurants](restaurants.md) — places to try and visit reviews
 - [Projects](projects.md) — house projects from idea to done
-- [Trackers](trackers.md) — recurring measurements and observations
+- [Metrics](metrics.md) — recurring measurements and charts
+- [Inventory](inventory.md) — searchable household items, manuals, and photos
 - [Events](events.md) — calendar-dated things to remember
 - [Notifications & @-mentions](notifications-and-mentions.md) — activity feed
 - [Attachments](attachments.md) — photos on notes and entries
