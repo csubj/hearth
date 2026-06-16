@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { create, type ProjectActionState } from "@/lib/actions/projects";
 
 function ActionMessage({ state }: { state: ProjectActionState }) {
@@ -16,7 +16,7 @@ function ActionMessage({ state }: { state: ProjectActionState }) {
   return null;
 }
 
-export function ProjectCreateForm() {
+export function ProjectCreateForm({ users = [] }: { users?: MentionUser[] }) {
   const [state, action, pending] = useActionState<ProjectActionState, FormData>(create, {});
 
   return (
@@ -35,6 +35,7 @@ export function ProjectCreateForm() {
       </div>
       <MentionTextarea
         name="description"
+        users={users}
         rows={2}
         placeholder="Notes, materials, links… (optional)"
       />

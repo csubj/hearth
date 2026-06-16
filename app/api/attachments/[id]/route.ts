@@ -44,7 +44,10 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
-  const result = await deleteAttachment(id);
+  const result = await deleteAttachment(id, {
+    userId: session.user.id,
+    isAdmin: session.user.role === "admin",
+  });
 
   if (!result.ok) {
     return Response.json({ error: result.error }, { status: result.status });

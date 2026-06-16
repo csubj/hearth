@@ -1,25 +1,9 @@
-import { desc, eq, isNull } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { streamEntries, users } from "@/db/schema";
 import { StreamCaptureForm } from "@/components/StreamCaptureForm";
 import { StreamEntryList, type StreamEntryWithAuthor } from "@/components/StreamEntryList";
-
-async function loadMentionUsers() {
-  const rows = await getDb()
-    .select({
-      id: users.id,
-      username: users.username,
-      displayName: users.displayName,
-    })
-    .from(users)
-    .where(isNull(users.disabledAt));
-
-  return rows.map((row) => ({
-    id: row.id,
-    username: row.username,
-    displayName: row.displayName,
-  }));
-}
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 async function loadStreamEntries(): Promise<{
   open: StreamEntryWithAuthor[];
@@ -74,7 +58,7 @@ export default async function StreamPage() {
         <p className="mt-1 text-sm text-text-muted">Quick notes and reminders for the household.</p>
       </header>
       <StreamCaptureForm users={mentionUsers} />
-      <StreamEntryList openEntries={open} doneEntries={done} />
+      <StreamEntryList openEntries={open} doneEntries={done} users={mentionUsers} />
     </div>
   );
 }

@@ -1,11 +1,17 @@
 "use client";
 
 import { useActionState } from "react";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import type { Restaurant } from "@/db/schema";
 import { update, type RestaurantActionState } from "@/lib/actions/restaurants";
 
-export function UpdateRestaurantForm({ restaurant }: { restaurant: Restaurant }) {
+export function UpdateRestaurantForm({
+  restaurant,
+  users = [],
+}: {
+  restaurant: Restaurant;
+  users?: MentionUser[];
+}) {
   const [state, formAction, pending] = useActionState<RestaurantActionState, FormData>(update, {});
 
   return (
@@ -60,11 +66,27 @@ export function UpdateRestaurantForm({ restaurant }: { restaurant: Restaurant })
           <MentionTextarea
             id="edit-notes"
             name="notes"
+            users={users}
             rows={3}
             defaultValue={restaurant.notes ?? ""}
             className="mt-1 text-sm"
           />
         </div>
+        {restaurant.status === "visited" ? (
+          <div className="sm:col-span-2">
+            <label htmlFor="edit-visit-note" className="block text-sm font-medium text-text">
+              Visit note
+            </label>
+            <MentionTextarea
+              id="edit-visit-note"
+              name="visitNote"
+              users={users}
+              rows={3}
+              defaultValue={restaurant.visitNote ?? ""}
+              className="mt-1 text-sm"
+            />
+          </div>
+        ) : null}
       </div>
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">

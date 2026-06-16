@@ -1,11 +1,33 @@
 import { unauthorizedResponse, validateApiSession } from "@/lib/attachments/auth";
+import { MAX_ATTACHMENT_BYTES } from "@/lib/attachments/config";
 import { isAttachmentEntityType } from "@/lib/attachments/entity";
 import { uploadAttachment } from "@/lib/attachments/upload";
+
+export const runtime = "nodejs";
+
+function rejectOversizeRequest(request: Request): Response | null {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength === null) {
+    return null;
+  }
+
+  const size = Number.parseInt(contentLength, 10);
+  if (!Number.isFinite(size) || size <= MAX_ATTACHMENT_BYTES) {
+    return null;
+  }
+
+  return Response.json({ error: "File exceeds the 10 MB limit." }, { status: 413 });
+}
 
 export async function POST(request: Request): Promise<Response> {
   const session = await validateApiSession();
   if (!session.user) {
     return unauthorizedResponse();
+  }
+
+  const oversizeResponse = rejectOversizeRequest(request);
+  if (oversizeResponse) {
+    return oversizeResponse;
   }
 
   let formData: FormData;
@@ -21,6 +43,10 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!(file instanceof File)) {
     return Response.json({ error: "File is required." }, { status: 400 });
+  }
+
+  if (file.size > MAX_ATTACHMENT_BYTES) {
+    return Response.json({ error: "File exceeds the 10 MB limit." }, { status: 413 });
   }
 
   if (typeof entityType !== "string" || !isAttachmentEntityType(entityType)) {

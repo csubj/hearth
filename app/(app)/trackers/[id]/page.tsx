@@ -4,10 +4,11 @@ import { AddEntryForm } from "@/components/trackers/AddEntryForm";
 import { EntryHistoryList } from "@/components/trackers/EntryHistoryList";
 import { UpdateTrackerForm } from "@/components/trackers/UpdateTrackerForm";
 import { getTrackerWithEntries } from "@/lib/actions/trackers";
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export default async function TrackerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const data = await getTrackerWithEntries(id);
+  const [data, mentionUsers] = await Promise.all([getTrackerWithEntries(id), loadMentionUsers()]);
   if (!data) {
     notFound();
   }
@@ -45,7 +46,7 @@ export default async function TrackerDetailPage({ params }: { params: Promise<{ 
             Record a value with an optional note and date.
           </p>
           <div className="mt-4">
-            <AddEntryForm trackerId={tracker.id} />
+            <AddEntryForm trackerId={tracker.id} users={mentionUsers} />
           </div>
         </section>
       </div>

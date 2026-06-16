@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { create, type RestaurantActionState } from "@/lib/actions/restaurants";
 
-export function CreateRestaurantForm() {
+export function CreateRestaurantForm({ users = [] }: { users?: MentionUser[] }) {
   const [state, formAction, pending] = useActionState<RestaurantActionState, FormData>(create, {});
 
   return (
@@ -58,6 +58,7 @@ export function CreateRestaurantForm() {
           <MentionTextarea
             id="restaurant-notes"
             name="notes"
+            users={users}
             rows={2}
             placeholder="Why we want to go…"
             className="mt-1 text-sm"

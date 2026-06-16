@@ -16,7 +16,12 @@ export async function validateApiSession(): Promise<ApiSessionResult> {
 
   const result = await lucia.validateSession(sessionId);
 
-  if (!result.user || !result.session || result.user.disabledAt) {
+  if (!result.user || !result.session) {
+    return { user: null, session: null };
+  }
+
+  if (result.user.disabledAt) {
+    await lucia.invalidateSession(sessionId);
     return { user: null, session: null };
   }
 

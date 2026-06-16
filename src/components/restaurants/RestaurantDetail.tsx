@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Restaurant } from "@/db/schema";
+import type { MentionUser } from "@/components/MentionTextarea";
 import { Attachments } from "@/components/Attachments";
 import { MarkVisitedForm } from "@/components/restaurants/MarkVisitedForm";
 import { RestaurantStatusChip } from "@/components/restaurants/RestaurantStatusChip";
@@ -19,7 +20,13 @@ function formatDate(date: Date | null): string | null {
   });
 }
 
-export function RestaurantDetail({ restaurant }: { restaurant: Restaurant }) {
+export function RestaurantDetail({
+  restaurant,
+  users = [],
+}: {
+  restaurant: Restaurant;
+  users?: MentionUser[];
+}) {
   const location = restaurant.neighborhood ?? restaurant.address;
   const visitedLabel = formatDate(restaurant.visitedAt);
 
@@ -53,9 +60,9 @@ export function RestaurantDetail({ restaurant }: { restaurant: Restaurant }) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <UpdateRestaurantForm restaurant={restaurant} />
+        <UpdateRestaurantForm restaurant={restaurant} users={users} />
         {restaurant.status === "want_to_try" ? (
-          <MarkVisitedForm restaurant={restaurant} />
+          <MarkVisitedForm restaurant={restaurant} users={users} />
         ) : (
           <SetRatingForm restaurant={restaurant} />
         )}

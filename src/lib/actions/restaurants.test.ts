@@ -6,6 +6,7 @@ import { restaurants } from "@/db/schema";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { create, listRestaurants, markVisited, setRating, update } from "@/lib/actions/restaurants";
+import { combineRestaurantMentionText } from "@/lib/restaurants/mention-text";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 vi.mock("next/cache", () => ({
@@ -275,10 +276,130 @@ describe("restaurant actions", () => {
     expect(rated!.rating).toBe(4);
     expect(emitHouseholdActivity).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "restaurant.visited",
-        summary: "Dan visited Pizza Place",
+        type: "restaurant.rated",
+        summary: "Dan rated Pizza Place 4 stars",
       }),
     );
+  });
+
+  it("combines notes and visit note for mention text", () => {
+    expect(combineRestaurantMentionText("hello @alice", "great food @bob")).toBe(
+      "hello @alice\n\ngreat food @bob",
+    );
+    expect(combineRestaurantMentionText(null, "visit only")).toBe("visit only");
+    expect(combineRestaurantMentionText("notes only", null)).toBe("notes only");
+  });
+
+  it("preserves mentions across notes and visit-note edits", async () => {
+    const user = await createTestUser({ displayName: "Eve" });
+    requireUser.mockResolvedValue({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        disabledAt: user.disabledAt,
+      },
+      session: { id: "session-1", userId: user.id, expiresAt: new Date() },
+    });
+
+    await create({}, formData({ name: "Noodle House", notes: "@alice try this" }));
+    const [created] = await getDb().select().from(restaurants);
+    await markVisited({}, formData({ id: created!.id, visitNote: "@bob loved it" }));
+
+    vi.mocked(emitMentions).mockClear();
+
+    await update(
+      {},
+      formData({
+        id: created!.id,
+        name: "Noodle House",
+        notes: "@alice try this",
+        visitNote: "@bob loved it and @carol too",
+      }),
+    );
+
+    expect(emitMentions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: "@alice try this\n\n@bob loved it and @carol too",
+        entityType: "restaurant",
+        entityId: created!.id,
+      }),
+    );
+  });
+
+  it("removes stale mentions when mention text is cleared", async () => {
+    const user = await createTestUser();
+    requireUser.mockResolvedValue({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        disabledAt: user.disabledAt,
+      },
+      session: { id: "session-1", userId: user.id, expiresAt: new Date() },
+    });
+
+    await create({}, formData({ name: "Clear Test", notes: "@alice check" }));
+    const [created] = await getDb().select().from(restaurants);
+
+    vi.mocked(emitMentions).mockClear();
+
+    await update(
+      {},
+      formData({
+        id: created!.id,
+        name: "Clear Test",
+        notes: "",
+      }),
+    );
+
+    expect(emitMentions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: "",
+        entityType: "restaurant",
+        entityId: created!.id,
+      }),
+    );
+  });
+
+  it("filters restaurants by neighborhood and added-by user", async () => {
+    const alice = await createTestUser({ username: "alice", displayName: "Alice" });
+    const bob = await createTestUser({ username: "bob", displayName: "Bob" });
+
+    requireUser.mockResolvedValue({
+      user: {
+        id: alice.id,
+        username: alice.username,
+        displayName: alice.displayName,
+        role: alice.role,
+        disabledAt: alice.disabledAt,
+      },
+      session: { id: "session-1", userId: alice.id, expiresAt: new Date() },
+    });
+
+    await create({}, formData({ name: "Downtown A", neighborhood: "Downtown" }));
+    requireUser.mockResolvedValue({
+      user: {
+        id: bob.id,
+        username: bob.username,
+        displayName: bob.displayName,
+        role: bob.role,
+        disabledAt: bob.disabledAt,
+      },
+      session: { id: "session-2", userId: bob.id, expiresAt: new Date() },
+    });
+    await create({}, formData({ name: "Uptown B", neighborhood: "Uptown" }));
+    await create({}, formData({ name: "Downtown C", neighborhood: "Downtown" }));
+
+    const downtown = await listRestaurants({ neighborhood: "Downtown" });
+    expect(downtown).toHaveLength(2);
+    expect(downtown.every((row) => row.neighborhood === "Downtown")).toBe(true);
+
+    const byBob = await listRestaurants({ addedBy: bob.id });
+    expect(byBob).toHaveLength(2);
+    expect(byBob.every((row) => row.addedByName === "Bob")).toBe(true);
   });
 
   it("filters restaurants by status and sorts by rating", async () => {

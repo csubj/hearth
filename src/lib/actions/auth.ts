@@ -1,12 +1,18 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { getLucia } from "@/lib/auth/lucia";
-import { hashPassword, validatePasswordPolicy, verifyPassword } from "@/lib/auth/password";
+import {
+  hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  validatePasswordPolicy,
+  verifyPassword,
+} from "@/lib/auth/password";
 import { requireUser } from "@/lib/auth/session";
 
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
@@ -15,6 +21,24 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
 function loginKey(username: string, ip: string): string {
   return `${username.toLowerCase()}:${ip}`;
+}
+
+let dummyPasswordHash: string | undefined;
+
+async function getDummyPasswordHash(): Promise<string> {
+  if (!dummyPasswordHash) {
+    dummyPasswordHash = await hashPassword("hearth-timing-dummy");
+  }
+  return dummyPasswordHash;
+}
+
+async function getClientIp(): Promise<string> {
+  const headerList = await headers();
+  return (
+    headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    headerList.get("x-real-ip") ??
+    "unknown"
+  );
 }
 
 function checkRateLimit(key: string): boolean {
@@ -39,7 +63,7 @@ export async function login(_prev: AuthActionState, formData: FormData): Promise
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const returnTo = String(formData.get("returnTo") ?? "/");
-  const ip = String(formData.get("ip") ?? "unknown");
+  const ip = await getClientIp();
 
   if (!username || !password) {
     return { error: "Username and password are required" };
@@ -52,13 +76,20 @@ export async function login(_prev: AuthActionState, formData: FormData): Promise
   const db = getDb();
   const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
 
+  const invalidCredentials = { error: "Invalid username or password" } as const;
+
   if (!user || user.disabledAt) {
-    return { error: "Invalid username or password" };
+    await verifyPassword(password, await getDummyPasswordHash());
+    return invalidCredentials;
+  }
+
+  if (password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
+    return invalidCredentials;
   }
 
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) {
-    return { error: "Invalid username or password" };
+    return invalidCredentials;
   }
 
   const lucia = getLucia();
@@ -127,5 +158,5 @@ export async function changePassword(
   const sessionCookie = lucia.createSessionCookie(session.id);
   (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
-  redirect("/settings?toast=Password updated");
+  redirect("/settings?changed=1");
 }

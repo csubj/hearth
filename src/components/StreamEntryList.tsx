@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { updateEntry } from "@/lib/actions/stream";
+import type { MentionUser } from "@/components/MentionTextarea";
 import { Attachments } from "@/components/Attachments";
 import { StreamEntryActions } from "@/components/StreamEntryActions";
 import { StreamEntryEditForm } from "@/components/StreamEntryEditForm";
@@ -26,9 +27,11 @@ function formatWhen(date: Date): string {
 function StreamEntryRow({
   entry,
   showActions,
+  users,
 }: {
   entry: StreamEntryWithAuthor;
   showActions: boolean;
+  users: MentionUser[];
 }) {
   const isDone = Boolean(entry.doneAt);
 
@@ -72,7 +75,7 @@ function StreamEntryRow({
         <details className="mt-3">
           <summary className="cursor-pointer text-sm text-text-muted hover:text-text">Edit</summary>
           <div className="mt-2">
-            <StreamEntryEditForm entry={entry} action={updateEntry} />
+            <StreamEntryEditForm entry={entry} action={updateEntry} users={users} />
           </div>
         </details>
       ) : null}
@@ -90,11 +93,13 @@ export function StreamEntryList({
   doneEntries,
   emptyMessage = "Nothing here yet. Add a note above.",
   showActions = true,
+  users = [],
 }: {
   openEntries: StreamEntryWithAuthor[];
   doneEntries?: StreamEntryWithAuthor[];
   emptyMessage?: string;
   showActions?: boolean;
+  users?: MentionUser[];
 }) {
   const hasDone = doneEntries && doneEntries.length > 0;
 
@@ -108,7 +113,7 @@ export function StreamEntryList({
         <ul className="space-y-3">
           {openEntries.map((entry) => (
             <li key={entry.id}>
-              <StreamEntryRow entry={entry} showActions={showActions} />
+              <StreamEntryRow entry={entry} showActions={showActions} users={users} />
             </li>
           ))}
         </ul>
@@ -119,7 +124,7 @@ export function StreamEntryList({
           <ul className="space-y-3">
             {doneEntries!.map((entry) => (
               <li key={entry.id}>
-                <StreamEntryRow entry={entry} showActions={showActions} />
+                <StreamEntryRow entry={entry} showActions={showActions} users={users} />
               </li>
             ))}
           </ul>

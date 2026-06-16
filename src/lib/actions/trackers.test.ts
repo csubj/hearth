@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { trackerEntries, trackers } from "@/db/schema";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser } from "@/lib/auth/test-helpers";
+import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import {
   STALE_THRESHOLD_MS,
   addEntryRecord,
@@ -16,6 +17,17 @@ import {
   listTrackersWithLatest,
   updateTrackerRecord,
 } from "@/lib/actions/trackers";
+
+const mockRequireUser = vi.fn();
+
+vi.mock("@/lib/auth/session", () => ({
+  requireUser: () => mockRequireUser(),
+}));
+
+vi.mock("@/lib/notifications/emit", () => ({
+  emitHouseholdActivity: vi.fn(),
+  emitMentions: vi.fn(),
+}));
 
 function resetTestDb(): void {
   resetDbForTests();
@@ -44,10 +56,35 @@ describe("isTrackerStale", () => {
 describe("tracker records", () => {
   beforeEach(() => {
     resetTestDb();
+    vi.clearAllMocks();
+  });
+
+  function mockSession(user: Awaited<ReturnType<typeof createTestUser>>) {
+    mockRequireUser.mockResolvedValue({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        disabledAt: user.disabledAt,
+      },
+      session: { id: "session-1", userId: user.id, expiresAt: new Date() },
+    });
+  }
+
+  it("requires authentication for read helpers", async () => {
+    mockRequireUser.mockImplementation(() => {
+      throw new Error("REDIRECT:/login");
+    });
+
+    await expect(listTrackersWithLatest()).rejects.toThrow("REDIRECT:/login");
+    await expect(getTrackerWithEntries(crypto.randomUUID())).rejects.toThrow("REDIRECT:/login");
+    await expect(getTrackersHomeSummary()).rejects.toThrow("REDIRECT:/login");
   });
 
   it("creates a tracker and lists it with no latest entry", async () => {
     const user = await createTestUser();
+    mockSession(user);
     const tracker = await createTrackerRecord(user.id, { name: "Flora's weight", unit: "lbs" });
 
     const items = await listTrackersWithLatest();
@@ -59,7 +96,8 @@ describe("tracker records", () => {
   });
 
   it("adds dated entries with value and note", async () => {
-    const user = await createTestUser();
+    const user = await createTestUser({ displayName: "Alice" });
+    mockSession(user);
     const tracker = await createTrackerRecord(user.id, { name: "Water meter", unit: "gal" });
     const recordedAt = new Date("2026-06-01T12:00:00");
 
@@ -71,6 +109,12 @@ describe("tracker records", () => {
     });
 
     expect(result).not.toBeNull();
+    expect(emitHouseholdActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "tracker.entry_added",
+        summary: "Alice logged 1234 gal on Water meter",
+      }),
+    );
     const detail = await getTrackerWithEntries(tracker.id);
     expect(detail?.entries).toHaveLength(1);
     expect(detail?.entries[0]?.value).toBe("1234");
@@ -80,6 +124,7 @@ describe("tracker records", () => {
 
   it("updates tracker name and unit", async () => {
     const user = await createTestUser();
+    mockSession(user);
     const tracker = await createTrackerRecord(user.id, { name: "Old name", unit: "kg" });
 
     const updated = await updateTrackerRecord(user.id, {
@@ -94,6 +139,7 @@ describe("tracker records", () => {
 
   it("returns entries sorted by recorded_at descending", async () => {
     const user = await createTestUser();
+    mockSession(user);
     const tracker = await createTrackerRecord(user.id, { name: "Scale" });
 
     await addEntryRecord(user.id, {
@@ -113,6 +159,7 @@ describe("tracker records", () => {
 
   it("summarizes home trackers with stale items first", async () => {
     const user = await createTestUser();
+    mockSession(user);
     const fresh = await createTrackerRecord(user.id, { name: "Fresh" });
     const stale = await createTrackerRecord(user.id, { name: "Stale" });
 
@@ -135,6 +182,7 @@ describe("tracker records", () => {
 
   it("cascades entry deletion when tracker is removed", async () => {
     const user = await createTestUser();
+    mockSession(user);
     const tracker = await createTrackerRecord(user.id, { name: "Temp" });
     await addEntryRecord(user.id, { trackerId: tracker.id, value: "1" });
 

@@ -1,9 +1,14 @@
 import { EventCreateForm } from "@/components/events/EventCreateForm";
 import { EventList } from "@/components/events/EventList";
 import { listPastEvents, listUpcomingEvents } from "@/lib/actions/events";
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export default async function EventsPage() {
-  const [upcoming, past] = await Promise.all([listUpcomingEvents(), listPastEvents()]);
+  const [upcoming, past, mentionUsers] = await Promise.all([
+    listUpcomingEvents(),
+    listPastEvents(),
+    loadMentionUsers(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -14,11 +19,16 @@ export default async function EventsPage() {
         </p>
       </header>
 
-      <EventCreateForm />
+      <EventCreateForm users={mentionUsers} />
 
-      <EventList title="Upcoming" events={upcoming} emptyMessage="Nothing on the calendar yet." />
+      <EventList
+        title="Upcoming"
+        events={upcoming}
+        emptyMessage="Nothing on the calendar yet."
+        users={mentionUsers}
+      />
 
-      <EventList title="Past" events={past} emptyMessage="No past events." muted />
+      <EventList title="Past" events={past} emptyMessage="No past events." muted users={mentionUsers} />
     </div>
   );
 }

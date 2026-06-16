@@ -132,14 +132,12 @@ export async function update(
     })
     .where(eq(projects.id, id));
 
-  if (description) {
-    await emitMentions({
-      body: description,
-      entityType: "project",
-      entityId: id,
-      actorId: user.id,
-    });
-  }
+  await emitMentions({
+    body: description ?? "",
+    entityType: "project",
+    entityId: id,
+    actorId: user.id,
+  });
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);

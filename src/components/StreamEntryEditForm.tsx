@@ -1,23 +1,25 @@
 "use client";
 
 import { useActionState } from "react";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import type { StreamActionState } from "@/lib/actions/stream";
 import type { StreamEntryWithAuthor } from "@/components/StreamEntryList";
 
 export function StreamEntryEditForm({
   entry,
   action,
+  users = [],
 }: {
   entry: StreamEntryWithAuthor;
   action: (prev: StreamActionState, formData: FormData) => Promise<StreamActionState>;
+  users?: MentionUser[];
 }) {
   const [state, formAction, pending] = useActionState<StreamActionState, FormData>(action, {});
 
   return (
     <form action={formAction} className="space-y-2">
       <input type="hidden" name="id" value={entry.id} />
-      <MentionTextarea name="body" defaultValue={entry.body} rows={3} required />
+      <MentionTextarea name="body" users={users} defaultValue={entry.body} rows={3} required />
       <input
         name="roughWhen"
         type="text"

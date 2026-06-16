@@ -1,7 +1,7 @@
-import type { Restaurant } from "@/db/schema";
+import type { RestaurantListItem } from "@/lib/actions/restaurants";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
 
-export function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
+export function RestaurantList({ restaurants }: { restaurants: RestaurantListItem[] }) {
   if (restaurants.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">

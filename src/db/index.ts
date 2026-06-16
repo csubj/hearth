@@ -16,6 +16,7 @@ export function getDb(): BetterSQLite3Database<typeof schema> {
   if (!instance) {
     const pathOrMemory = resolveDatabasePath();
     const sqlite = new Database(pathOrMemory);
+    sqlite.pragma("foreign_keys = ON");
     instance = drizzle(sqlite, { schema });
   }
   return instance;

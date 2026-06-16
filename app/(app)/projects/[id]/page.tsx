@@ -8,10 +8,15 @@ import { projects } from "@/db/schema";
 import { ProjectDetailForm } from "@/components/projects/ProjectDetailForm";
 import { ProjectStatusActions } from "@/components/projects/ProjectStatusActions";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [project] = await getDb().select().from(projects).where(eq(projects.id, id)).limit(1);
+  const [projectRow, mentionUsers] = await Promise.all([
+    getDb().select().from(projects).where(eq(projects.id, id)).limit(1),
+    loadMentionUsers(),
+  ]);
+  const [project] = projectRow;
 
   if (!project) {
     notFound();
@@ -45,6 +50,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               title: project.title,
               description: project.description,
             }}
+            users={mentionUsers}
           />
         </div>
       </section>

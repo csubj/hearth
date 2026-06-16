@@ -32,6 +32,12 @@ pnpm-error.log*
 .DS_Store
 Thumbs.db
 
+# MkDocs build output
+site/
+
+# Git worktrees (parallel audit branches)
+.worktrees/
+
 # Editors (local settings)
 .idea/
 *.swp

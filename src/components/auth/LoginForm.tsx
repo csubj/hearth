@@ -3,13 +3,12 @@
 import { useActionState } from "react";
 import { login, type AuthActionState } from "@/lib/actions/auth";
 
-export function LoginForm({ returnTo, ip }: { returnTo: string; ip: string }) {
+export function LoginForm({ returnTo }: { returnTo: string }) {
   const [state, formAction, pending] = useActionState<AuthActionState, FormData>(login, {});
 
   return (
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="returnTo" value={returnTo} />
-      <input type="hidden" name="ip" value={ip} />
       <div>
         <label htmlFor="username" className="block text-sm font-medium text-text">
           Username

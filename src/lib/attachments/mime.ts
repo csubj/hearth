@@ -53,3 +53,35 @@ export function detectImageMime(buffer: Buffer): MimeValidationResult {
 export function isAllowedMimeType(mimeType: string): mimeType is AllowedMimeType {
   return (ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType);
 }
+
+const FILENAME_EXT_TO_CANONICAL: Record<string, string> = {
+  jpg: "jpg",
+  jpeg: "jpg",
+  png: "png",
+  gif: "gif",
+  webp: "webp",
+};
+
+export function parseFilenameExtension(filename: string): string | null {
+  const base = filename.split(/[/\\]/).pop() ?? filename;
+  const dot = base.lastIndexOf(".");
+  if (dot <= 0 || dot === base.length - 1) {
+    return null;
+  }
+  return base.slice(dot + 1).toLowerCase();
+}
+
+export function filenameExtensionMatchesDetected(
+  filename: string,
+  detectedExtension: string,
+): boolean {
+  const extension = parseFilenameExtension(filename);
+  if (!extension) {
+    return true;
+  }
+  const canonical = FILENAME_EXT_TO_CANONICAL[extension];
+  if (!canonical) {
+    return false;
+  }
+  return canonical === detectedExtension;
+}

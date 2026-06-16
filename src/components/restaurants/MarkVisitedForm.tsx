@@ -1,11 +1,17 @@
 "use client";
 
 import { useActionState } from "react";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import type { Restaurant } from "@/db/schema";
 import { markVisited, type RestaurantActionState } from "@/lib/actions/restaurants";
 
-export function MarkVisitedForm({ restaurant }: { restaurant: Restaurant }) {
+export function MarkVisitedForm({
+  restaurant,
+  users = [],
+}: {
+  restaurant: Restaurant;
+  users?: MentionUser[];
+}) {
   const [state, formAction, pending] = useActionState<RestaurantActionState, FormData>(
     markVisited,
     {},
@@ -42,6 +48,7 @@ export function MarkVisitedForm({ restaurant }: { restaurant: Restaurant }) {
         <MentionTextarea
           id="visit-note"
           name="visitNote"
+          users={users}
           rows={3}
           placeholder="How was it?"
           className="mt-1 text-sm"

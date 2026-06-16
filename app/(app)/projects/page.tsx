@@ -4,6 +4,7 @@ import { projects } from "@/db/schema";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectCreateForm } from "@/components/projects/ProjectCreateForm";
 import type { ProjectListItem } from "@/components/projects/ProjectCard";
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 function toListItem(row: typeof projects.$inferSelect): ProjectListItem {
   return {
@@ -16,7 +17,10 @@ function toListItem(row: typeof projects.$inferSelect): ProjectListItem {
 }
 
 export default async function ProjectsPage() {
-  const rows = await getDb().select().from(projects).orderBy(desc(projects.updatedAt));
+  const [rows, mentionUsers] = await Promise.all([
+    getDb().select().from(projects).orderBy(desc(projects.updatedAt)),
+    loadMentionUsers(),
+  ]);
   const items = rows.map(toListItem);
 
   const inProgress = items.filter((p) => p.status === "in_progress");
@@ -31,7 +35,7 @@ export default async function ProjectsPage() {
       </header>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <ProjectCreateForm />
+        <ProjectCreateForm users={mentionUsers} />
       </section>
 
       {items.length === 0 ? (

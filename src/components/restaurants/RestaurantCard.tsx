@@ -1,13 +1,13 @@
 import Link from "next/link";
-import type { Restaurant } from "@/db/schema";
+import type { RestaurantListItem } from "@/lib/actions/restaurants";
 import { RestaurantStatusChip } from "@/components/restaurants/RestaurantStatusChip";
 import { StarRating } from "@/components/restaurants/StarRating";
 
-function locationLine(restaurant: Restaurant): string | null {
+function locationLine(restaurant: RestaurantListItem): string | null {
   return restaurant.neighborhood ?? restaurant.address ?? null;
 }
 
-export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
+export function RestaurantCard({ restaurant }: { restaurant: RestaurantListItem }) {
   const location = locationLine(restaurant);
 
   return (
@@ -19,6 +19,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
         <div className="min-w-0">
           <h3 className="truncate font-medium text-text">{restaurant.name}</h3>
           {location ? <p className="mt-0.5 text-sm text-text-muted">{location}</p> : null}
+          <p className="mt-0.5 text-xs text-text-muted">Added by {restaurant.addedByName}</p>
         </div>
         <RestaurantStatusChip status={restaurant.status} />
       </div>

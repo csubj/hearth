@@ -138,12 +138,12 @@ export async function updateEntry(
   return {};
 }
 
-export async function togglePin(formData: FormData): Promise<void> {
+export async function togglePin(formData: FormData): Promise<StreamActionState> {
   const { user } = await requireUser();
 
   const parsed = idSchema.safeParse({ id: formData.get("id") });
   if (!parsed.success) {
-    return;
+    return { error: "Invalid entry" };
   }
 
   const db = getDb();
@@ -154,7 +154,7 @@ export async function togglePin(formData: FormData): Promise<void> {
     .limit(1);
 
   if (!existing) {
-    return;
+    return { error: "Entry not found" };
   }
 
   const now = new Date();
@@ -168,14 +168,15 @@ export async function togglePin(formData: FormData): Promise<void> {
     .where(eq(streamEntries.id, parsed.data.id));
 
   revalidateStreamPaths();
+  return {};
 }
 
-export async function markDone(formData: FormData): Promise<void> {
+export async function markDone(formData: FormData): Promise<StreamActionState> {
   const { user } = await requireUser();
 
   const parsed = idSchema.safeParse({ id: formData.get("id") });
   if (!parsed.success) {
-    return;
+    return { error: "Invalid entry" };
   }
 
   const db = getDb();
@@ -185,8 +186,11 @@ export async function markDone(formData: FormData): Promise<void> {
     .where(eq(streamEntries.id, parsed.data.id))
     .limit(1);
 
-  if (!existing || existing.doneAt) {
-    return;
+  if (!existing) {
+    return { error: "Entry not found" };
+  }
+  if (existing.doneAt) {
+    return { error: "Entry is already done" };
   }
 
   const now = new Date();
@@ -209,4 +213,5 @@ export async function markDone(formData: FormData): Promise<void> {
   });
 
   revalidateStreamPaths();
+  return {};
 }

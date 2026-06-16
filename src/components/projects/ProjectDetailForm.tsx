@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { update, type ProjectActionState } from "@/lib/actions/projects";
 
 function ActionMessage({ state }: { state: ProjectActionState }) {
@@ -21,8 +21,10 @@ function ActionMessage({ state }: { state: ProjectActionState }) {
 
 export function ProjectDetailForm({
   project,
+  users = [],
 }: {
   project: { id: string; title: string; description: string | null };
+  users?: MentionUser[];
 }) {
   const [state, action, pending] = useActionState<ProjectActionState, FormData>(update, {});
 
@@ -48,6 +50,7 @@ export function ProjectDetailForm({
         <MentionTextarea
           id="description"
           name="description"
+          users={users}
           rows={5}
           defaultValue={project.description ?? ""}
           className="mt-1"

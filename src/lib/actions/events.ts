@@ -5,13 +5,15 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { events, type Event } from "@/db/schema";
-import { requireUser } from "@/lib/auth/session";
+import { displayName, requireUser } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 export type EventActionState = {
   error?: string;
   success?: string;
 };
+
+const eventIdSchema = z.string().uuid("Invalid event");
 
 const optionalText = z
   .string()
@@ -49,6 +51,7 @@ function revalidateEventPaths(): void {
 }
 
 export async function listUpcomingEvents(now = Date.now()): Promise<Event[]> {
+  await requireUser();
   const db = getDb();
   return db
     .select()
@@ -58,6 +61,7 @@ export async function listUpcomingEvents(now = Date.now()): Promise<Event[]> {
 }
 
 export async function listPastEvents(now = Date.now()): Promise<Event[]> {
+  await requireUser();
   const db = getDb();
   return db
     .select()
@@ -67,6 +71,7 @@ export async function listPastEvents(now = Date.now()): Promise<Event[]> {
 }
 
 export async function listHomeEvents(now = Date.now()): Promise<Event[]> {
+  await requireUser();
   const db = getDb();
   const horizon = now + 14 * 24 * 60 * 60 * 1000;
   return db
@@ -117,12 +122,13 @@ export async function createEvent(
     updatedAt: now,
   });
 
+  const actor = displayName(user);
   await emitHouseholdActivity({
     type: "event.created",
     actorId: user.id,
     entityType: "event",
     entityId: id,
-    summary: `added event "${parsed.data.title}"`,
+    summary: `${actor} added event "${parsed.data.title}"`,
   });
 
   if (parsed.data.note) {
@@ -143,11 +149,12 @@ export async function updateEvent(
   formData: FormData,
 ): Promise<EventActionState> {
   const { user } = await requireUser();
-  const eventId = String(formData.get("eventId") ?? "");
 
-  if (!eventId) {
-    return { error: "Event is required" };
+  const parsedId = eventIdSchema.safeParse(String(formData.get("eventId") ?? ""));
+  if (!parsedId.success) {
+    return { error: parsedId.error.errors[0]?.message ?? "Invalid event" };
   }
+  const eventId = parsedId.data;
 
   const parsed = eventFieldsSchema.safeParse({
     title: formData.get("title"),
@@ -186,22 +193,21 @@ export async function updateEvent(
     return { error: "Event not found" };
   }
 
+  const actor = displayName(user);
   await emitHouseholdActivity({
     type: "event.updated",
     actorId: user.id,
     entityType: "event",
     entityId: eventId,
-    summary: `updated event "${updated[0]!.title}"`,
+    summary: `${actor} updated event "${updated[0]!.title}"`,
   });
 
-  if (parsed.data.note) {
-    await emitMentions({
-      body: parsed.data.note,
-      entityType: "event",
-      entityId: eventId,
-      actorId: user.id,
-    });
-  }
+  await emitMentions({
+    body: parsed.data.note ?? "",
+    entityType: "event",
+    entityId: eventId,
+    actorId: user.id,
+  });
 
   revalidateEventPaths();
   return { success: "Event updated" };
@@ -212,11 +218,12 @@ export async function deleteEvent(
   formData: FormData,
 ): Promise<EventActionState> {
   await requireUser();
-  const eventId = String(formData.get("eventId") ?? "");
 
-  if (!eventId) {
-    return { error: "Event is required" };
+  const parsedId = eventIdSchema.safeParse(String(formData.get("eventId") ?? ""));
+  if (!parsedId.success) {
+    return { error: parsedId.error.errors[0]?.message ?? "Invalid event" };
   }
+  const eventId = parsedId.data;
 
   const db = getDb();
   const deleted = await db

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { addEntry, type TrackerActionState } from "@/lib/actions/trackers-mutations";
 
 function defaultRecordedAtValue(): string {
@@ -11,7 +11,13 @@ function defaultRecordedAtValue(): string {
   return local.toISOString().slice(0, 16);
 }
 
-export function AddEntryForm({ trackerId }: { trackerId: string }) {
+export function AddEntryForm({
+  trackerId,
+  users = [],
+}: {
+  trackerId: string;
+  users?: MentionUser[];
+}) {
   const [state, formAction, pending] = useActionState<TrackerActionState, FormData>(addEntry, {});
 
   return (
@@ -45,7 +51,7 @@ export function AddEntryForm({ trackerId }: { trackerId: string }) {
         <label htmlFor="entry-note" className="block text-sm font-medium text-text">
           Note <span className="font-normal text-text-muted">(optional)</span>
         </label>
-        <MentionTextarea id="entry-note" name="note" rows={3} className="mt-1 text-sm" />
+        <MentionTextarea id="entry-note" name="note" users={users} rows={3} className="mt-1 text-sm" />
       </div>
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">

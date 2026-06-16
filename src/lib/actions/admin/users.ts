@@ -4,10 +4,15 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
-import { canDemoteAdmin, canDisableUser } from "@/lib/auth/admin-guards";
+import {
+  AdminGuardError,
+  assertCanDemoteAdmin,
+  assertCanDisableUser,
+} from "@/lib/auth/admin-guards";
 import { getLucia } from "@/lib/auth/lucia";
 import { hashPassword, validatePasswordPolicy } from "@/lib/auth/password";
-import { requireAdmin } from "@/lib/auth/session";
+import { displayName, requireAdmin } from "@/lib/auth/session";
+import { emitHouseholdActivity } from "@/lib/notifications/emit";
 
 export type AdminActionState = {
   error?: string;
@@ -18,11 +23,11 @@ export async function createUser(
   _prev: AdminActionState,
   formData: FormData,
 ): Promise<AdminActionState> {
-  await requireAdmin();
+  const { user: admin } = await requireAdmin();
 
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const displayName = String(formData.get("displayName") ?? "").trim() || null;
+  const displayNameInput = String(formData.get("displayName") ?? "").trim() || null;
   const role = String(formData.get("role") ?? "member") as "member" | "admin";
 
   if (!username || !password) {
@@ -48,15 +53,24 @@ export async function createUser(
   }
 
   const now = new Date();
+  const userId = crypto.randomUUID();
   const passwordHash = await hashPassword(password);
   await db.insert(users).values({
-    id: crypto.randomUUID(),
+    id: userId,
     username,
-    displayName,
+    displayName: displayNameInput,
     passwordHash,
     role,
     createdAt: now,
     updatedAt: now,
+  });
+
+  await emitHouseholdActivity({
+    type: "user.admin_action",
+    actorId: admin.id,
+    entityType: "stream_entry",
+    entityId: userId,
+    summary: `${displayName(admin)} created user @${username}`,
   });
 
   revalidatePath("/admin/users");
@@ -67,7 +81,7 @@ export async function resetUserPassword(
   _prev: AdminActionState,
   formData: FormData,
 ): Promise<AdminActionState> {
-  await requireAdmin();
+  const { user: admin } = await requireAdmin();
 
   const userId = String(formData.get("userId") ?? "");
   const password = String(formData.get("password") ?? "");
@@ -95,6 +109,15 @@ export async function resetUserPassword(
   }
 
   await getLucia().invalidateUserSessions(userId);
+
+  await emitHouseholdActivity({
+    type: "user.admin_action",
+    actorId: admin.id,
+    entityType: "stream_entry",
+    entityId: userId,
+    summary: `${displayName(admin)} reset password for @${updated[0]!.username}`,
+  });
+
   revalidatePath("/admin/users");
   return { success: `Password reset for "${updated[0]!.username}"` };
 }
@@ -111,22 +134,43 @@ export async function disableUser(
   }
 
   const db = getDb();
-  const [target] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  if (!target) {
-    return { error: "User not found" };
-  }
-
-  const guard = await canDisableUser(target, admin.id);
-  if (!guard.ok) {
-    return { error: guard.error };
-  }
-
   const now = new Date();
-  await db.update(users).set({ disabledAt: now, updatedAt: now }).where(eq(users.id, userId));
+  let targetUsername: string | undefined;
+
+  try {
+    db.transaction((tx) => {
+      const [target] = tx.select().from(users).where(eq(users.id, userId)).limit(1).all();
+      if (!target) {
+        throw new AdminGuardError("User not found");
+      }
+
+      assertCanDisableUser(tx, target, admin.id);
+      targetUsername = target.username;
+
+      tx.update(users)
+        .set({ disabledAt: now, updatedAt: now })
+        .where(eq(users.id, userId))
+        .run();
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) {
+      return { error: error.guardError };
+    }
+    throw error;
+  }
 
   await getLucia().invalidateUserSessions(userId);
+
+  await emitHouseholdActivity({
+    type: "user.admin_action",
+    actorId: admin.id,
+    entityType: "stream_entry",
+    entityId: userId,
+    summary: `${displayName(admin)} disabled user @${targetUsername}`,
+  });
+
   revalidatePath("/admin/users");
-  return { success: `User "${target.username}" disabled` };
+  return { success: `User "${targetUsername}" disabled` };
 }
 
 export async function enableUser(
@@ -160,7 +204,7 @@ export async function promoteToAdmin(
   _prev: AdminActionState,
   formData: FormData,
 ): Promise<AdminActionState> {
-  await requireAdmin();
+  const { user: admin } = await requireAdmin();
   const userId = String(formData.get("userId") ?? "");
 
   if (!userId) {
@@ -180,6 +224,14 @@ export async function promoteToAdmin(
   const now = new Date();
   await db.update(users).set({ role: "admin", updatedAt: now }).where(eq(users.id, userId));
 
+  await emitHouseholdActivity({
+    type: "user.admin_action",
+    actorId: admin.id,
+    entityType: "stream_entry",
+    entityId: userId,
+    summary: `${displayName(admin)} promoted @${target.username} to admin`,
+  });
+
   revalidatePath("/admin/users");
   return { success: `"${target.username}" promoted to admin` };
 }
@@ -196,19 +248,36 @@ export async function demoteFromAdmin(
   }
 
   const db = getDb();
-  const [target] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  if (!target) {
-    return { error: "User not found" };
-  }
-
-  const guard = await canDemoteAdmin(target, admin.id);
-  if (!guard.ok) {
-    return { error: guard.error };
-  }
-
   const now = new Date();
-  await db.update(users).set({ role: "member", updatedAt: now }).where(eq(users.id, userId));
+  let targetUsername: string | undefined;
+
+  try {
+    db.transaction((tx) => {
+      const [target] = tx.select().from(users).where(eq(users.id, userId)).limit(1).all();
+      if (!target) {
+        throw new AdminGuardError("User not found");
+      }
+
+      assertCanDemoteAdmin(tx, target, admin.id);
+      targetUsername = target.username;
+
+      tx.update(users).set({ role: "member", updatedAt: now }).where(eq(users.id, userId)).run();
+    });
+  } catch (error) {
+    if (error instanceof AdminGuardError) {
+      return { error: error.guardError };
+    }
+    throw error;
+  }
+
+  await emitHouseholdActivity({
+    type: "user.admin_action",
+    actorId: admin.id,
+    entityType: "stream_entry",
+    entityId: userId,
+    summary: `${displayName(admin)} demoted @${targetUsername} to member`,
+  });
 
   revalidatePath("/admin/users");
-  return { success: `"${target.username}" demoted to member` };
+  return { success: `"${targetUsername}" demoted to member` };
 }

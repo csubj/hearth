@@ -3,13 +3,21 @@
 import { useActionState, useState } from "react";
 import type { Event } from "@/db/schema";
 import { deleteEvent, updateEvent, type EventActionState } from "@/lib/actions/events";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { formatEventDate, toDatetimeLocalValue } from "@/components/events/format";
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none";
 
-export function EventCard({ event, muted = false }: { event: Event; muted?: boolean }) {
+export function EventCard({
+  event,
+  muted = false,
+  users = [],
+}: {
+  event: Event;
+  muted?: boolean;
+  users?: MentionUser[];
+}) {
   const [editing, setEditing] = useState(false);
   const [updateState, updateAction, updatePending] = useActionState<EventActionState, FormData>(
     updateEvent,
@@ -67,6 +75,7 @@ export function EventCard({ event, muted = false }: { event: Event; muted?: bool
             <label className="block text-sm font-medium text-text">Note</label>
             <MentionTextarea
               name="note"
+              users={users}
               rows={2}
               defaultValue={event.note ?? ""}
               className="mt-1 text-sm"

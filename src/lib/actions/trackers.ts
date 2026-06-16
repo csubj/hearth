@@ -1,7 +1,8 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
-import { trackerEntries, trackers, type Tracker, type TrackerEntry } from "@/db/schema";
+import { trackerEntries, trackers, users, type Tracker, type TrackerEntry } from "@/db/schema";
+import { requireUser } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 export const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
@@ -61,16 +62,27 @@ function formatTrackerValue(value: string, unit: string | null): string {
   return unit ? `${value} ${unit}` : value;
 }
 
-async function getLatestEntriesByTracker(): Promise<Map<string, TrackerEntry>> {
-  const db = getDb();
-  const rows = await db.select().from(trackerEntries).orderBy(desc(trackerEntries.recordedAt));
+async function getLatestEntryForTracker(trackerId: string): Promise<TrackerEntry | null> {
+  const [entry] = await getDb()
+    .select()
+    .from(trackerEntries)
+    .where(eq(trackerEntries.trackerId, trackerId))
+    .orderBy(desc(trackerEntries.recordedAt), desc(trackerEntries.createdAt))
+    .limit(1);
 
+  return entry ?? null;
+}
+
+async function getLatestEntriesByTracker(trackerIds: string[]): Promise<Map<string, TrackerEntry>> {
   const latest = new Map<string, TrackerEntry>();
-  for (const row of rows) {
-    if (!latest.has(row.trackerId)) {
-      latest.set(row.trackerId, row);
-    }
-  }
+  await Promise.all(
+    trackerIds.map(async (trackerId) => {
+      const entry = await getLatestEntryForTracker(trackerId);
+      if (entry) {
+        latest.set(trackerId, entry);
+      }
+    }),
+  );
   return latest;
 }
 
@@ -83,9 +95,10 @@ function toTrackerListItem(tracker: Tracker, latestEntry: TrackerEntry | null): 
 }
 
 export async function listTrackersWithLatest(): Promise<TrackerListItem[]> {
+  await requireUser();
   const db = getDb();
   const allTrackers = await db.select().from(trackers).orderBy(desc(trackers.updatedAt));
-  const latestByTracker = await getLatestEntriesByTracker();
+  const latestByTracker = await getLatestEntriesByTracker(allTrackers.map((tracker) => tracker.id));
 
   return allTrackers.map((tracker) =>
     toTrackerListItem(tracker, latestByTracker.get(tracker.id) ?? null),
@@ -95,6 +108,7 @@ export async function listTrackersWithLatest(): Promise<TrackerListItem[]> {
 export async function getTrackerWithEntries(
   trackerId: string,
 ): Promise<{ tracker: Tracker; entries: TrackerEntry[] } | null> {
+  await requireUser();
   const db = getDb();
   const [tracker] = await db.select().from(trackers).where(eq(trackers.id, trackerId)).limit(1);
   if (!tracker) {
@@ -111,6 +125,7 @@ export async function getTrackerWithEntries(
 }
 
 export async function getTrackersHomeSummary(limit = 5): Promise<TrackerHomeItem[]> {
+  await requireUser();
   const items = await listTrackersWithLatest();
   return items
     .sort((a, b) => {
@@ -184,6 +199,13 @@ export async function addEntryRecord(
     return null;
   }
 
+  const [actor] = await db
+    .select({ username: users.username, displayName: users.displayName })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  const actorName = actor ? (actor.displayName ?? actor.username) : "Someone";
+
   const now = new Date();
   const recordedAt = input.recordedAt ?? now;
   const entry: TrackerEntry = {
@@ -204,7 +226,7 @@ export async function addEntryRecord(
     actorId: userId,
     entityType: "tracker_entry",
     entityId: entry.id,
-    summary: `logged ${formatTrackerValue(entry.value, tracker.unit)} on ${tracker.name}`,
+    summary: `${actorName} logged ${formatTrackerValue(entry.value, tracker.unit)} on ${tracker.name}`,
   });
 
   if (entry.note) {

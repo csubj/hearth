@@ -13,7 +13,7 @@ import {
   listUpcomingEvents,
   updateEvent,
 } from "@/lib/actions/events";
-import { requireUser } from "@/lib/auth/session";
+import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -21,7 +21,16 @@ vi.mock("next/cache", () => ({
 
 vi.mock("@/lib/auth/session", () => ({
   requireUser: vi.fn(),
+  displayName: (user: { displayName: string | null; username: string }) =>
+    user.displayName ?? user.username,
 }));
+
+vi.mock("@/lib/notifications/emit", () => ({
+  emitHouseholdActivity: vi.fn(),
+  emitMentions: vi.fn(),
+}));
+
+import { requireUser } from "@/lib/auth/session";
 
 function resetTestDb(): void {
   resetDbForTests();
@@ -126,6 +135,13 @@ describe("event actions", () => {
     expect(rows[0]!.startsAt.getTime()).toBe(startsAt.getTime());
     expect(rows[0]!.createdByUserId).toBe(user.id);
     expect(rows[0]!.updatedByUserId).toBe(user.id);
+
+    expect(emitHouseholdActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "event.created",
+        summary: expect.stringContaining('added event "Block party"'),
+      }),
+    );
   });
 
   it("rejects missing title", async () => {
@@ -145,6 +161,28 @@ describe("event actions", () => {
 
     expect(result.error).toBe("Title is required");
     expect(await getDb().select().from(events)).toHaveLength(0);
+  });
+
+  it("creates an event with actor name in summary", async () => {
+    const user = await createTestUser({ displayName: "Alice" });
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
+
+    await createEvent(
+      {},
+      formData({
+        title: "Picnic",
+        startsAt: toLocalInput(new Date("2026-07-04T18:00:00")),
+      }),
+    );
+
+    expect(emitHouseholdActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        summary: 'Alice added event "Picnic"',
+      }),
+    );
   });
 
   it("updates an existing event", async () => {
@@ -176,6 +214,39 @@ describe("event actions", () => {
     expect(row!.startsAt.getTime()).toBe(newStart.getTime());
     expect(row!.location).toBe("Clinic");
     expect(row!.updatedByUserId).toBe(user.id);
+
+    expect(emitHouseholdActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "event.updated",
+        summary: `${user.username} updated event "Vet checkup"`,
+      }),
+    );
+    expect(emitMentions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: "",
+        entityType: "event",
+        entityId: event.id,
+      }),
+    );
+  });
+
+  it("rejects invalid event id on update", async () => {
+    const user = await createTestUser();
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
+
+    const result = await updateEvent(
+      {},
+      formData({
+        eventId: "not-a-uuid",
+        title: "Bad",
+        startsAt: toLocalInput(new Date("2026-07-04T18:00:00")),
+      }),
+    );
+
+    expect(result.error).toBe("Invalid event");
   });
 
   it("deletes an event", async () => {
@@ -191,15 +262,41 @@ describe("event actions", () => {
     expect(result.success).toBe("Event deleted");
     expect(await getDb().select().from(events)).toHaveLength(0);
   });
+
+  it("rejects invalid event id on delete", async () => {
+    const user = await createTestUser();
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
+
+    const result = await deleteEvent({}, formData({ eventId: "bad-id" }));
+    expect(result.error).toBe("Invalid event");
+  });
 });
 
 describe("event queries", () => {
   beforeEach(() => {
     resetTestDb();
+    vi.clearAllMocks();
+  });
+
+  it("requires authentication for list helpers", async () => {
+    vi.mocked(requireUser).mockImplementation(() => {
+      throw new Error("REDIRECT:/login");
+    });
+
+    await expect(listUpcomingEvents()).rejects.toThrow("REDIRECT:/login");
+    await expect(listPastEvents()).rejects.toThrow("REDIRECT:/login");
+    await expect(listHomeEvents()).rejects.toThrow("REDIRECT:/login");
   });
 
   it("lists upcoming events sorted ascending by starts_at", async () => {
     const user = await createTestUser();
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
     const now = Date.now();
     await insertEvent(user.id, {
       title: "Later",
@@ -220,6 +317,10 @@ describe("event queries", () => {
 
   it("lists past events sorted descending by starts_at", async () => {
     const user = await createTestUser();
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
     const now = Date.now();
     await insertEvent(user.id, {
       title: "Older",
@@ -240,6 +341,10 @@ describe("event queries", () => {
 
   it("lists home events within 14 days, limited to 5", async () => {
     const user = await createTestUser();
+    vi.mocked(requireUser).mockResolvedValue({
+      user: { ...user, disabledAt: user.disabledAt ?? null },
+      session: { id: "sess", userId: user.id, expiresAt: new Date(), fresh: true },
+    });
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
 

@@ -193,6 +193,26 @@ describe("stream actions", () => {
     expect(unpinned?.isPinned).toBe(false);
   });
 
+  it("returns errors from togglePin for invalid input", async () => {
+    const user = await createTestUser();
+    mockRequireUser.mockResolvedValue({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        disabledAt: null,
+      },
+      session: { id: "session-1" },
+    });
+
+    const invalid = await togglePin(formData({ id: "not-a-uuid" }));
+    expect(invalid.error).toBe("Invalid entry");
+
+    const missing = await togglePin(formData({ id: crypto.randomUUID() }));
+    expect(missing.error).toBe("Entry not found");
+  });
+
   it("marks an entry done", async () => {
     const user = await createTestUser({ displayName: "Cara" });
     mockRequireUser.mockResolvedValue({
@@ -222,6 +242,27 @@ describe("stream actions", () => {
         summary: "Cara marked a stream note done",
       }),
     );
+  });
+
+  it("returns errors from markDone when already done", async () => {
+    const user = await createTestUser();
+    mockRequireUser.mockResolvedValue({
+      user: {
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        disabledAt: null,
+      },
+      session: { id: "session-1" },
+    });
+
+    await createEntry({}, formData({ body: "Already done" }));
+    const [created] = await getDb().select().from(streamEntries);
+    await markDone(formData({ id: created!.id }));
+
+    const again = await markDone(formData({ id: created!.id }));
+    expect(again.error).toBe("Entry is already done");
   });
 
   it("home query returns pinned and recent open entries", async () => {

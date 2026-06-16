@@ -2,13 +2,13 @@
 
 import { useActionState } from "react";
 import { createEvent, type EventActionState } from "@/lib/actions/events";
-import { MentionTextarea } from "@/components/MentionTextarea";
+import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { defaultDatetimeLocalValue } from "@/components/events/format";
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none";
 
-export function EventCreateForm() {
+export function EventCreateForm({ users = [] }: { users?: MentionUser[] }) {
   const [state, formAction, pending] = useActionState<EventActionState, FormData>(createEvent, {});
 
   return (
@@ -75,6 +75,7 @@ export function EventCreateForm() {
           <MentionTextarea
             id="event-note"
             name="note"
+            users={users}
             rows={2}
             className="mt-1 text-sm"
             placeholder="Optional details"
