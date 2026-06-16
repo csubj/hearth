@@ -2,10 +2,14 @@
 
 A date-ordered list of things to go to or remember by calendar date — concerts, appointments, parties, and deadlines tied to a specific day.
 
+## Browsing events
+
+Go to **Events** (`/events`). The page leads with upcoming events in chronological order. Adding an event is a compact **New** button in the header, so what's coming up stays front and center.
+
 ## Adding an event
 
-1. Go to **Events** (`/events`)
-2. Create a new event with:
+1. Use the **New event** button in the header
+2. Fill in:
 
 | Field | Required | Notes |
 | ----- | -------- | ----- |

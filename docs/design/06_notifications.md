@@ -29,9 +29,11 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 | `restaurant.visited`     | Marked visited / rated             | All except actor                                         |
 | `project.created`        | New project                        | All except actor                                         |
 | `project.status_changed` | Status update                      | All except actor                                         |
-| `tracker.entry_added`    | New tracker entry                  | All except actor                                         |
+| `metric.entry_added`     | New metric entry                  | All except actor                                         |
 | `event.created`          | New event                          | All except actor                                         |
 | `event.updated`          | Event edit                         | All except actor                                         |
+| `inventory.created`      | New inventory item                 | All except actor                                         |
+| `inventory.updated`      | Inventory item edit                | All except actor                                         |
 | `mention`                | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
 | `user.admin_action`      | Admin create/disable/reset user    | All admins except actor (audit)                          |
 
@@ -64,6 +66,9 @@ Templates (actor display name interpolated):
 | `restaurant.created`     | `{actor} added {restaurant.name}`                |
 | `restaurant.visited`     | `{actor} visited {restaurant.name}`              |
 | `project.status_changed` | `{actor} moved "{project.title}" to In progress` |
+| `metric.entry_added`     | `{actor} logged {value} for {metric.name}`       |
+| `inventory.created`      | `{actor} added {inventory_item.name} to inventory` |
+| `inventory.updated`      | `{actor} updated {inventory_item.name}`          |
 | `mention`                | `{actor} mentioned you in a stream note`         |
 | `user.admin_action`      | `{actor} created user @{username}`               |
 
@@ -115,8 +120,9 @@ Fields supporting mentions in v1:
 - `stream_entries.body`
 - `restaurants.notes`, `restaurants.visit_note`
 - `projects.description`
-- `tracker_entries.note`
+- `metric_entries.note`
 - `events.note`
+- `inventory_items.notes`
 
 ---
 
@@ -129,8 +135,9 @@ Map `(entity_type, entity_id)` → route:
 | `stream_entry`              | `/stream#entry-{id}` or scroll via query |
 | `restaurant`                | `/restaurants/[id]`                      |
 | `project`                   | `/projects/[id]`                         |
-| `tracker` / `tracker_entry` | `/trackers/[trackerId]`                  |
+| `metric` / `metric_entry`   | `/metrics/[metricId]`                    |
 | `event`                     | `/events`                                |
+| `inventory_item`            | `/inventory/[id]`                        |
 
 Notification row click marks read and navigates.
 
@@ -197,9 +204,11 @@ notifications:
     - restaurant.visited
     - project.created
     - project.status_changed
-    - tracker.entry_added
+    - metric.entry_added
     - event.created
     - event.updated
+    - inventory.created
+    - inventory.updated
     - mention
     - user.admin_action
 ```

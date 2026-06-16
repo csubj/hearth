@@ -32,17 +32,23 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
     House projects from idea to done — fix the gate, paint the guest room, organize the garage.
 
-- :material-chart-line: **Trackers**
+- :material-chart-line: **Metrics**
 
     ---
 
-    Flexible lists for recurring measurements — pet weight, plant watering, utility readings.
+    Flexible lists for recurring measurements with charts — pet weight, plant watering, utility readings.
 
 - :material-calendar: **Events**
 
     ---
 
     Date-ordered things to remember — vet appointments, concerts, block parties.
+
+- :material-archive-outline: **Inventory**
+
+    ---
+
+    A searchable record of household things — appliances, electronics, and tools, with manuals, photos, and tags.
 
 - :material-bell-outline: **Notifications**
 
@@ -55,6 +61,7 @@ There is no audience beyond the household. No public profiles, no social feed. T
 ## Design principles
 
 - **Glanceable first** — the home page answers "what's going on?" in a few seconds
+- **Show what exists first** — every page leads with what's already there; adding something new is a secondary affordance
 - **Low friction to capture** — adding a thought should be as easy as a sticky note
 - **Shared by default** — everything is visible to everyone in the household
 - **Gentle structure** — lists and maps, not workflows; items can sit idle for months

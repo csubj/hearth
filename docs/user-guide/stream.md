@@ -2,12 +2,14 @@
 
 The stream is hearth's catch-all layer — tasks, reminders, and half-formed thoughts anyone can add.
 
-If something doesn't fit restaurants, projects, trackers, or events yet, it lives here.
+If something doesn't fit restaurants, projects, metrics, events, or inventory yet, it lives here.
 
 ## Quick capture
 
+The stream leads with your existing notes; a compact capture box sits above the list so adding is quick without dominating the page.
+
 1. Go to **Stream** (`/stream`)
-2. Type your note in the capture box at the top
+2. Type your note in the capture box
 3. Click **Add**
 
 That's it. No required categories, due dates, or assignments.

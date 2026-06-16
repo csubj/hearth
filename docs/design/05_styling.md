@@ -89,17 +89,36 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ## Component patterns
 
-### Lists (stream, restaurants, projects, events)
+### Lists (stream, restaurants, projects, metrics, events, inventory)
 
+- **Lead with existing content** — the list, history, or searchable catalog is the first element on the page
 - Full-width rows or cards with clear primary line + muted secondary line
 - Actions (pin, done, edit) appear on hover/focus or in a `⋯` dropdown — not always visible
 - Empty state: one line of friendly copy + primary action button
 
-### Quick capture
+### Quick capture / create
 
-- Single textarea or input at top of list pages, auto-focus optional
+- **Secondary affordance** — a compact "Add" / "New …" button in the page header, or a collapsed/expandable form (Radix `Collapsible`), not a large form at the top of the page
+- Stream is the exception for quick capture — it may keep an inline textarea, but still below any pinned/recent items on the home summary
 - Submit button labeled simply: "Add", not "Create task"
-- No modal for simple adds
+- No modal for simple adds unless the form is large (inventory item with many fields)
+
+### Charts (metrics)
+
+- `MetricChart` client component (Recharts) on `/metrics/[id]`
+- Line chart for numeric values; X-axis = `recorded_at`, Y-axis = value with optional unit label
+- Chart is the lead element on the detail page; entry table/cards below
+- Non-numeric metrics skip the chart and show the entry list only
+- Responsive: chart fills container width; height ~240px on mobile, ~320px on desktop
+- Muted grid lines; accent color for the line/points; tooltip on hover with value + date + note
+
+### Inventory
+
+- **Search bar** pinned at top of list (inventory leads with findability, not capture)
+- **Tag chips** — filter by tag; selected tags highlighted with accent outline
+- **Item card** — name prominent; secondary line: type · location · model; tag chips inline
+- **Detail page** — metadata grid (brand, model, serial, purchase info); links section; photo + document file list; notes at bottom
+- **Compact create** — "Add item" in header opens collapsible form or Radix `Dialog` for the full field set
 
 ### Forms
 
@@ -142,7 +161,8 @@ Implement as needed during MVP phases:
 | `Dialog`       | `@radix-ui/react-dialog`        | edit forms, photo lightbox                                     |
 | `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu                                         |
 | `Popover`      | `@radix-ui/react-popover`       | @-mention autocomplete                                         |
-| `Tabs`         | `@radix-ui/react-tabs`          | events upcoming/past if needed                                 |
+| `Tabs`         | `@radix-ui/react-tabs`          | events upcoming/past; metric chart/table toggle if needed      |
+| `Collapsible`  | `@radix-ui/react-collapsible`   | compact create forms, expandable capture                       |
 
 ---
 
@@ -150,7 +170,7 @@ Implement as needed during MVP phases:
 
 - **Mobile first:** nav collapses to hamburger or bottom tab bar (pick one in implementation; document in component)
 - Touch targets minimum `44px` height for buttons
-- Tables (tracker history) → stacked cards on `sm`
+- Tables (metric history) → stacked cards on `sm`
 
 ---
 
@@ -181,6 +201,8 @@ styling:
   primitives: radix-ui
   ui_wrappers_dir: src/components/ui
   component_dir: src/components
+  charting: recharts
+  layout_principle: show_what_exists_first
   dark_mode: false
   design_tone: warm, calm, notebook-like
 ```

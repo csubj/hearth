@@ -1,9 +1,9 @@
 ---
 doc: schema
 project: hearth
-version: 1
+version: 2
 status: decided
-last_updated: 2026-06-14
+last_updated: 2026-06-16
 related:
   - docs/design/00_init.md
   - docs/design/01_tech.md
@@ -27,13 +27,13 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 
 ## Enums
 
-| Enum                | Values                                                                       | Used by                              |
-| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------ |
-| `user_role`         | `member`, `admin`                                                            | `users.role`                         |
-| `restaurant_status` | `want_to_try`, `visited`                                                     | `restaurants.status`                 |
-| `project_status`    | `idea`, `in_progress`, `done`                                                | `projects.status`                    |
-| `entity_type`       | `stream_entry`, `restaurant`, `project`, `tracker`, `tracker_entry`, `event` | attachments, mentions, notifications |
-| `notification_type` | see `06_notifications.md`                                                    | `notifications.type`                 |
+| Enum                | Values                                                                                              | Used by                              |
+| ------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `user_role`         | `member`, `admin`                                                                                   | `users.role`                         |
+| `restaurant_status` | `want_to_try`, `visited`                                                                            | `restaurants.status`                 |
+| `project_status`    | `idea`, `in_progress`, `done`                                                                       | `projects.status`                    |
+| `entity_type`       | `stream_entry`, `restaurant`, `project`, `metric`, `metric_entry`, `event`, `inventory_item`        | attachments, mentions, notifications |
+| `notification_type` | see `06_notifications.md`                                                                           | `notifications.type`                 |
 
 ---
 
@@ -58,6 +58,21 @@ Defined in detail in `02_auth.md`. Included here for ERD completeness.
 ### `sessions`
 
 Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema at implementation time.
+
+### `api_tokens`
+
+| Column         | Type             | Notes                              |
+| -------------- | ---------------- | ---------------------------------- |
+| `id`           | text PK          |                                    |
+| `user_id`      | text FK → users  | Attribution target for API writes  |
+| `name`         | text NOT NULL    | Human label                        |
+| `prefix`       | text NOT NULL    | First chars shown in admin list    |
+| `token_hash`   | text NOT NULL    | Hash of full bearer token          |
+| `last_used_at` | integer NULL     | ms                                 |
+| `revoked_at`   | integer NULL     | ms; NULL = active                  |
+| `created_at`   | integer NOT NULL |                                    |
+
+**Indexes:** `(user_id)`, `(prefix)`.
 
 ---
 
@@ -126,9 +141,9 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 ---
 
-## Trackers
+## Metrics
 
-### `trackers`
+### `metrics`
 
 | Column               | Type             | Notes                           |
 | -------------------- | ---------------- | ------------------------------- |
@@ -139,19 +154,19 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 | `created_at`         | integer NOT NULL |                                 |
 | `updated_at`         | integer NOT NULL |                                 |
 
-### `tracker_entries`
+### `metric_entries`
 
-| Column               | Type               | Notes                            |
-| -------------------- | ------------------ | -------------------------------- |
-| `id`                 | text PK            |                                  |
-| `tracker_id`         | text FK → trackers | ON DELETE CASCADE                |
-| `value`              | text NOT NULL      | numeric or text stored as string |
-| `note`               | text NULL          |                                  |
-| `recorded_at`        | integer NOT NULL   | ms — when measurement applies    |
-| `created_by_user_id` | text FK → users    |                                  |
-| `created_at`         | integer NOT NULL   |                                  |
+| Column               | Type              | Notes                            |
+| -------------------- | ----------------- | -------------------------------- |
+| `id`                 | text PK           |                                  |
+| `metric_id`          | text FK → metrics | ON DELETE CASCADE                |
+| `value`              | text NOT NULL     | numeric or text stored as string |
+| `note`               | text NULL         |                                  |
+| `recorded_at`        | integer NOT NULL  | ms — when measurement applies    |
+| `created_by_user_id` | text FK → users   |                                  |
+| `created_at`         | integer NOT NULL  |                                  |
 
-**Indexes:** `(tracker_id, recorded_at DESC)`.
+**Indexes:** `(metric_id, recorded_at DESC)`.
 
 ---
 
@@ -175,6 +190,60 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 **Indexes:** `(starts_at ASC)` for upcoming lists.
 
 Past events remain in DB; UI filters `starts_at >= now` on home summary. Full list view can toggle archived/past.
+
+---
+
+## Inventory
+
+### `inventory_items`
+
+| Column               | Type             | Notes                                    |
+| -------------------- | ---------------- | ---------------------------------------- |
+| `id`                 | text PK          |                                          |
+| `name`               | text NOT NULL    | e.g. "Washer"                            |
+| `brand`              | text NULL        |                                          |
+| `model`              | text NULL        |                                          |
+| `serial`             | text NULL        | serial number                            |
+| `item_type`          | text NULL        | e.g. appliance, electronics, furniture   |
+| `location`           | text NULL        | e.g. basement, garage                    |
+| `purchase_date`      | integer NULL     | ms                                       |
+| `store`              | text NULL        | where purchased                          |
+| `price`              | text NULL        | freeform — "$899"                        |
+| `warranty_note`      | text NULL        | expiry, claim info                       |
+| `notes`              | text NULL        | freeform                                 |
+| `created_by_user_id` | text FK → users  |                                          |
+| `updated_by_user_id` | text FK → users  |                                          |
+| `created_at`         | integer NOT NULL |                                          |
+| `updated_at`         | integer NOT NULL |                                          |
+
+**Indexes:** `(name)`, `(item_type)`, `(location)`, `(updated_at DESC)` for search/list.
+
+### `inventory_links`
+
+| Column              | Type                      | Notes                    |
+| ------------------- | ------------------------- | ------------------------ |
+| `id`                | text PK                   |                          |
+| `inventory_item_id` | text FK → inventory_items | ON DELETE CASCADE        |
+| `label`             | text NOT NULL             | e.g. "Manual", "Receipt" |
+| `url`               | text NOT NULL             |                          |
+| `created_at`        | integer NOT NULL          |                          |
+
+### `inventory_tags`
+
+| Column       | Type             | Notes              |
+| ------------ | ---------------- | ------------------ |
+| `id`         | text PK          |                    |
+| `name`       | text UNIQUE NOT NULL | e.g. kitchen   |
+| `created_at` | integer NOT NULL |                    |
+
+### `inventory_item_tags`
+
+| Column              | Type                      | Notes             |
+| ------------------- | ------------------------- | ----------------- |
+| `inventory_item_id` | text FK → inventory_items | ON DELETE CASCADE |
+| `tag_id`            | text FK → inventory_tags  | ON DELETE CASCADE |
+
+**Indexes:** `(inventory_item_id)`, `(tag_id)`.
 
 ---
 
@@ -252,17 +321,23 @@ erDiagram
   users ||--o{ stream_entries : creates
   users ||--o{ restaurants : creates
   users ||--o{ projects : creates
-  users ||--o{ trackers : creates
-  users ||--o{ tracker_entries : creates
+  users ||--o{ metrics : creates
+  users ||--o{ metric_entries : creates
   users ||--o{ events : creates
+  users ||--o{ inventory_items : creates
+  users ||--o{ api_tokens : owns
   users ||--o{ notifications : receives
   users ||--o{ mentions : mentioned_in
-  trackers ||--o{ tracker_entries : has
+  metrics ||--o{ metric_entries : has
+  inventory_items ||--o{ inventory_links : has
+  inventory_items ||--o{ inventory_item_tags : tagged
+  inventory_tags ||--o{ inventory_item_tags : applied
   stream_entries ||--o{ attachments : has
   restaurants ||--o{ attachments : has
   projects ||--o{ attachments : has
   events ||--o{ attachments : has
-  tracker_entries ||--o{ attachments : has
+  metric_entries ||--o{ attachments : has
+  inventory_items ||--o{ attachments : has
 ```
 
 ---
@@ -275,11 +350,13 @@ src/db/
   schema/
     users.ts
     sessions.ts      # Lucia adapter tables
+    api_tokens.ts
     stream.ts
     restaurants.ts
     projects.ts
-    trackers.ts
+    metrics.ts
     events.ts
+    inventory.ts
     mentions.ts
     notifications.ts
     attachments.ts
@@ -300,13 +377,14 @@ schema:
   id_type: text_uuid
   timestamp_type: integer_ms
   tables:
-    auth: [users, sessions]
+    auth: [users, sessions, api_tokens]
     features:
       stream: [stream_entries]
       restaurants: [restaurants]
       projects: [projects]
-      trackers: [trackers, tracker_entries]
+      metrics: [metrics, metric_entries]
       events: [events]
+      inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags]
     cross_cutting:
       - mentions
       - notifications
@@ -315,5 +393,5 @@ schema:
     user_role: [member, admin]
     restaurant_status: [want_to_try, visited]
     project_status: [idea, in_progress, done]
-    entity_type: [stream_entry, restaurant, project, tracker, tracker_entry, event]
+    entity_type: [stream_entry, restaurant, project, metric, metric_entry, event, inventory_item]
 ```

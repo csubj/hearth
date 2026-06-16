@@ -30,8 +30,9 @@ An optional **Since you last visited** block on the home page summarizes recent 
 | New or updated stream note | Everyone except the person who did it |
 | Restaurant added or visited | Everyone except the actor |
 | Project created or status changed | Everyone except the actor |
-| Tracker entry added | Everyone except the actor |
+| Metric entry added | Everyone except the actor |
 | Event created or updated | Everyone except the actor |
+| Inventory item created or updated | Everyone except the actor |
 | @-mention | The mentioned user (always) |
 | Admin user management | All other admins |
 
@@ -54,8 +55,9 @@ Usernames are case-insensitive. Use the autocomplete popover that appears when y
 - Stream entry body
 - Restaurant notes and visit reviews
 - Project descriptions
-- Tracker entry notes
+- Metric entry notes
 - Event notes
+- Inventory item notes
 
 ### What happens
 

@@ -6,7 +6,7 @@ Frequently asked questions about hearth.
 
 ### What is hearth?
 
-A self-hosted web app for household coordination — shared notes, restaurants, projects, trackers, and events. Think kitchen whiteboard, not corporate task manager.
+A self-hosted web app for household coordination — shared notes, restaurants, projects, metrics, events, and inventory. Think kitchen whiteboard, not corporate task manager.
 
 ### Who is it for?
 

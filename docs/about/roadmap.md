@@ -11,6 +11,7 @@ Items explicitly **out of scope for v1** that may come later. Nothing here is co
 | Email digests | Weekly summary of household activity |
 | Dark mode | CSS variables already structured for it |
 | Thumbnail generation | `sharp`-based thumbs on upload for faster grids |
+| Scoped API tokens | Per-resource permissions instead of full household access |
 
 ## Longer-term ideas
 
@@ -32,10 +33,19 @@ Phases 0–7 from [MVP Phases](../design/08_mvp.md):
 - [x] Authentication and admin user management
 - [x] Home page and stream
 - [x] Restaurants (list, no map)
-- [x] Projects, events, trackers
+- [x] Projects, events, metrics
 - [x] Photo attachments
 - [x] Notifications and @-mentions
 - [x] Polish, CI, smoke tests, documentation
+
+## In progress / upcoming
+
+Phases 8–10 from [MVP Phases](../design/08_mvp.md):
+
+- [ ] Configurable auth (`AUTH_MODE`) and API tokens
+- [ ] REST API (`/api/v1/*`) with OpenAPI spec and interactive docs
+- [ ] Metrics graphing (Recharts) and existing-data-first page layout
+- [ ] Inventory — searchable catalog with tags, links, documents, import/export
 
 ## Contributing to the roadmap
 

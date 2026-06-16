@@ -1,20 +1,20 @@
 ---
 doc: attachments
 project: hearth
-version: 1
+version: 2
 status: decided
-last_updated: 2026-06-14
+last_updated: 2026-06-16
 related:
   - docs/design/00_init.md
   - docs/design/03_schema.md
   - docs/design/04_routes.md
 ---
 
-# Attachments (Photos)
+# Attachments (Photos & Documents)
 
 Structured reference for agents and contributors. Product behavior in `00_init.md` (Attachments); schema in `03_schema.md`.
 
-**Model:** image files on local disk; metadata in SQLite. No S3 or external hosting in v1.
+**Model:** files on local disk; metadata in SQLite. No S3 or external hosting in v1. Most entities accept **images only**; inventory additionally accepts **documents** (PDFs, manuals, receipts).
 
 ---
 
@@ -23,7 +23,7 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 | Field           | Value                                                                                                                                                                        |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Choice**      | Local filesystem under `data/uploads/`                                                                                                                                       |
-| **Role**        | Byte storage for photos                                                                                                                                                      |
+| **Role**        | Byte storage for photos and documents                                                                                                                                        |
 | **Rationale**   | Matches single-instance SQLite deployment. Simple Docker volume mount. No extra service cost.                                                                                |
 | **Conventions** | Gitignore entire `data/` directory (already in `.gitignore`). Paths stored in DB are relative to project root: `uploads/{uuid}.{ext}`. Never serve files without auth check. |
 | **References**  | `09_deploy.md` for volume mounts                                                                                                                                             |
@@ -35,19 +35,44 @@ data/
   hearth.db
   uploads/
     ab12cd34-....jpg
-    ef56gh78-....webp
+    ef56gh78-....pdf
 ```
 
 ---
 
-## Allowed files
+## Per-entity mime policy
+
+| entity_type     | Images | Documents (PDF) | Notes                                |
+| --------------- | ------ | --------------- | ------------------------------------ |
+| `stream_entry`  | Yes    | No              | Photos only                          |
+| `restaurant`    | Yes    | No              | Menu pics, visit photos              |
+| `project`       | Yes    | No              | Before/after, progress photos        |
+| `metric_entry`  | Yes    | No              | Scale reading, condition photo       |
+| `event`         | Yes    | No              | Event-related photos                 |
+| `inventory_item`| Yes    | Yes             | Photos + manuals, receipts, warranties |
+
+### Allowed mime types
+
+**Images (all supported entities):**
+
+| Mime type      | Extensions   |
+| -------------- | ------------ |
+| `image/jpeg`   | `.jpg`, `.jpeg` |
+| `image/png`    | `.png`       |
+| `image/webp`   | `.webp`      |
+| `image/gif`    | `.gif`       |
+
+**Documents (inventory only):**
+
+| Mime type       | Extensions |
+| --------------- | ---------- |
+| `application/pdf` | `.pdf`   |
 
 | Rule           | Value                                                |
 | -------------- | ---------------------------------------------------- |
-| Mime types     | `image/jpeg`, `image/png`, `image/webp`, `image/gif` |
-| Max size       | 10 MB per file                                       |
-| Max per entity | 10 photos                                            |
-| Extensions     | Derived from mime; reject mismatch                   |
+| Max size       | 10 MB per file (images); 25 MB per file (documents)  |
+| Max per entity | 10 files (images + documents combined for inventory) |
+| Extensions     | Derived from mime; reject mismatch                     |
 
 Validate mime from magic bytes (file-type lib or manual header check), not client-provided extension alone.
 
@@ -63,20 +88,21 @@ sequenceDiagram
   participant DB
 
   UI->>API: multipart file + entityType + entityId
-  API->>API: validate session
-  API->>API: validate mime, size, entity exists
+  API->>API: validate session or bearer token
+  API->>API: validate mime per entity policy, size, entity exists
   API->>FS: write uuid file
   API->>DB: insert attachments row
   API->>UI: { id, url }
 ```
 
-1. Client: `<input type="file" accept="image/*">` on detail/edit forms
+1. Client: `<input type="file" accept="image/*">` or `accept="image/*,.pdf"` on inventory
 2. `POST /api/attachments` with `FormData`: `file`, `entityType`, `entityId`
-3. Server verifies user session and that entity exists
-4. Write file, insert row, emit `*.updated` notification if appropriate
-5. Return `{ id, url: "/api/attachments/{id}" }` for immediate preview
+3. Server verifies auth and that entity exists
+4. Check mime against per-entity policy
+5. Write file, insert row, emit notification if appropriate
+6. Return `{ id, url: "/api/attachments/{id}" }` for immediate preview
 
-Server actions are awkward for large multipart — API route is intentional exception per `04_routes.md`.
+Server actions are awkward for large multipart — API route is intentional.
 
 ---
 
@@ -84,7 +110,7 @@ Server actions are awkward for large multipart — API route is intentional exce
 
 `GET /api/attachments/[id]`:
 
-1. Validate session
+1. Validate session or bearer token
 2. Load `attachments` row
 3. Stream file from `data/{storage_path}` with correct `Content-Type`
 4. `Cache-Control: private, max-age=3600`
@@ -97,15 +123,24 @@ Do not expose direct static URLs under `/public` — all access authenticated.
 
 Attachments link polymorphically via `entity_type` + `entity_id`:
 
-| entity_type     | When attached                        |
-| --------------- | ------------------------------------ |
-| `stream_entry`  | On create/edit stream note           |
-| `restaurant`    | Notes, visit review                  |
-| `project`       | Description updates, progress photos |
-| `tracker_entry` | Entry note (e.g. scale photo)        |
-| `event`         | Event note                           |
+| entity_type      | When attached                        |
+| ---------------- | ------------------------------------ |
+| `stream_entry`   | On create/edit stream note           |
+| `restaurant`     | Notes, visit review                  |
+| `project`        | Description updates, progress photos |
+| `metric_entry`   | Entry note (e.g. scale photo)        |
+| `event`          | Event note                           |
+| `inventory_item` | Photos, manuals, receipts, warranties |
 
-Upload requires entity to exist first — UI flow: create entry → edit/add photos. Optional: allow pending uploads on create form after first save.
+Upload requires entity to exist first — UI flow: create entry → edit/add files. Optional: allow pending uploads on create form after first save.
+
+---
+
+## Import / export file handling
+
+Inventory bulk import (`POST /api/inventory/import`) may reference attachment metadata but does not inline file bytes. Export (`GET /api/inventory/export`) includes attachment metadata (id, filename, mime) with URLs for separate download.
+
+For full backup including files, operators tar `data/uploads/` alongside the DB — see `09_deploy.md`.
 
 ---
 
@@ -123,7 +158,7 @@ On attachment delete: remove DB row, then `fs.unlink` storage path. Fail gracefu
 
 ## Thumbnails
 
-v1: serve original only; browser scales via CSS `object-cover` in thumbnail grid.
+v1: serve original only; browser scales via CSS `object-cover` in thumbnail grid. PDFs show a document icon with filename.
 
 Later: generate `_thumb.webp` on upload with `sharp` if performance requires.
 
@@ -138,17 +173,19 @@ Later: generate `_thumb.webp` on upload with `sharp` if performance requires.
 
 ## Security
 
-- Auth required for upload and download
+- Auth required for upload and download (session or bearer token)
 - Reject path traversal in any user-supplied filename — store server-generated UUID names only
 - Rate-limit uploads per user (simple counter) if abuse matters on shared network
+- Enforce per-entity mime policy server-side — do not trust client `accept` attribute alone
 
 ---
 
 ## Testing
 
 - Upload valid jpeg → row + file exist
+- Upload PDF on inventory → accepted; PDF on stream → rejected
 - Oversize / wrong mime rejected
-- GET without session → 401
+- GET without auth → 401
 - Delete removes file from disk
 
 Use temp directory override `UPLOADS_DIR` in tests.
@@ -160,13 +197,12 @@ Use temp directory override `UPLOADS_DIR` in tests.
 ```yaml
 attachments:
   uploads_dir: UPLOADS_DIR # default: data/uploads
-  max_bytes: 10485760 # 10 MB
+  max_bytes_image: 10485760 # 10 MB
+  max_bytes_document: 26214400 # 25 MB
   max_per_entity: 10
-  allowed_mime:
-    - image/jpeg
-    - image/png
-    - image/webp
-    - image/gif
+  mime_allowlist_images: [image/jpeg, image/png, image/webp, image/gif]
+  mime_allowlist_documents: [application/pdf]
+  documents_allowed_for: [inventory_item]
 ```
 
 ---
@@ -180,8 +216,12 @@ attachments:
   metadata_table: attachments
   upload_route: POST /api/attachments
   serve_route: GET /api/attachments/[id]
-  max_size_bytes: 10485760
+  max_size_bytes_image: 10485760
+  max_size_bytes_document: 26214400
   max_per_entity: 10
-  mime_allowlist: [image/jpeg, image/png, image/webp, image/gif]
+  mime_images: [image/jpeg, image/png, image/webp, image/gif]
+  mime_documents: [application/pdf]
+  documents_entity_types: [inventory_item]
   thumbnails: false # v1
+  import_export: metadata_only # files backed up via data/ volume
 ```

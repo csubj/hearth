@@ -2,10 +2,14 @@
 
 A list of things to fix, build, or improve around the home. Projects can linger — the goal is visibility, not velocity.
 
+## Browsing projects
+
+Go to **Projects** (`/projects`). The page leads with your existing projects grouped by status, so you see what's underway at a glance. Adding a project is a compact **New** button in the header.
+
 ## Adding a project
 
-1. Go to **Projects** (`/projects`)
-2. Create a new project with a **title**
+1. Use the **New project** button in the header
+2. Give it a **title**
 3. Optionally add a **description** — materials, links, steps, or context
 
 **Examples:**

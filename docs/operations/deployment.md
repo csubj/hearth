@@ -110,13 +110,19 @@ pnpm smoke:docker
 
 Builds, starts, bootstraps, and checks health + authenticated stream access.
 
+## Authentication mode
+
+By default the web UI requires login (`AUTH_MODE=required`). To skip the login gate on a trusted network, set `AUTH_MODE=open` and `OPEN_MODE_USERNAME` — see [Configuration](configuration.md#authentication-modes). The REST API still requires a bearer token in every mode.
+
 ## Manual deploy checklist
 
 - [ ] `SESSION_SECRET` set (production)
 - [ ] `data/` volume persisted
 - [ ] Migrations applied (automatic in Docker entrypoint)
 - [ ] First admin bootstrapped
+- [ ] `AUTH_MODE` reviewed (`required` unless on a trusted network)
 - [ ] HTTPS configured
+- [ ] API tokens issued for any integrations — see [API reference](../reference/api.md)
 - [ ] Health check passing
 - [ ] Backup strategy in place — see [Backup & restore](backup-restore.md)
 
