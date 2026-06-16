@@ -4,7 +4,8 @@ Household coordination — a shared landing page for stream notes, restaurants, 
 
 ## Design docs
 
-- **[docs/design/README.md](docs/design/README.md)** — full design index
+- **[Documentation site](https://csubj.github.io/hearth/)** — user guide, operating guide, architecture (MkDocs)
+- **[docs/design/README.md](docs/design/README.md)** — internal design index
 - **[AGENTS.md](AGENTS.md)** — contributor and agent guide
 
 ## Requirements

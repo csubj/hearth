@@ -1,0 +1,122 @@
+site_name: hearth
+site_description: Household coordination — a shared landing page for stream notes, restaurants, projects, trackers, and events.
+site_url: https://csubj.github.io/hearth/
+repo_url: https://github.com/csubj/hearth
+repo_name: csubj/hearth
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+exclude_docs: |
+  design/README.md
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/installation.md
+      - getting-started/docker-quickstart.md
+      - getting-started/first-use.md
+  - User Guide:
+      - user-guide/index.md
+      - Stream: user-guide/stream.md
+      - Restaurants: user-guide/restaurants.md
+      - Projects: user-guide/projects.md
+      - Trackers: user-guide/trackers.md
+      - Events: user-guide/events.md
+      - Notifications & Mentions: user-guide/notifications-and-mentions.md
+      - Attachments: user-guide/attachments.md
+      - Your Account: user-guide/account.md
+  - Administration:
+      - admin/users.md
+  - Operating Guide:
+      - operations/index.md
+      - Configuration: operations/configuration.md
+      - Deployment: operations/deployment.md
+      - Backup & Restore: operations/backup-restore.md
+      - Upgrading: operations/upgrading.md
+      - Troubleshooting: operations/troubleshooting.md
+  - Architecture & Design:
+      - architecture/index.md
+      - Product Vision: design/00_init.md
+      - Tech Choices: design/01_tech.md
+      - Authentication: design/02_auth.md
+      - Data Model: design/03_schema.md
+      - Routes & Structure: design/04_routes.md
+      - Styling: design/05_styling.md
+      - Notifications: design/06_notifications.md
+      - Attachments: design/07_attachments.md
+      - MVP Phases: design/08_mvp.md
+      - Deployment Design: design/09_deploy.md
+      - CI/CD: design/10_ci.md
+  - Reference:
+      - reference/scripts.md
+      - API: reference/api.md
+  - Contributing: contributing.md
+  - About:
+      - about/faq.md
+      - Roadmap: about/roadmap.md
+      - Changelog: about/changelog.md
+      - License: about/license.md
