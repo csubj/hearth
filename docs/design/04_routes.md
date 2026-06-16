@@ -85,24 +85,24 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 
 ## Route table
 
-| Path | Access | Purpose |
-|------|--------|---------|
-| `/login` | public | Login form; redirect to `/` if session valid |
-| `/` | auth | Home summary (all feature sections) |
-| `/stream` | auth | Full stream list + quick capture |
-| `/restaurants` | auth | Restaurant list (v1: no map) |
-| `/restaurants/[id]` | auth | Detail, mark visited, rating, notes |
-| `/projects` | auth | Project list |
-| `/projects/[id]` | auth | Project detail + status updates |
-| `/trackers` | auth | Tracker list |
-| `/trackers/[id]` | auth | Entry history + add entry |
-| `/events` | auth | Upcoming + past events |
-| `/notifications` | auth | Per-user activity stream |
-| `/settings` | auth | Change own password |
-| `/admin/users` | admin | User CRUD |
-| `POST /api/attachments` | auth | Multipart upload |
-| `GET /api/attachments/[id]` | auth | Serve file (check session) |
-| `GET /api/health` | public | `{ ok: true }` for probes |
+| Path                        | Access | Purpose                                      |
+| --------------------------- | ------ | -------------------------------------------- |
+| `/login`                    | public | Login form; redirect to `/` if session valid |
+| `/`                         | auth   | Home summary (all feature sections)          |
+| `/stream`                   | auth   | Full stream list + quick capture             |
+| `/restaurants`              | auth   | Restaurant list (v1: no map)                 |
+| `/restaurants/[id]`         | auth   | Detail, mark visited, rating, notes          |
+| `/projects`                 | auth   | Project list                                 |
+| `/projects/[id]`            | auth   | Project detail + status updates              |
+| `/trackers`                 | auth   | Tracker list                                 |
+| `/trackers/[id]`            | auth   | Entry history + add entry                    |
+| `/events`                   | auth   | Upcoming + past events                       |
+| `/notifications`            | auth   | Per-user activity stream                     |
+| `/settings`                 | auth   | Change own password                          |
+| `/admin/users`              | admin  | User CRUD                                    |
+| `POST /api/attachments`     | auth   | Multipart upload                             |
+| `GET /api/attachments/[id]` | auth   | Serve file (check session)                   |
+| `GET /api/health`           | public | `{ ok: true }` for probes                    |
 
 Unauthenticated access to `(app)/*` or `/admin/*` → redirect `/login?returnTo=...`.
 
@@ -135,12 +135,12 @@ Non-admin access to `/admin/*` → redirect `/` with error toast or 403 page.
 
 `middleware.ts` at repo root:
 
-| Matcher | Behavior |
-|---------|----------|
-| `/login` | If session valid → redirect `/` |
-| `/(app)/*`, `/admin/*` | If no session → redirect `/login?returnTo=pathname` |
-| `/api/attachments/*` (except health) | Session required |
-| Static assets, `/_next/*` | Skip |
+| Matcher                              | Behavior                                            |
+| ------------------------------------ | --------------------------------------------------- |
+| `/login`                             | If session valid → redirect `/`                     |
+| `/(app)/*`, `/admin/*`               | If no session → redirect `/login?returnTo=pathname` |
+| `/api/attachments/*` (except health) | Session required                                    |
+| Static assets, `/_next/*`            | Skip                                                |
 
 Use Lucia session validation helper from `src/lib/auth/session.ts`. Keep middleware edge-compatible — defer DB-heavy work to layouts if needed (Lucia often validates in Node runtime).
 
@@ -156,16 +156,16 @@ Colocate in `src/lib/actions/` by domain. Each action:
 4. Calls notification emitter when appropriate
 5. Calls `revalidatePath()` for affected routes
 
-| File | Actions |
-|------|---------|
-| `auth.ts` | `login`, `logout`, `changePassword` |
-| `stream.ts` | `createEntry`, `updateEntry`, `togglePin`, `markDone` |
-| `restaurants.ts` | `create`, `update`, `markVisited`, `setRating` |
-| `projects.ts` | `create`, `update`, `setStatus` |
-| `trackers.ts` | `createTracker`, `addEntry`, `updateTracker` |
-| `events.ts` | `create`, `update`, `delete` |
-| `notifications.ts` | `markRead`, `markAllRead` |
-| `admin/users.ts` | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin` |
+| File               | Actions                                                                    |
+| ------------------ | -------------------------------------------------------------------------- |
+| `auth.ts`          | `login`, `logout`, `changePassword`                                        |
+| `stream.ts`        | `createEntry`, `updateEntry`, `togglePin`, `markDone`                      |
+| `restaurants.ts`   | `create`, `update`, `markVisited`, `setRating`                             |
+| `projects.ts`      | `create`, `update`, `setStatus`                                            |
+| `trackers.ts`      | `createTracker`, `addEntry`, `updateTracker`                               |
+| `events.ts`        | `create`, `update`, `delete`                                               |
+| `notifications.ts` | `markRead`, `markAllRead`                                                  |
+| `admin/users.ts`   | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin` |
 
 Forms use `<form action={...}>` or `useActionState` in client wrappers where UX needs pending states.
 
@@ -173,11 +173,11 @@ Forms use `<form action={...}>` or `useActionState` in client wrappers where UX 
 
 ## API routes (binary / upload only)
 
-| Route | Method | Body | Response |
-|-------|--------|------|----------|
-| `/api/attachments` | POST | `multipart/form-data`: `file`, `entityType`, `entityId` | `{ id, url }` |
-| `/api/attachments/[id]` | GET | — | file stream with `Content-Type` |
-| `/api/health` | GET | — | `{ ok: true }` |
+| Route                   | Method | Body                                                    | Response                        |
+| ----------------------- | ------ | ------------------------------------------------------- | ------------------------------- |
+| `/api/attachments`      | POST   | `multipart/form-data`: `file`, `entityType`, `entityId` | `{ id, url }`                   |
+| `/api/attachments/[id]` | GET    | —                                                       | file stream with `Content-Type` |
+| `/api/health`           | GET    | —                                                       | `{ ok: true }`                  |
 
 Do not add REST CRUD APIs for feature entities — server actions are the default.
 
@@ -217,13 +217,13 @@ Bootstrap is CLI-only (`scripts/auth-bootstrap.ts`), not a web route.
 
 ## File naming
 
-| Kind | Pattern | Example |
-|------|---------|---------|
-| Page | `page.tsx` | `app/(app)/stream/page.tsx` |
-| Layout | `layout.tsx` | `app/(app)/layout.tsx` |
-| Server action module | kebab or domain name | `src/lib/actions/stream.ts` |
-| Component | PascalCase file | `src/components/StreamEntryForm.tsx` |
-| Test | co-located | `src/lib/mentions/parse.test.ts` |
+| Kind                 | Pattern              | Example                              |
+| -------------------- | -------------------- | ------------------------------------ |
+| Page                 | `page.tsx`           | `app/(app)/stream/page.tsx`          |
+| Layout               | `layout.tsx`         | `app/(app)/layout.tsx`               |
+| Server action module | kebab or domain name | `src/lib/actions/stream.ts`          |
+| Component            | PascalCase file      | `src/components/StreamEntryForm.tsx` |
+| Test                 | co-located           | `src/lib/mentions/parse.test.ts`     |
 
 ---
 
@@ -250,6 +250,6 @@ routes:
   api:
     - POST /api/attachments
     - GET /api/attachments/[id]
-  mutations: server_actions  # default
+  mutations: server_actions # default
   middleware: middleware.ts
 ```

@@ -1,0 +1,9 @@
+node_modules
+.next
+data
+coverage
+dist
+pnpm-lock.yaml
+tsconfig.tsbuildinfo
+drizzle/meta
+.cursor

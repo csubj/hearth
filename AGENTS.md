@@ -27,17 +27,17 @@ pnpm run auth:bootstrap   # first admin (once per instance)
 
 ## Conventions
 
-| Area | Rule |
-|------|------|
-| Package manager | **pnpm only** |
-| Router | Next.js **App Router** (`app/`), not Pages Router |
-| Components | Server Components default; `"use client"` only when needed |
-| Mutations | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve |
-| Database | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/` |
-| Auth | Lucia v3 + Argon2id — see [docs/design/02_auth.md](docs/design/02_auth.md) |
-| Styling | Tailwind v4 + Radix wrappers in `src/components/ui/` |
-| Tests | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared` |
-| Commits | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook |
+| Area            | Rule                                                                            |
+| --------------- | ------------------------------------------------------------------------------- |
+| Package manager | **pnpm only**                                                                   |
+| Router          | Next.js **App Router** (`app/`), not Pages Router                               |
+| Components      | Server Components default; `"use client"` only when needed                      |
+| Mutations       | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve |
+| Database        | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/`        |
+| Auth            | Lucia v3 + Argon2id — see [docs/design/02_auth.md](docs/design/02_auth.md)      |
+| Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                            |
+| Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                 |
+| Commits         | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook         |
 
 ## Key paths
 

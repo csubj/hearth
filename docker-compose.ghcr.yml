@@ -1,0 +1,9 @@
+# Override for production: pull published image from GHCR instead of building locally.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
+#
+# Replace <owner> with your GitHub org or username (lowercase).
+
+services:
+  app:
+    image: ghcr.io/<owner>/hearth:latest
+    build: !reset null

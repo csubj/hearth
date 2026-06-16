@@ -93,13 +93,13 @@ Complements the stream-of-consciousness list for anything that is inherently tie
 
 The landing page aggregates what needs attention across all features:
 
-| Area | What surfaces |
-|------|----------------|
-| Stream | Recent additions, pinned items, things marked active |
-| Restaurants | A few "want to try" suggestions (v1: list; later: nearby on map) |
-| Projects | Items in progress or recently touched |
-| Trackers | Latest entry or reminder if something hasn't been logged in a while |
-| Events | Upcoming within the next week or two |
+| Area        | What surfaces                                                       |
+| ----------- | ------------------------------------------------------------------- |
+| Stream      | Recent additions, pinned items, things marked active                |
+| Restaurants | A few "want to try" suggestions (v1: list; later: nearby on map)    |
+| Projects    | Items in progress or recently touched                               |
+| Trackers    | Latest entry or reminder if something hasn't been logged in a while |
+| Events      | Upcoming within the next week or two                                |
 
 Each section links to its full view. The page should feel like a summary, not a dashboard with widgets.
 
@@ -107,7 +107,7 @@ Each section links to its full view. The page should feel like a summary, not a 
 
 ## Users & access
 
-Each hearth instance serves **one household**. There is no multi-tenant signup flow or household picker — the instance *is* the household.
+Each hearth instance serves **one household**. There is no multi-tenant signup flow or household picker — the instance _is_ the household.
 
 - Users log in with a username and password
 - The **instance admin** creates accounts, sets or resets passwords, and removes users

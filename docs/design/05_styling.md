@@ -19,24 +19,24 @@ Structured reference for agents and contributors. Product tone in `00_init.md` (
 
 ## Stack
 
-| Field | Value |
-|-------|-------|
-| **Choice** | Tailwind CSS v4 + CSS variables |
-| **Role** | Utility-first layout and spacing; design tokens via `@theme` |
-| **Rationale** | Fast iteration, consistent spacing, pairs well with Next.js App Router and Radix unstyled primitives. One toolchain for responsive layout without fighting CSS modules for every prop. |
+| Field           | Value                                                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Choice**      | Tailwind CSS v4 + CSS variables                                                                                                                                                                                                |
+| **Role**        | Utility-first layout and spacing; design tokens via `@theme`                                                                                                                                                                   |
+| **Rationale**   | Fast iteration, consistent spacing, pairs well with Next.js App Router and Radix unstyled primitives. One toolchain for responsive layout without fighting CSS modules for every prop.                                         |
 | **Conventions** | Global tokens in `app/globals.css`. Component-specific classes inline with Tailwind. Avoid `@apply` except for repeated form control base styles. Do not add MUI, Chakra, or shadcn as a full dependency — wrap Radix locally. |
-| **References** | https://tailwindcss.com · `docs/design/05_styling.md` |
+| **References**  | https://tailwindcss.com · `docs/design/05_styling.md`                                                                                                                                                                          |
 
-| Field | Value |
-|-------|-------|
-| **Choice** | Radix UI primitives (from `01_tech.md`) |
-| **Role** | Accessible dialogs, dropdowns, popovers, tabs |
+| Field           | Value                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Radix UI primitives (from `01_tech.md`)                                                                                                     |
+| **Role**        | Accessible dialogs, dropdowns, popovers, tabs                                                                                               |
 | **Conventions** | Styled wrappers in `src/components/ui/` (e.g. `Button`, `Dialog`, `DropdownMenu`). Pages import wrappers, not `@radix-ui/react-*` directly. |
 
-| Field | Value |
-|-------|-------|
-| **Choice** | `next/font` — DM Sans + optional serif accent |
-| **Role** | Typography without layout shift |
+| Field           | Value                                                                                |
+| --------------- | ------------------------------------------------------------------------------------ |
+| **Choice**      | `next/font` — DM Sans + optional serif accent                                        |
+| **Role**        | Typography without layout shift                                                      |
 | **Conventions** | `--font-sans` for UI; `--font-serif` sparingly for page title "hearth" wordmark only |
 
 ---
@@ -48,17 +48,13 @@ Define in `app/globals.css` under `@theme`:
 ```css
 /* conceptual — implement in globals.css */
 --color-background: /* warm off-white, e.g. #faf8f5 */
---color-surface: /* card white #ffffff */
---color-border: /* soft gray #e8e4df */
---color-text: /* near-black #1c1917 */
---color-text-muted: /* #78716c */
---color-accent: /* terracotta / hearth orange #c2410c */
---color-accent-soft: /* light tint for hovers */
---color-success: /* muted green for done states */
---radius-sm: 0.375rem
---radius-md: 0.5rem
---radius-lg: 0.75rem
---shadow-card: subtle, warm gray
+  --color-surface: /* card white #ffffff */ --color-border: /* soft gray #e8e4df */
+    --color-text: /* near-black #1c1917 */ --color-text-muted: /* #78716c */
+    --color-accent: /* terracotta / hearth orange #c2410c */
+    --color-accent-soft: /* light tint for hovers */
+    --color-success: /* muted green for done states */ --radius-sm: 0.375rem --radius-md: 0.5rem
+    --radius-lg: 0.75rem --shadow-card: subtle,
+  warm gray;
 ```
 
 **Palette direction:** warm neutrals, one accent color (hearth/ember), minimal semantic colors. No bright corporate blue.
@@ -67,13 +63,13 @@ Define in `app/globals.css` under `@theme`:
 
 ## Typography scale
 
-| Token | Use |
-|-------|-----|
+| Token                 | Use                                 |
+| --------------------- | ----------------------------------- |
 | `text-2xl font-serif` | Page title "hearth", section heroes |
-| `text-lg font-medium` | Section headings on home |
-| `text-base` | Body, list items |
-| `text-sm text-muted` | Timestamps, metadata, hints |
-| `text-xs text-muted` | Badges, counts |
+| `text-lg font-medium` | Section headings on home            |
+| `text-base`           | Body, list items                    |
+| `text-sm text-muted`  | Timestamps, metadata, hints         |
+| `text-xs text-muted`  | Badges, counts                      |
 
 Line height relaxed (`leading-relaxed`) for note-like content.
 
@@ -81,13 +77,13 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ## Layout
 
-| Pattern | Spec |
-|---------|------|
-| Max content width | `max-w-3xl` for lists and forms; `max-w-5xl` for home grid |
-| Page padding | `px-4 py-6` mobile; `px-6 py-8` md+ |
-| App nav | Top bar, sticky; horizontal links on md+, bottom or menu on small screens |
-| Home | Single column on mobile; two-column section grid on `md:` |
-| Cards | `rounded-lg border bg-surface shadow-card p-4` |
+| Pattern           | Spec                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| Max content width | `max-w-3xl` for lists and forms; `max-w-5xl` for home grid                |
+| Page padding      | `px-4 py-6` mobile; `px-6 py-8` md+                                       |
+| App nav           | Top bar, sticky; horizontal links on md+, bottom or menu on small screens |
+| Home              | Single column on mobile; two-column section grid on `md:`                 |
+| Cards             | `rounded-lg border bg-surface shadow-card p-4`                            |
 
 ---
 
@@ -114,15 +110,15 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ### Status chips
 
-| Feature | Chip styles |
-|---------|---------------|
-| Stream open | default text |
-| Stream done | muted + strikethrough optional |
-| Restaurant want_to_try | accent outline |
-| Restaurant visited | muted + stars |
-| Project idea | neutral |
-| Project in_progress | accent soft background |
-| Project done | muted green |
+| Feature                | Chip styles                    |
+| ---------------------- | ------------------------------ |
+| Stream open            | default text                   |
+| Stream done            | muted + strikethrough optional |
+| Restaurant want_to_try | accent outline                 |
+| Restaurant visited     | muted + stars                  |
+| Project idea           | neutral                        |
+| Project in_progress    | accent soft background         |
+| Project done           | muted green                    |
 
 ### Notifications bell
 
@@ -140,13 +136,13 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 Implement as needed during MVP phases:
 
-| Component | Radix package | Notes |
-|-----------|---------------|-------|
-| `Button` | — | native button + Tailwind variants: primary, ghost, destructive |
-| `Dialog` | `@radix-ui/react-dialog` | edit forms, photo lightbox |
-| `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu |
-| `Popover` | `@radix-ui/react-popover` | @-mention autocomplete |
-| `Tabs` | `@radix-ui/react-tabs` | events upcoming/past if needed |
+| Component      | Radix package                   | Notes                                                          |
+| -------------- | ------------------------------- | -------------------------------------------------------------- |
+| `Button`       | —                               | native button + Tailwind variants: primary, ghost, destructive |
+| `Dialog`       | `@radix-ui/react-dialog`        | edit forms, photo lightbox                                     |
+| `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu                                         |
+| `Popover`      | `@radix-ui/react-popover`       | @-mention autocomplete                                         |
+| `Tabs`         | `@radix-ui/react-tabs`          | events upcoming/past if needed                                 |
 
 ---
 

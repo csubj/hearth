@@ -3,7 +3,7 @@ doc: deploy
 project: hearth
 version: 1
 status: decided
-last_updated: 2026-06-14
+last_updated: 2026-06-15
 related:
   - docs/design/01_tech.md
   - docs/design/02_auth.md
@@ -20,13 +20,13 @@ Structured reference for agents and contributors. How to run hearth locally, in 
 
 ## Hosting target
 
-| Field | Value |
-|-------|-------|
-| **Choice** | Single VPS or PaaS container (Fly.io, Railway, Hetzner, etc.) |
-| **Role** | Run one Next.js Node server per household instance |
-| **Rationale** | Matches embedded SQLite — one writer, local disk for DB and photos. Simplest ops for a personal/household app. |
+| Field           | Value                                                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Single VPS or PaaS container (Fly.io, Railway, Hetzner, etc.)                                                          |
+| **Role**        | Run one Next.js Node server per household instance                                                                     |
+| **Rationale**   | Matches embedded SQLite — one writer, local disk for DB and photos. Simplest ops for a personal/household app.         |
 | **Conventions** | One deployment = one household. Scale vertically if needed; do not run multiple app instances against one SQLite file. |
-| **References** | Provider docs when chosen; this doc is provider-agnostic |
+| **References**  | Provider docs when chosen; this doc is provider-agnostic                                                               |
 
 ---
 
@@ -34,16 +34,16 @@ Structured reference for agents and contributors. How to run hearth locally, in 
 
 Document all in `.env.example`:
 
-| Variable | Required | Default | Purpose |
-|----------|----------|---------|---------|
-| `DATABASE_URL` | yes | `file:./data/hearth.db` | SQLite path |
-| `SESSION_SECRET` | prod yes | — | Lucia session signing (32+ random bytes) |
-| `NODE_ENV` | auto | `development` | |
-| `PORT` | no | `3000` | Next.js listen port |
-| `UPLOADS_DIR` | no | `data/uploads` | Photo storage root |
-| `HEARTH_BOOTSTRAP_USERNAME` | bootstrap | — | First admin (non-interactive) |
-| `HEARTH_BOOTSTRAP_PASSWORD` | bootstrap | — | |
-| `HEARTH_BOOTSTRAP_DISPLAY_NAME` | no | — | |
+| Variable                        | Required  | Default                 | Purpose                                  |
+| ------------------------------- | --------- | ----------------------- | ---------------------------------------- |
+| `DATABASE_URL`                  | yes       | `file:./data/hearth.db` | SQLite path                              |
+| `SESSION_SECRET`                | prod yes  | —                       | Lucia session signing (32+ random bytes) |
+| `NODE_ENV`                      | auto      | `development`           |                                          |
+| `PORT`                          | no        | `3000`                  | Next.js listen port                      |
+| `UPLOADS_DIR`                   | no        | `data/uploads`          | Photo storage root                       |
+| `HEARTH_BOOTSTRAP_USERNAME`     | bootstrap | —                       | First admin (non-interactive)            |
+| `HEARTH_BOOTSTRAP_PASSWORD`     | bootstrap | —                       |                                          |
+| `HEARTH_BOOTSTRAP_DISPLAY_NAME` | no        | —                       |                                          |
 
 Generate session secret:
 
@@ -83,7 +83,7 @@ Database and uploads live in `./data/` (gitignored).
 Enable Next.js standalone output in `next.config.ts` for smaller images:
 
 ```typescript
-output: "standalone"
+output: "standalone";
 ```
 
 ### docker-compose.yml
@@ -136,11 +136,35 @@ Migrations must be idempotent and committed in `drizzle/`.
 
 ---
 
+## Container registry (GHCR)
+
+Workflow: `.github/workflows/publish-image.yml`
+
+| Trigger        | Tags pushed                                               |
+| -------------- | --------------------------------------------------------- |
+| Push to `main` | `latest`, `sha-<short-sha>`, `main`                       |
+| Tag `v*`       | semver (`v1.2.3` → `1.2.3`, `1.2`) plus `sha-<short-sha>` |
+
+Image: `ghcr.io/<owner>/hearth` (lowercased `${{ github.repository }}`).
+
+Pull and run:
+
+```bash
+docker pull ghcr.io/<owner>/hearth:latest
+docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
+```
+
+Edit `docker-compose.ghcr.yml` with your owner slug. Persist `/app/data` (volume `hearth-data`).
+
+**Repo settings:** package visibility defaults to private for org repos; set the `hearth` package to public if you want anonymous pulls, or authenticate with `docker login ghcr.io` using a PAT with `read:packages`.
+
+---
+
 ## Health checks
 
-| Probe | Endpoint |
-|-------|----------|
-| Liveness | `GET /api/health` → `200 { "ok": true }` |
+| Probe     | Endpoint                                                |
+| --------- | ------------------------------------------------------- |
+| Liveness  | `GET /api/health` → `200 { "ok": true }`                |
 | Readiness | same — DB connectivity optional check in health handler |
 
 Docker Compose / Fly / Railway health check → `/api/health`.
@@ -186,10 +210,10 @@ hearth.example.com {
 
 ## Resource guidance
 
-| Scale | Suggestion |
-|-------|------------|
-| Household (2–6 users) | 512 MB–1 GB RAM, 1 vCPU |
-| Disk | Grow `data/` with photos; monitor volume size |
+| Scale                 | Suggestion                                    |
+| --------------------- | --------------------------------------------- |
+| Household (2–6 users) | 512 MB–1 GB RAM, 1 vCPU                       |
+| Disk                  | Grow `data/` with photos; monitor volume size |
 
 SQLite handles this workload easily.
 

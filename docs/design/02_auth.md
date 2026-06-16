@@ -19,10 +19,10 @@ Structured reference for agents and contributors. Product context lives in `00_i
 
 ## Roles
 
-| Role | Capabilities |
-|------|----------------|
-| **member** | Log in, read and write all household data, change own password, view notification stream |
-| **admin** | Everything a member can do, plus create/disable users, reset any user's password, promote another user to admin |
+| Role       | Capabilities                                                                                                    |
+| ---------- | --------------------------------------------------------------------------------------------------------------- |
+| **member** | Log in, read and write all household data, change own password, view notification stream                        |
+| **admin**  | Everything a member can do, plus create/disable users, reset any user's password, promote another user to admin |
 
 There is no read-only or guest role in v1. Every authenticated user has full access to shared data.
 
@@ -32,16 +32,16 @@ There is no read-only or guest role in v1. Every authenticated user has full acc
 
 ## User lifecycle
 
-| Action | Who | Notes |
-|--------|-----|-------|
-| Bootstrap first admin | Deploy / CLI | Created once when the instance has no users (see Bootstrap) |
-| Create user | Admin | Username + initial password (+ optional display name) |
-| Log in | User | Username + password → session cookie |
-| Change own password | User | Requires current password |
-| Reset password | Admin | Sets a new password for any user; no email flow |
-| Disable user | Admin | Soft-disable: user cannot log in; historical attribution preserved |
-| Re-enable user | Admin | Restores login access |
-| Promote to admin | Admin | Idempotent; cannot demote self if last admin |
+| Action                | Who          | Notes                                                              |
+| --------------------- | ------------ | ------------------------------------------------------------------ |
+| Bootstrap first admin | Deploy / CLI | Created once when the instance has no users (see Bootstrap)        |
+| Create user           | Admin        | Username + initial password (+ optional display name)              |
+| Log in                | User         | Username + password → session cookie                               |
+| Change own password   | User         | Requires current password                                          |
+| Reset password        | Admin        | Sets a new password for any user; no email flow                    |
+| Disable user          | Admin        | Soft-disable: user cannot log in; historical attribution preserved |
+| Re-enable user        | Admin        | Restores login access                                              |
+| Promote to admin      | Admin        | Idempotent; cannot demote self if last admin                       |
 
 Usernames are unique within the instance. Display names are optional and used for @-mentions and activity attribution; default to username when unset.
 
@@ -49,13 +49,13 @@ Usernames are unique within the instance. Display names are optional and used fo
 
 ## Passwords
 
-| Field | Value |
-|-------|-------|
-| **Hashing** | Argon2id via `@node-rs/argon2` |
-| **Role** | One-way password storage |
-| **Rationale** | Modern default for new applications; resistant to GPU cracking. Native bindings via `@node-rs/*` perform well in Node without shipping a full compiler toolchain. |
+| Field           | Value                                                                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hashing**     | Argon2id via `@node-rs/argon2`                                                                                                                                                                 |
+| **Role**        | One-way password storage                                                                                                                                                                       |
+| **Rationale**   | Modern default for new applications; resistant to GPU cracking. Native bindings via `@node-rs/*` perform well in Node without shipping a full compiler toolchain.                              |
 | **Conventions** | Never store or log plaintext passwords. Hash on write (create, reset, change-password); verify on login. Tune Argon2 params via env or constants in one module — do not scatter magic numbers. |
-| **References** | https://github.com/napi-rs/node-rs · https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html |
+| **References**  | https://github.com/napi-rs/node-rs · https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html                                                                          |
 
 **Policy (v1):**
 
@@ -68,14 +68,14 @@ Usernames are unique within the instance. Display names are optional and used fo
 
 ## Sessions
 
-| Field | Value |
-|-------|-------|
-| **Choice** | Server-side sessions in SQLite + httpOnly cookie |
-| **Role** | Authenticate requests after login |
-| **Rationale** | Fits the single-instance, embedded-SQLite stack. Sessions can be revoked immediately (disable user, logout everywhere). No JWT secret rotation or stateless tradeoffs needed at this scale. |
-| **Library** | Lucia v3 with `@lucia-auth/adapter-drizzle` |
+| Field           | Value                                                                                                                                                                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Server-side sessions in SQLite + httpOnly cookie                                                                                                                                                                                                    |
+| **Role**        | Authenticate requests after login                                                                                                                                                                                                                   |
+| **Rationale**   | Fits the single-instance, embedded-SQLite stack. Sessions can be revoked immediately (disable user, logout everywhere). No JWT secret rotation or stateless tradeoffs needed at this scale.                                                         |
+| **Library**     | Lucia v3 with `@lucia-auth/adapter-drizzle`                                                                                                                                                                                                         |
 | **Conventions** | Session ID in an httpOnly, `Secure` (production), `SameSite=Lax` cookie. Validate session in Next.js middleware for protected routes and in server actions / route handlers. Invalidate all sessions for a user on disable or admin password reset. |
-| **References** | https://lucia-auth.com · https://nextjs.org/docs/app/building-your-application/routing/middleware |
+| **References**  | https://lucia-auth.com · https://nextjs.org/docs/app/building-your-application/routing/middleware                                                                                                                                                   |
 
 ### Session flow
 
@@ -105,12 +105,12 @@ sequenceDiagram
 
 ## Route protection
 
-| Surface | Rule |
-|---------|------|
-| `/login` | Public; redirect to `/` if already authenticated |
-| App pages (`/`, feature routes, notifications) | Require valid session |
-| Admin pages (`/admin/users`, etc.) | Require session + `role = admin` |
-| API routes / server actions | Check session in handler; never rely on client-side checks alone |
+| Surface                                        | Rule                                                             |
+| ---------------------------------------------- | ---------------------------------------------------------------- |
+| `/login`                                       | Public; redirect to `/` if already authenticated                 |
+| App pages (`/`, feature routes, notifications) | Require valid session                                            |
+| Admin pages (`/admin/users`, etc.)             | Require session + `role = admin`                                 |
+| API routes / server actions                    | Check session in handler; never rely on client-side checks alone |
 
 Unauthenticated requests to protected routes redirect to `/login` with a `returnTo` query param.
 
@@ -134,11 +134,11 @@ No bulk import, no invitation emails. The admin copies credentials out of band (
 
 On first run, the instance has no users. The first admin is created outside the web UI:
 
-| Field | Value |
-|-------|-------|
-| **Mechanism** | CLI script: `pnpm run auth:bootstrap` |
-| **Input** | Username + password via prompts, or env vars for non-interactive deploy |
-| **Guard** | Script refuses to run if any user already exists |
+| Field         | Value                                                                   |
+| ------------- | ----------------------------------------------------------------------- |
+| **Mechanism** | CLI script: `pnpm run auth:bootstrap`                                   |
+| **Input**     | Username + password via prompts, or env vars for non-interactive deploy |
+| **Guard**     | Script refuses to run if any user already exists                        |
 
 Env vars for non-interactive bootstrap (document in `.env.example`):
 
@@ -184,8 +184,8 @@ Lucia's Drizzle adapter defines exact session table shape — follow upstream sc
 
 ```yaml
 auth:
-  session_cookie_name: hearth_session  # default; override if needed
-  session_ttl_days: 30                   # sliding or absolute — pick one in implementation
+  session_cookie_name: hearth_session # default; override if needed
+  session_ttl_days: 30 # sliding or absolute — pick one in implementation
   bootstrap:
     username: HEARTH_BOOTSTRAP_USERNAME
     password: HEARTH_BOOTSTRAP_PASSWORD
@@ -224,7 +224,7 @@ auth:
 auth:
   model: self-managed
   household_per_instance: 1
-  provider: none  # no OAuth
+  provider: none # no OAuth
   password_hash: argon2id
   password_hash_lib: "@node-rs/argon2"
   session: server-side

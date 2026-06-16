@@ -22,17 +22,17 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** empty app boots, DB migrates, hooks run.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `package.json` + pnpm | Scripts: `dev`, `build`, `start`, `test`, `lint`, `typecheck`, `db:migrate`, `db:generate` |
-| Next.js App Router skeleton | `app/layout.tsx`, `app/globals.css` |
-| Tailwind v4 | per `05_styling.md` |
-| Drizzle + better-sqlite3 | `src/db/`, `drizzle/` migrations |
-| Vitest + ESLint + Prettier | per `01_tech.md` |
-| Lefthook | wire existing `lefthook.yml` |
-| `.env.example` | `DATABASE_URL`, `SESSION_SECRET`, bootstrap vars |
-| Docker | `Dockerfile`, `docker-compose.yml` per `09_deploy.md` |
-| Health route | `GET /api/health` |
+| Deliverable                 | Notes                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| `package.json` + pnpm       | Scripts: `dev`, `build`, `start`, `test`, `lint`, `typecheck`, `db:migrate`, `db:generate` |
+| Next.js App Router skeleton | `app/layout.tsx`, `app/globals.css`                                                        |
+| Tailwind v4                 | per `05_styling.md`                                                                        |
+| Drizzle + better-sqlite3    | `src/db/`, `drizzle/` migrations                                                           |
+| Vitest + ESLint + Prettier  | per `01_tech.md`                                                                           |
+| Lefthook                    | wire existing `lefthook.yml`                                                               |
+| `.env.example`              | `DATABASE_URL`, `SESSION_SECRET`, bootstrap vars                                           |
+| Docker                      | `Dockerfile`, `docker-compose.yml` per `09_deploy.md`                                      |
+| Health route                | `GET /api/health`                                                                          |
 
 **Done when:**
 
@@ -47,17 +47,17 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** login works; admin bootstrap; protected routes.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `users`, `sessions` schema + migrations | `02_auth.md`, `03_schema.md` |
-| Lucia setup | `src/lib/auth/` |
-| `middleware.ts` | route protection |
-| `/login` page | server action login |
-| `pnpm run auth:bootstrap` | first admin CLI |
-| `(app)/layout.tsx` | minimal shell + logout |
-| `/settings` | change own password |
-| `/admin/users` | admin CRUD |
-| Auth tests | login, disabled user, admin guard, last-admin |
+| Deliverable                             | Notes                                         |
+| --------------------------------------- | --------------------------------------------- |
+| `users`, `sessions` schema + migrations | `02_auth.md`, `03_schema.md`                  |
+| Lucia setup                             | `src/lib/auth/`                               |
+| `middleware.ts`                         | route protection                              |
+| `/login` page                           | server action login                           |
+| `pnpm run auth:bootstrap`               | first admin CLI                               |
+| `(app)/layout.tsx`                      | minimal shell + logout                        |
+| `/settings`                             | change own password                           |
+| `/admin/users`                          | admin CRUD                                    |
+| Auth tests                              | login, disabled user, admin guard, last-admin |
 
 **Done when:**
 
@@ -72,14 +72,14 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** core product loop — capture and glance.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `stream_entries` migration | |
-| `/stream` page | list + quick capture form |
-| `/` home | stream section summary |
-| Server actions | create, update, pin, mark done |
-| Basic UI components | `Button`, list cards per `05_styling.md` |
-| Notification emitter stub | log-only OK; full fan-out in Phase 6 |
+| Deliverable                | Notes                                    |
+| -------------------------- | ---------------------------------------- |
+| `stream_entries` migration |                                          |
+| `/stream` page             | list + quick capture form                |
+| `/` home                   | stream section summary                   |
+| Server actions             | create, update, pin, mark done           |
+| Basic UI components        | `Button`, list cards per `05_styling.md` |
+| Notification emitter stub  | log-only OK; full fan-out in Phase 6     |
 
 **Done when:**
 
@@ -94,13 +94,13 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** first specialized list feature.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `restaurants` migration | |
-| `/restaurants`, `/restaurants/[id]` | list + detail |
-| Actions | create, update, mark visited, rating |
-| Home section | want-to-try preview |
-| Filters | status, sort by date/rating |
+| Deliverable                         | Notes                                |
+| ----------------------------------- | ------------------------------------ |
+| `restaurants` migration             |                                      |
+| `/restaurants`, `/restaurants/[id]` | list + detail                        |
+| Actions                             | create, update, mark visited, rating |
+| Home section                        | want-to-try preview                  |
+| Filters                             | status, sort by date/rating          |
 
 **Done when:**
 
@@ -115,12 +115,12 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** remaining feature lists.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `projects`, `trackers`, `tracker_entries`, `events` migrations | |
-| Routes per `04_routes.md` | all list + detail pages |
-| Home sections | one block per feature |
-| Tracker history | table/cards on detail page |
+| Deliverable                                                    | Notes                      |
+| -------------------------------------------------------------- | -------------------------- |
+| `projects`, `trackers`, `tracker_entries`, `events` migrations |                            |
+| Routes per `04_routes.md`                                      | all list + detail pages    |
+| Home sections                                                  | one block per feature      |
+| Tracker history                                                | table/cards on detail page |
 
 **Done when:**
 
@@ -135,12 +135,12 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** photos on user content.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `attachments` migration | |
-| `POST/GET /api/attachments` | per `07_attachments.md` |
-| Upload UI on detail forms | stream, restaurant, project, tracker entry, event |
-| Thumbnail grid + lightbox | Radix Dialog |
+| Deliverable                 | Notes                                             |
+| --------------------------- | ------------------------------------------------- |
+| `attachments` migration     |                                                   |
+| `POST/GET /api/attachments` | per `07_attachments.md`                           |
+| Upload UI on detail forms   | stream, restaurant, project, tracker entry, event |
+| Thumbnail grid + lightbox   | Radix Dialog                                      |
 
 **Done when:**
 
@@ -154,16 +154,16 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** activity stream and mentions.
 
-| Deliverable | Notes |
-|-------------|-------|
-| `notifications`, `mentions` migrations | |
-| `src/lib/notifications/emit.ts` | full fan-out |
-| `src/lib/mentions/parse.ts` | parse + persist |
-| `/notifications` page | feed, mark read, mark all |
-| Nav badge | unread count |
-| @ autocomplete | Popover on supported fields |
-| Home "since last visit" | optional block |
-| Wire emitter into all actions | from Phase 2–5 |
+| Deliverable                            | Notes                       |
+| -------------------------------------- | --------------------------- |
+| `notifications`, `mentions` migrations |                             |
+| `src/lib/notifications/emit.ts`        | full fan-out                |
+| `src/lib/mentions/parse.ts`            | parse + persist             |
+| `/notifications` page                  | feed, mark read, mark all   |
+| Nav badge                              | unread count                |
+| @ autocomplete                         | Popover on supported fields |
+| Home "since last visit"                | optional block              |
+| Wire emitter into all actions          | from Phase 2–5              |
 
 **Done when:**
 
@@ -178,13 +178,13 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Goal:** production-like local run and CI green.
 
-| Deliverable | Notes |
-|-------------|-------|
-| Error boundaries / toast feedback | minimal |
-| Loading states on forms | `useActionState` where needed |
-| README | setup instructions |
-| CI workflow | per `10_ci.md` |
-| Docker production smoke test | compose + health + login |
+| Deliverable                       | Notes                         |
+| --------------------------------- | ----------------------------- |
+| Error boundaries / toast feedback | minimal                       |
+| Loading states on forms           | `useActionState` where needed |
+| README                            | setup instructions            |
+| CI workflow                       | per `10_ci.md`                |
+| Docker production smoke test      | compose + health + login      |
 
 **Done when:**
 
@@ -219,7 +219,7 @@ mvp:
       depends_on: [4]
     - id: 6
       name: notifications_mentions
-      depends_on: [4]  # can parallel with 5 if needed
+      depends_on: [4] # can parallel with 5 if needed
     - id: 7
       name: polish_deploy
       depends_on: [5, 6]

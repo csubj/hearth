@@ -20,13 +20,13 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 
 ## Storage
 
-| Field | Value |
-|-------|-------|
-| **Choice** | Local filesystem under `data/uploads/` |
-| **Role** | Byte storage for photos |
-| **Rationale** | Matches single-instance SQLite deployment. Simple Docker volume mount. No extra service cost. |
+| Field           | Value                                                                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Local filesystem under `data/uploads/`                                                                                                                                       |
+| **Role**        | Byte storage for photos                                                                                                                                                      |
+| **Rationale**   | Matches single-instance SQLite deployment. Simple Docker volume mount. No extra service cost.                                                                                |
 | **Conventions** | Gitignore entire `data/` directory (already in `.gitignore`). Paths stored in DB are relative to project root: `uploads/{uuid}.{ext}`. Never serve files without auth check. |
-| **References** | `09_deploy.md` for volume mounts |
+| **References**  | `09_deploy.md` for volume mounts                                                                                                                                             |
 
 Directory layout:
 
@@ -42,12 +42,12 @@ data/
 
 ## Allowed files
 
-| Rule | Value |
-|------|-------|
-| Mime types | `image/jpeg`, `image/png`, `image/webp`, `image/gif` |
-| Max size | 10 MB per file |
-| Max per entity | 10 photos |
-| Extensions | Derived from mime; reject mismatch |
+| Rule           | Value                                                |
+| -------------- | ---------------------------------------------------- |
+| Mime types     | `image/jpeg`, `image/png`, `image/webp`, `image/gif` |
+| Max size       | 10 MB per file                                       |
+| Max per entity | 10 photos                                            |
+| Extensions     | Derived from mime; reject mismatch                   |
 
 Validate mime from magic bytes (file-type lib or manual header check), not client-provided extension alone.
 
@@ -97,13 +97,13 @@ Do not expose direct static URLs under `/public` — all access authenticated.
 
 Attachments link polymorphically via `entity_type` + `entity_id`:
 
-| entity_type | When attached |
-|-------------|---------------|
-| `stream_entry` | On create/edit stream note |
-| `restaurant` | Notes, visit review |
-| `project` | Description updates, progress photos |
-| `tracker_entry` | Entry note (e.g. scale photo) |
-| `event` | Event note |
+| entity_type     | When attached                        |
+| --------------- | ------------------------------------ |
+| `stream_entry`  | On create/edit stream note           |
+| `restaurant`    | Notes, visit review                  |
+| `project`       | Description updates, progress photos |
+| `tracker_entry` | Entry note (e.g. scale photo)        |
+| `event`         | Event note                           |
 
 Upload requires entity to exist first — UI flow: create entry → edit/add photos. Optional: allow pending uploads on create form after first save.
 
@@ -159,8 +159,8 @@ Use temp directory override `UPLOADS_DIR` in tests.
 
 ```yaml
 attachments:
-  uploads_dir: UPLOADS_DIR  # default: data/uploads
-  max_bytes: 10485760       # 10 MB
+  uploads_dir: UPLOADS_DIR # default: data/uploads
+  max_bytes: 10485760 # 10 MB
   max_per_entity: 10
   allowed_mime:
     - image/jpeg
@@ -183,5 +183,5 @@ attachments:
   max_size_bytes: 10485760
   max_per_entity: 10
   mime_allowlist: [image/jpeg, image/png, image/webp, image/gif]
-  thumbnails: false  # v1
+  thumbnails: false # v1
 ```

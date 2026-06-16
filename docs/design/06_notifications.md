@@ -20,20 +20,20 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 
 ## Notification types
 
-| Type | When emitted | Recipients |
-|------|--------------|------------|
-| `stream.created` | New stream entry | All users except actor |
-| `stream.updated` | Body/metadata edit | All except actor |
-| `stream.done` | Entry marked done | All except actor |
-| `restaurant.created` | New restaurant | All except actor |
-| `restaurant.visited` | Marked visited / rated | All except actor |
-| `project.created` | New project | All except actor |
-| `project.status_changed` | Status update | All except actor |
-| `tracker.entry_added` | New tracker entry | All except actor |
-| `event.created` | New event | All except actor |
-| `event.updated` | Event edit | All except actor |
-| `mention` | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
-| `user.admin_action` | Admin create/disable/reset user | All admins except actor (audit) |
+| Type                     | When emitted                       | Recipients                                               |
+| ------------------------ | ---------------------------------- | -------------------------------------------------------- |
+| `stream.created`         | New stream entry                   | All users except actor                                   |
+| `stream.updated`         | Body/metadata edit                 | All except actor                                         |
+| `stream.done`            | Entry marked done                  | All except actor                                         |
+| `restaurant.created`     | New restaurant                     | All except actor                                         |
+| `restaurant.visited`     | Marked visited / rated             | All except actor                                         |
+| `project.created`        | New project                        | All except actor                                         |
+| `project.status_changed` | Status update                      | All except actor                                         |
+| `tracker.entry_added`    | New tracker entry                  | All except actor                                         |
+| `event.created`          | New event                          | All except actor                                         |
+| `event.updated`          | Event edit                         | All except actor                                         |
+| `mention`                | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
+| `user.admin_action`      | Admin create/disable/reset user    | All admins except actor (audit)                          |
 
 ---
 
@@ -57,15 +57,15 @@ Pre-rendered string stored in `notifications.summary` for stable feed display wi
 
 Templates (actor display name interpolated):
 
-| Type | Template example |
-|------|------------------|
-| `stream.created` | `{actor} added a stream note` |
-| `stream.done` | `{actor} marked a stream note done` |
-| `restaurant.created` | `{actor} added {restaurant.name}` |
-| `restaurant.visited` | `{actor} visited {restaurant.name}` |
+| Type                     | Template example                                 |
+| ------------------------ | ------------------------------------------------ |
+| `stream.created`         | `{actor} added a stream note`                    |
+| `stream.done`            | `{actor} marked a stream note done`              |
+| `restaurant.created`     | `{actor} added {restaurant.name}`                |
+| `restaurant.visited`     | `{actor} visited {restaurant.name}`              |
 | `project.status_changed` | `{actor} moved "{project.title}" to In progress` |
-| `mention` | `{actor} mentioned you in a stream note` |
-| `user.admin_action` | `{actor} created user @{username}` |
+| `mention`                | `{actor} mentioned you in a stream note`         |
+| `user.admin_action`      | `{actor} created user @{username}`               |
 
 Include enough context to scan; full detail on click-through to entity route.
 
@@ -73,10 +73,10 @@ Include enough context to scan; full detail on click-through to entity route.
 
 ## Read state
 
-| Mechanism | Use |
-|-----------|-----|
-| `notifications.read_at` | Per-notification read timestamp |
-| `users.last_seen_at` | Updated on authenticated layout load; drives home "since you last visited" and nav badge |
+| Mechanism               | Use                                                                                      |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| `notifications.read_at` | Per-notification read timestamp                                                          |
+| `users.last_seen_at`    | Updated on authenticated layout load; drives home "since you last visited" and nav badge |
 
 **Badge count:** `COUNT(*) WHERE recipient = currentUser AND read_at IS NULL`.
 
@@ -124,13 +124,13 @@ Fields supporting mentions in v1:
 
 Map `(entity_type, entity_id)` → route:
 
-| entity_type | Route |
-|-------------|-------|
-| `stream_entry` | `/stream#entry-{id}` or scroll via query |
-| `restaurant` | `/restaurants/[id]` |
-| `project` | `/projects/[id]` |
-| `tracker` / `tracker_entry` | `/trackers/[trackerId]` |
-| `event` | `/events` |
+| entity_type                 | Route                                    |
+| --------------------------- | ---------------------------------------- |
+| `stream_entry`              | `/stream#entry-{id}` or scroll via query |
+| `restaurant`                | `/restaurants/[id]`                      |
+| `project`                   | `/projects/[id]`                         |
+| `tracker` / `tracker_entry` | `/trackers/[trackerId]`                  |
+| `event`                     | `/events`                                |
 
 Notification row click marks read and navigates.
 
