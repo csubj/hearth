@@ -1,17 +1,38 @@
-# SQLite (on-disk mode — see docs/design/01_tech.md)
+# SQLite database + uploads (see docs/design/01_tech.md)
 data/
 
 # Dependencies
 node_modules/
+.pnpm-store/
 
 # Next.js
 .next/
 out/
 
-# Env
+# Env (keep .env.example committed)
 .env
 .env*.local
 
-# OS / editor
-.DS_Store
+# TypeScript (incremental builds)
+*.tsbuildinfo
+
+# Test & lint artifacts
+coverage/
+.eslintcache
+
+# Logs & debug
 *.log
+pnpm-debug.log*
+pnpm-error.log*
+
+# Deploy tooling
+.vercel
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors (local settings)
+.idea/
+*.swp
+*.swo
