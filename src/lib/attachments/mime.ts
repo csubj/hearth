@@ -1,6 +1,7 @@
 import type { AllowedMimeType } from "./config";
-import { ALLOWED_MIME_TYPES } from "./config";
+import { ALLOWED_IMAGE_MIME_TYPES } from "./config";
 
+const PDF = "%PDF" as const;
 const JPEG = [0xff, 0xd8, 0xff] as const;
 const PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] as const;
 const GIF87 = "GIF87a";
@@ -50,8 +51,23 @@ export function detectImageMime(buffer: Buffer): MimeValidationResult {
   return { ok: false, error: "Unsupported or unrecognized image format." };
 }
 
+export function detectPdfMime(buffer: Buffer): MimeValidationResult {
+  if (buffer.length >= 4 && buffer.toString("ascii", 0, 4) === PDF) {
+    return { ok: true, mimeType: "application/pdf", extension: "pdf" };
+  }
+  return { ok: false, error: "Unsupported or unrecognized document format." };
+}
+
+export function detectFileMime(buffer: Buffer): MimeValidationResult {
+  const image = detectImageMime(buffer);
+  if (image.ok) {
+    return image;
+  }
+  return detectPdfMime(buffer);
+}
+
 export function isAllowedMimeType(mimeType: string): mimeType is AllowedMimeType {
-  return (ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType);
+  return (ALLOWED_IMAGE_MIME_TYPES as readonly string[]).includes(mimeType);
 }
 
 const FILENAME_EXT_TO_CANONICAL: Record<string, string> = {
@@ -60,6 +76,7 @@ const FILENAME_EXT_TO_CANONICAL: Record<string, string> = {
   png: "png",
   gif: "gif",
   webp: "webp",
+  pdf: "pdf",
 };
 
 export function parseFilenameExtension(filename: string): string | null {

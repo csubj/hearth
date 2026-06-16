@@ -2,10 +2,16 @@ import { and, count, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { attachments, users } from "@/db/schema";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
-import { MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS_PER_ENTITY } from "./config";
+import type { EntityType } from "@/lib/notifications/emit";
+import {
+  getMaxBytesForEntity,
+  getMaxBytesForMime,
+  isAllowedMimeForEntity,
+  MAX_ATTACHMENTS_PER_ENTITY,
+} from "./config";
 import type { AttachmentEntityType } from "./entity";
 import { entityExists } from "./entity";
-import { detectImageMime, filenameExtensionMatchesDetected } from "./mime";
+import { detectFileMime, filenameExtensionMatchesDetected } from "./mime";
 import { toAttachmentSummary } from "./queries";
 import { deleteUploadFile, writeUploadFile } from "./storage";
 
@@ -41,8 +47,10 @@ function notificationTypeForEntity(entityType: AttachmentEntityType): string {
       return "restaurant.updated";
     case "project":
       return "project.updated";
-    case "tracker_entry":
-      return "tracker.entry_added";
+    case "metric_entry":
+      return "metric.entry_added";
+    case "inventory_item":
+      return "inventory.updated";
     case "event":
       return "event.updated";
   }
@@ -65,17 +73,34 @@ export async function uploadAttachment(
     return { ok: false, status: 404, error: "Entity not found." };
   }
 
-  if (input.data.byteLength > MAX_ATTACHMENT_BYTES) {
-    return { ok: false, status: 413, error: "File exceeds the 10 MB limit." };
+  if (input.data.byteLength > getMaxBytesForEntity(input.entityType)) {
+    const limitMb = Math.round(getMaxBytesForEntity(input.entityType) / (1024 * 1024));
+    return { ok: false, status: 413, error: `File exceeds the ${limitMb} MB limit.` };
   }
 
   if (input.data.byteLength === 0) {
     return { ok: false, status: 400, error: "File is empty." };
   }
 
-  const mimeResult = detectImageMime(input.data);
+  const mimeResult = detectFileMime(input.data);
   if (!mimeResult.ok) {
     return { ok: false, status: 415, error: mimeResult.error };
+  }
+
+  if (!isAllowedMimeForEntity(input.entityType, mimeResult.mimeType)) {
+    return {
+      ok: false,
+      status: 415,
+      error:
+        input.entityType === "inventory_item"
+          ? "File type not allowed for inventory (images and PDF only)."
+          : "Only image files are allowed for this item.",
+    };
+  }
+
+  if (input.data.byteLength > getMaxBytesForMime(input.entityType, mimeResult.mimeType)) {
+    const limitMb = Math.round(getMaxBytesForMime(input.entityType, mimeResult.mimeType) / (1024 * 1024));
+    return { ok: false, status: 413, error: `File exceeds the ${limitMb} MB limit.` };
   }
 
   if (!filenameExtensionMatchesDetected(input.filename, mimeResult.extension)) {
@@ -132,19 +157,20 @@ export async function uploadAttachment(
       return {
         ok: false,
         status: 409,
-        error: `Maximum of ${MAX_ATTACHMENTS_PER_ENTITY} photos per item.`,
+        error: `Maximum of ${MAX_ATTACHMENTS_PER_ENTITY} files per item.`,
       };
     }
     return { ok: false, status: 500, error: "Failed to save attachment metadata." };
   }
 
   const name = await actorDisplayName(input.userId);
+  const activityEntityType: EntityType = input.entityType;
   await emitHouseholdActivity({
     type: notificationTypeForEntity(input.entityType),
     actorId: input.userId,
-    entityType: input.entityType,
+    entityType: activityEntityType,
     entityId: input.entityId,
-    summary: `${name} added a photo`,
+    summary: `${name} added a ${mimeResult.mimeType === "application/pdf" ? "document" : "photo"}`,
   });
 
   return { ok: true, attachment: toAttachmentSummary(row) };

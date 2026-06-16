@@ -1,4 +1,4 @@
-import { CreateRestaurantForm } from "@/components/restaurants/CreateRestaurantForm";
+import { CreateRestaurantCollapsible } from "@/components/restaurants/CreateRestaurantCollapsible";
 import { RestaurantFilters } from "@/components/restaurants/RestaurantFilters";
 import { RestaurantList } from "@/components/restaurants/RestaurantList";
 import {
@@ -40,11 +40,13 @@ export default async function RestaurantsPage({
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-serif text-2xl text-text">Restaurants</h1>
-        <p className="mt-1 text-sm text-text-muted">Places to try and spots you&apos;ve loved.</p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl text-text">Restaurants</h1>
+          <p className="mt-1 text-sm text-text-muted">Places to try and spots you&apos;ve loved.</p>
+        </div>
+        <CreateRestaurantCollapsible users={mentionUsers} />
       </header>
-      <CreateRestaurantForm users={mentionUsers} />
       <RestaurantFilters filters={filters} neighborhoods={neighborhoods} users={mentionUsers} />
       <RestaurantList restaurants={items} />
     </div>

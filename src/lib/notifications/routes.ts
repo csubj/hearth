@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { trackerEntries } from "@/db/schema";
+import { metricEntries } from "@/db/schema";
 import type { EntityType } from "@/lib/notifications/emit";
 
 export async function getNotificationHref(
@@ -18,18 +18,20 @@ export async function getNotificationHref(
       return `/restaurants/${entityId}`;
     case "project":
       return `/projects/${entityId}`;
-    case "tracker":
-      return `/trackers/${entityId}`;
-    case "tracker_entry": {
+    case "metric":
+      return `/metrics/${entityId}`;
+    case "metric_entry": {
       const [entry] = await getDb()
-        .select({ trackerId: trackerEntries.trackerId })
-        .from(trackerEntries)
-        .where(eq(trackerEntries.id, entityId))
+        .select({ metricId: metricEntries.metricId })
+        .from(metricEntries)
+        .where(eq(metricEntries.id, entityId))
         .limit(1);
-      return entry ? `/trackers/${entry.trackerId}` : null;
+      return entry ? `/metrics/${entry.metricId}` : null;
     }
     case "event":
       return "/events";
+    case "inventory_item":
+      return `/inventory/${entityId}`;
     default:
       return null;
   }

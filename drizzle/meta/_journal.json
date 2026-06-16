@@ -29,6 +29,20 @@
       "when": 1781589412783,
       "tag": "0003_abnormal_siren",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1781635901140,
+      "tag": "0004_rename_trackers_to_metrics",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1781636723812,
+      "tag": "0005_broken_lucky_pierre",
+      "breakpoints": true
     }
   ]
 }

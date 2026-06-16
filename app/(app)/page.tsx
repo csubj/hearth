@@ -1,9 +1,10 @@
 import { SinceLastVisitSection } from "@/components/home/SinceLastVisitSection";
 import { EventsSection } from "@/components/home/EventsSection";
+import { InventorySection } from "@/components/home/InventorySection";
+import { MetricsSection } from "@/components/home/MetricsSection";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
 import { RestaurantsSection } from "@/components/home/RestaurantsSection";
 import { StreamSection } from "@/components/home/StreamSection";
-import { TrackersSection } from "@/components/home/TrackersSection";
 
 export default function HomePage() {
   return (
@@ -17,8 +18,9 @@ export default function HomePage() {
         <StreamSection />
         <RestaurantsSection />
         <ProjectsSection />
-        <TrackersSection />
+        <MetricsSection />
         <EventsSection />
+        <InventorySection />
       </div>
     </div>
   );
