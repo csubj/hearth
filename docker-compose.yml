@@ -15,7 +15,6 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: file:/app/data/hearth.db
-      SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-in-production-32bytes}
       NODE_ENV: production
     volumes:
       - hearth-data:/app/data

@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 jobs:
   check:
@@ -23,3 +24,4 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm build

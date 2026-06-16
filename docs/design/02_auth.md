@@ -120,7 +120,7 @@ Unauthenticated requests to protected routes redirect to `/login` with a `return
 
 Minimal user management under `/admin` (admin role only):
 
-- List users: username, display name, role, active/disabled, last login (if tracked)
+- List users: username, display name, role, active/disabled, last seen (`last_seen_at`, if tracked)
 - Create user: username, initial password, optional display name, role (default member)
 - Reset password: set new password for selected user
 - Disable / re-enable toggle
@@ -191,11 +191,11 @@ auth:
     password: HEARTH_BOOTSTRAP_PASSWORD
     display_name: HEARTH_BOOTSTRAP_DISPLAY_NAME
   secrets:
-    # Lucia / cookie signing — required in production
+    # Reserved / unused — Lucia uses opaque DB session IDs stored in SQLite, not signed cookies.
     session_secret: SESSION_SECRET
 ```
 
-`SESSION_SECRET` must be a long random string in production. Document generation in README / `.env.example`.
+`SESSION_SECRET` is listed in `.env.example` for backward compatibility but is **not read** by the application. It may be removed in a future release.
 
 ---
 

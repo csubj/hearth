@@ -37,7 +37,7 @@ Document all in `.env.example`:
 | Variable                        | Required  | Default                 | Purpose                                  |
 | ------------------------------- | --------- | ----------------------- | ---------------------------------------- |
 | `DATABASE_URL`                  | yes       | `file:./data/hearth.db` | SQLite path                              |
-| `SESSION_SECRET`                | prod yes  | —                       | Lucia session signing (32+ random bytes) |
+| `SESSION_SECRET`                | no        | —                       | Reserved / unused (not read by Lucia)    |
 | `NODE_ENV`                      | auto      | `development`           |                                          |
 | `PORT`                          | no        | `3000`                  | Next.js listen port                      |
 | `UPLOADS_DIR`                   | no        | `data/uploads`          | Photo storage root                       |
@@ -45,11 +45,7 @@ Document all in `.env.example`:
 | `HEARTH_BOOTSTRAP_PASSWORD`     | bootstrap | —                       |                                          |
 | `HEARTH_BOOTSTRAP_DISPLAY_NAME` | no        | —                       |                                          |
 
-Generate session secret:
-
-```bash
-openssl rand -base64 32
-```
+`SESSION_SECRET` may appear in older examples but is not used — Lucia stores opaque session IDs in SQLite.
 
 Never commit `.env` — already gitignored.
 
@@ -96,7 +92,6 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: file:/app/data/hearth.db
-      SESSION_SECRET: ${SESSION_SECRET}
       NODE_ENV: production
     volumes:
       - hearth-data:/app/data
@@ -224,7 +219,6 @@ SQLite handles this workload easily.
 - Do not mount SQLite over NFS/network filesystem
 - Do not run multiple replicas writing one DB file
 - Do not store uploads outside the persisted volume
-- Do not skip `SESSION_SECRET` in production
 
 ---
 
@@ -243,6 +237,7 @@ deploy:
   https: reverse_proxy_or_platform
   scaling: vertical_only
   env:
-    required: [DATABASE_URL, SESSION_SECRET]
+    required: [DATABASE_URL]
     optional: [PORT, UPLOADS_DIR, HEARTH_BOOTSTRAP_*]
+    reserved_unused: [SESSION_SECRET]
 ```
