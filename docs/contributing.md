@@ -41,17 +41,17 @@ make check            # lint + typecheck + test
 
 ## Conventions
 
-| Area | Rule |
-| ---- | ---- |
-| Package manager | **pnpm only** |
-| Router | Next.js **App Router** (`app/`), not Pages Router |
-| Components | Server Components default; `"use client"` only when needed |
-| Mutations | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve |
-| Database | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/` |
-| Auth | Lucia v3 + Argon2id — see [Authentication](design/02_auth.md) |
-| Styling | Tailwind v4 + Radix wrappers in `src/components/ui/` |
-| Tests | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared` |
-| Commits | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook |
+| Area            | Rule                                                                            |
+| --------------- | ------------------------------------------------------------------------------- |
+| Package manager | **pnpm only**                                                                   |
+| Router          | Next.js **App Router** (`app/`), not Pages Router                               |
+| Components      | Server Components default; `"use client"` only when needed                      |
+| Mutations       | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve |
+| Database        | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/`        |
+| Auth            | Lucia v3 + Argon2id — see [Authentication](design/02_auth.md)                   |
+| Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                            |
+| Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                 |
+| Commits         | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook         |
 
 ## Key paths
 
@@ -70,11 +70,11 @@ docs/design/      # design docs (source of truth)
 
 Lefthook runs on commit and push:
 
-| Hook | Purpose |
-| ---- | ------- |
+| Hook         | Purpose                                      |
+| ------------ | -------------------------------------------- |
 | `pre-commit` | Lint, format check, typecheck (staged files) |
-| `commit-msg` | Conventional Commits format |
-| `pre-push` | Full test suite |
+| `commit-msg` | Conventional Commits format                  |
+| `pre-push`   | Full test suite                              |
 
 ## Testing
 

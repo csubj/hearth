@@ -6,12 +6,12 @@ Manage your login credentials and personal settings under **Settings** (`/settin
 
 Under **Settings → Appearance**, pick a color theme for your hearth:
 
-| Theme | Notes |
-| ----- | ----- |
-| Default | Light, warm neutral |
-| Warm Earth | Softer earth tones |
-| Dark | Dark background |
-| Gamer | High-contrast dark with neon accent |
+| Theme      | Notes                               |
+| ---------- | ----------------------------------- |
+| Default    | Light, warm neutral                 |
+| Warm Earth | Softer earth tones                  |
+| Dark       | Dark background                     |
+| Gamer      | High-contrast dark with neon accent |
 
 The choice is saved to your account and applies wherever you're logged in.
 
@@ -42,10 +42,10 @@ If you need your display name changed, ask an admin.
 
 ## Roles
 
-| Role | Your capabilities |
-| ---- | ----------------- |
-| **Member** | Read/write all household data, change own password |
-| **Admin** | Everything above, plus user management at `/admin/users` |
+| Role       | Your capabilities                                        |
+| ---------- | -------------------------------------------------------- |
+| **Member** | Read/write all household data, change own password       |
+| **Admin**  | Everything above, plus user management at `/admin/users` |
 
 ## Logging out
 

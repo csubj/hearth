@@ -43,11 +43,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const parsed = createInventoryMaintenanceReminderSchema.safeParse(body);
   if (!parsed.success) return validationError(parsed.error);
 
-  const row = await createInventoryMaintenanceReminderApi(
-    auth.user,
-    inventoryItemId,
-    parsed.data,
-  );
+  const row = await createInventoryMaintenanceReminderApi(auth.user, inventoryItemId, parsed.data);
   if (!row) return notFoundError("Inventory item not found");
   return Response.json(serializeInventoryMaintenanceReminder(row), { status: 201 });
 }

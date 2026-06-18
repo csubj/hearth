@@ -73,9 +73,7 @@ export function MetricChart({ unit, entries }: MetricChartProps) {
                 }
                 return (
                   <div className="rounded-md border border-border bg-surface px-3 py-2 text-sm shadow-card">
-                    <p className="font-medium text-text">
-                      {formatTooltipValue(point.value, unit)}
-                    </p>
+                    <p className="font-medium text-text">{formatTooltipValue(point.value, unit)}</p>
                     <p className="text-text-muted">{point.label}</p>
                     {point.note ? <p className="mt-1 text-text-muted">{point.note}</p> : null}
                   </div>

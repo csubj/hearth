@@ -1,11 +1,6 @@
 import { desc, eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db";
-import {
-  inventoryItems,
-  inventoryMaintenanceReminders,
-  metricEntries,
-  metrics,
-} from "@/db/schema";
+import { inventoryItems, inventoryMaintenanceReminders, metricEntries, metrics } from "@/db/schema";
 import {
   getMaintenanceReminderAnchor,
   reminderIntervalState,
@@ -87,10 +82,7 @@ async function listInventoryMaintenanceUpcoming(
       itemName: inventoryItems.name,
     })
     .from(inventoryMaintenanceReminders)
-    .innerJoin(
-      inventoryItems,
-      eq(inventoryMaintenanceReminders.inventoryItemId, inventoryItems.id),
-    )
+    .innerJoin(inventoryItems, eq(inventoryMaintenanceReminders.inventoryItemId, inventoryItems.id))
     .where(isNotNull(inventoryMaintenanceReminders.reminderIntervalCount));
 
   const results: UpcomingReminder[] = [];

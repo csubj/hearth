@@ -33,11 +33,7 @@ export async function requireApiToken(request: Request): Promise<ApiTokenAuthRes
 
   const prefix = token.slice(0, 16);
   const db = getDb();
-  const [tokenRow] = await db
-    .select()
-    .from(apiTokens)
-    .where(eq(apiTokens.prefix, prefix))
-    .limit(1);
+  const [tokenRow] = await db.select().from(apiTokens).where(eq(apiTokens.prefix, prefix)).limit(1);
 
   if (!tokenRow || tokenRow.revokedAt) {
     return { ok: false, response: unauthorizedError() };
@@ -52,10 +48,7 @@ export async function requireApiToken(request: Request): Promise<ApiTokenAuthRes
     return { ok: false, response: unauthorizedError() };
   }
 
-  await db
-    .update(apiTokens)
-    .set({ lastUsedAt: new Date() })
-    .where(eq(apiTokens.id, tokenRow.id));
+  await db.update(apiTokens).set({ lastUsedAt: new Date() }).where(eq(apiTokens.id, tokenRow.id));
 
   return { ok: true, user: userRowToAuthUser(userRow), tokenId: tokenRow.id };
 }

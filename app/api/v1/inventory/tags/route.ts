@@ -35,9 +35,12 @@ export async function POST(request: NextRequest) {
 
   const row = await createInventoryTagApi(auth.user, parsed.data);
   if (!row) {
-    return Response.json({ error: { code: "internal_error", message: "Failed to create tag" } }, {
-      status: 500,
-    });
+    return Response.json(
+      { error: { code: "internal_error", message: "Failed to create tag" } },
+      {
+        status: 500,
+      },
+    );
   }
   return Response.json(serializeInventoryTag(row), { status: 201 });
 }

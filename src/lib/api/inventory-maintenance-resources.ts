@@ -21,9 +21,7 @@ export type MaintenanceReminderWithLinksRow = InventoryMaintenanceReminder & {
   links: InventoryMaintenanceReminderLink[];
 };
 
-export function serializeInventoryMaintenanceReminder(
-  row: MaintenanceReminderWithLinksRow,
-) {
+export function serializeInventoryMaintenanceReminder(row: MaintenanceReminderWithLinksRow) {
   return {
     id: row.id,
     inventoryItemId: row.inventoryItemId,
@@ -144,29 +142,33 @@ export async function createInventoryMaintenanceReminderApi(
     reminderRecipientUserId: input.reminderRecipientUserId ?? null,
   });
 
-  await getDb().insert(inventoryMaintenanceReminders).values({
-    id: reminderId,
-    inventoryItemId,
-    title: input.title,
-    notes: input.notes ?? null,
-    ...intervalFields,
-    lastCompletedAt: null,
-    lastReminderAt: null,
-    createdByUserId: user.id,
-    createdAt: now,
-    updatedAt: now,
-  });
+  await getDb()
+    .insert(inventoryMaintenanceReminders)
+    .values({
+      id: reminderId,
+      inventoryItemId,
+      title: input.title,
+      notes: input.notes ?? null,
+      ...intervalFields,
+      lastCompletedAt: null,
+      lastReminderAt: null,
+      createdByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
 
   if (input.links?.length) {
-    await getDb().insert(inventoryMaintenanceReminderLinks).values(
-      input.links.map((link) => ({
-        id: crypto.randomUUID(),
-        reminderId,
-        label: link.label,
-        url: link.url,
-        createdAt: now,
-      })),
-    );
+    await getDb()
+      .insert(inventoryMaintenanceReminderLinks)
+      .values(
+        input.links.map((link) => ({
+          id: crypto.randomUUID(),
+          reminderId,
+          label: link.label,
+          url: link.url,
+          createdAt: now,
+        })),
+      );
   }
 
   return getInventoryMaintenanceReminderApi(inventoryItemId, reminderId);

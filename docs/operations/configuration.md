@@ -6,16 +6,16 @@ Never commit `.env` to version control.
 
 ## Required variables
 
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
+| Variable       | Default                 | Purpose              |
+| -------------- | ----------------------- | -------------------- |
 | `DATABASE_URL` | `file:./data/hearth.db` | SQLite database path |
 
 ## Authentication modes
 
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
-| `AUTH_MODE` | `required` | Web access mode: `required` or `open` |
-| `OPEN_MODE_USERNAME` | — | Required when `AUTH_MODE=open` — username of the shared identity |
+| Variable             | Default    | Purpose                                                          |
+| -------------------- | ---------- | ---------------------------------------------------------------- |
+| `AUTH_MODE`          | `required` | Web access mode: `required` or `open`                            |
+| `OPEN_MODE_USERNAME` | —          | Required when `AUTH_MODE=open` — username of the shared identity |
 
 ### `required` mode (default)
 
@@ -42,10 +42,10 @@ Create the `household` user via admin before enabling open mode.
 
 API tokens are not environment variables. They are created and stored in the `api_tokens` database table.
 
-| Method | How |
-| ------ | --- |
+| Method   | How                                        |
+| -------- | ------------------------------------------ |
 | Admin UI | `/admin/api-tokens` — create, list, revoke |
-| CLI | `pnpm run auth:create-token` |
+| CLI      | `pnpm run auth:create-token`               |
 
 Each token is shown **once** at creation. Store it securely. Send it as `Authorization: Bearer <token>` on all `/api/v1/*` requests.
 
@@ -53,21 +53,21 @@ Revoke compromised tokens immediately from the admin UI.
 
 ## Optional variables
 
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
-| `NODE_ENV` | `development` | `production` in deployed environments |
-| `PORT` | `3000` | HTTP listen port |
-| `UPLOADS_DIR` | `data/uploads` | Photo and document storage root |
+| Variable      | Default        | Purpose                               |
+| ------------- | -------------- | ------------------------------------- |
+| `NODE_ENV`    | `development`  | `production` in deployed environments |
+| `PORT`        | `3000`         | HTTP listen port                      |
+| `UPLOADS_DIR` | `data/uploads` | Photo and document storage root       |
 
 ## Bootstrap variables
 
 Used once for non-interactive first admin creation. Only needed on first deploy.
 
-| Variable | Required | Purpose |
-| -------- | -------- | ------- |
-| `HEARTH_BOOTSTRAP_USERNAME` | For non-interactive bootstrap | First admin username |
-| `HEARTH_BOOTSTRAP_PASSWORD` | For non-interactive bootstrap | First admin password |
-| `HEARTH_BOOTSTRAP_DISPLAY_NAME` | No | Display name for first admin |
+| Variable                        | Required                      | Purpose                      |
+| ------------------------------- | ----------------------------- | ---------------------------- |
+| `HEARTH_BOOTSTRAP_USERNAME`     | For non-interactive bootstrap | First admin username         |
+| `HEARTH_BOOTSTRAP_PASSWORD`     | For non-interactive bootstrap | First admin password         |
+| `HEARTH_BOOTSTRAP_DISPLAY_NAME` | No                            | Display name for first admin |
 
 Example:
 
@@ -80,10 +80,10 @@ pnpm run auth:bootstrap
 
 ## Database modes
 
-| Mode | `DATABASE_URL` | Use case |
-| ---- | ---------------- | -------- |
-| On disk | `file:./data/hearth.db` | Local dev, Docker, production |
-| In memory | `file::memory:?cache=shared` | Tests only |
+| Mode      | `DATABASE_URL`               | Use case                      |
+| --------- | ---------------------------- | ----------------------------- |
+| On disk   | `file:./data/hearth.db`      | Local dev, Docker, production |
+| In memory | `file::memory:?cache=shared` | Tests only                    |
 
 Tests and CI use in-memory SQLite automatically.
 
@@ -108,13 +108,13 @@ In `open` mode, session cookies are only needed for admin login.
 
 Configured in application code (not env vars in v1):
 
-| Setting | Value |
-| ------- | ----- |
-| Max image size | 10 MB |
-| Max document size (inventory & project PDFs) | 25 MB |
-| Max files per item | 10 |
-| Image types | JPEG, PNG, WebP, GIF |
-| Document types (inventory & projects only) | PDF |
+| Setting                                      | Value                |
+| -------------------------------------------- | -------------------- |
+| Max image size                               | 10 MB                |
+| Max document size (inventory & project PDFs) | 25 MB                |
+| Max files per item                           | 10                   |
+| Image types                                  | JPEG, PNG, WebP, GIF |
+| Document types (inventory & projects only)   | PDF                  |
 
 See [Attachments design](../design/07_attachments.md) for the per-entity mime policy.
 
@@ -122,9 +122,9 @@ See [Attachments design](../design/07_attachments.md) for the per-entity mime po
 
 Bulk inventory operations:
 
-| Endpoint | Method | Purpose |
-| -------- | ------ | ------- |
-| `/api/inventory/export` | GET | Download all inventory as JSON |
-| `/api/inventory/import` | POST | Upload JSON matching export format |
+| Endpoint                | Method | Purpose                            |
+| ----------------------- | ------ | ---------------------------------- |
+| `/api/inventory/export` | GET    | Download all inventory as JSON     |
+| `/api/inventory/import` | POST   | Upload JSON matching export format |
 
 File attachments are not inlined in the export — include `data/uploads/` in backups for a full restore.

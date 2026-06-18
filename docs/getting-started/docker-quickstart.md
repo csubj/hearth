@@ -88,12 +88,12 @@ The `hearth-data` Docker volume (or bind mount to `./data`) holds:
 
 ## Image tags
 
-| Tag | When published |
-| --- | -------------- |
-| `latest` | Every push to `main` |
-| `sha-<short-sha>` | Commit-specific |
-| `main` | Branch ref |
-| `1.2.3`, `1.2` | Version tags (`v*` releases) |
+| Tag               | When published               |
+| ----------------- | ---------------------------- |
+| `latest`          | Every push to `main`         |
+| `sha-<short-sha>` | Commit-specific              |
+| `main`            | Branch ref                   |
+| `1.2.3`, `1.2`    | Version tags (`v*` releases) |
 
 ## Automated smoke test
 

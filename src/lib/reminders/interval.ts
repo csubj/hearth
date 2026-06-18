@@ -101,19 +101,12 @@ export function formatReminderIntervalPhrase(count: number, unit: ReminderUnit):
   return formatReminderInterval(count, unit);
 }
 
-export function getReminderDueAt(
-  state: ReminderIntervalState,
-  anchor: Date,
-): Date | null {
+export function getReminderDueAt(state: ReminderIntervalState, anchor: Date): Date | null {
   if (!hasReminderInterval(state)) {
     return null;
   }
 
-  return addReminderInterval(
-    anchor,
-    state.reminderIntervalCount!,
-    state.reminderIntervalUnit!,
-  );
+  return addReminderInterval(anchor, state.reminderIntervalCount!, state.reminderIntervalUnit!);
 }
 
 function startOfDay(date: Date): Date {

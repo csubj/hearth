@@ -1,12 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import {
-  inventoryItems,
-  inventoryMaintenanceReminders,
-  metricEntries,
-  metrics,
-} from "@/db/schema";
+import { inventoryItems, inventoryMaintenanceReminders, metricEntries, metrics } from "@/db/schema";
 import { ensureInventoryTablesForTests } from "@/lib/actions/inventory-test-setup";
 import { ensureMetricTablesForTests } from "@/lib/actions/metrics";
 import { createTestUser } from "@/lib/auth/test-helpers";
@@ -49,34 +44,38 @@ describe("listUpcomingReminders", () => {
       updatedAt: now,
     });
 
-    await getDb().insert(inventoryMaintenanceReminders).values({
-      id: crypto.randomUUID(),
-      inventoryItemId: itemId,
-      title: "Clean filter",
-      notes: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      reminderRecipientUserId: null,
-      lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
-      lastReminderAt: null,
-      createdByUserId: user.id,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(inventoryMaintenanceReminders)
+      .values({
+        id: crypto.randomUUID(),
+        inventoryItemId: itemId,
+        title: "Clean filter",
+        notes: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        reminderRecipientUserId: null,
+        lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
+        lastReminderAt: null,
+        createdByUserId: user.id,
+        createdAt: now,
+        updatedAt: now,
+      });
 
     const metricId = crypto.randomUUID();
-    await getDb().insert(metrics).values({
-      id: metricId,
-      name: "Weight",
-      unit: "lb",
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      lastReminderAt: null,
-      reminderRecipientUserId: null,
-      createdByUserId: user.id,
-      createdAt: new Date("2026-06-10T00:00:00Z"),
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(metrics)
+      .values({
+        id: metricId,
+        name: "Weight",
+        unit: "lb",
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        lastReminderAt: null,
+        reminderRecipientUserId: null,
+        createdByUserId: user.id,
+        createdAt: new Date("2026-06-10T00:00:00Z"),
+        updatedAt: now,
+      });
 
     const reminders = await listUpcomingReminders({
       viewerUserId: user.id,
@@ -115,20 +114,22 @@ describe("listUpcomingReminders", () => {
       updatedAt: now,
     });
 
-    await getDb().insert(inventoryMaintenanceReminders).values({
-      id: crypto.randomUUID(),
-      inventoryItemId: itemId,
-      title: "Replace bag",
-      notes: null,
-      reminderIntervalCount: 30,
-      reminderIntervalUnit: "day",
-      reminderRecipientUserId: null,
-      lastCompletedAt: new Date("2026-06-10T00:00:00Z"),
-      lastReminderAt: null,
-      createdByUserId: user.id,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(inventoryMaintenanceReminders)
+      .values({
+        id: crypto.randomUUID(),
+        inventoryItemId: itemId,
+        title: "Replace bag",
+        notes: null,
+        reminderIntervalCount: 30,
+        reminderIntervalUnit: "day",
+        reminderRecipientUserId: null,
+        lastCompletedAt: new Date("2026-06-10T00:00:00Z"),
+        lastReminderAt: null,
+        createdByUserId: user.id,
+        createdAt: now,
+        updatedAt: now,
+      });
 
     const reminders = await listUpcomingReminders({
       viewerUserId: user.id,
@@ -164,20 +165,22 @@ describe("listUpcomingReminders", () => {
       updatedAt: now,
     });
 
-    await getDb().insert(inventoryMaintenanceReminders).values({
-      id: crypto.randomUUID(),
-      inventoryItemId: itemId,
-      title: "Reboot",
-      notes: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      reminderRecipientUserId: owner.id,
-      lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
-      lastReminderAt: null,
-      createdByUserId: owner.id,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(inventoryMaintenanceReminders)
+      .values({
+        id: crypto.randomUUID(),
+        inventoryItemId: itemId,
+        title: "Reboot",
+        notes: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        reminderRecipientUserId: owner.id,
+        lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
+        lastReminderAt: null,
+        createdByUserId: owner.id,
+        createdAt: now,
+        updatedAt: now,
+      });
 
     const ownerReminders = await listUpcomingReminders({
       viewerUserId: owner.id,
@@ -218,44 +221,50 @@ describe("listUpcomingReminders", () => {
       updatedAt: now,
     });
 
-    await getDb().insert(inventoryMaintenanceReminders).values({
-      id: crypto.randomUUID(),
-      inventoryItemId: itemId,
-      title: "Deep clean",
-      notes: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      reminderRecipientUserId: null,
-      lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
-      lastReminderAt: null,
-      createdByUserId: user.id,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(inventoryMaintenanceReminders)
+      .values({
+        id: crypto.randomUUID(),
+        inventoryItemId: itemId,
+        title: "Deep clean",
+        notes: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        reminderRecipientUserId: null,
+        lastCompletedAt: new Date("2026-06-01T00:00:00Z"),
+        lastReminderAt: null,
+        createdByUserId: user.id,
+        createdAt: now,
+        updatedAt: now,
+      });
 
     const metricId = crypto.randomUUID();
-    await getDb().insert(metrics).values({
-      id: metricId,
-      name: "Steps",
-      unit: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      lastReminderAt: null,
-      reminderRecipientUserId: null,
-      createdByUserId: user.id,
-      createdAt: new Date("2026-06-05T00:00:00Z"),
-      updatedAt: now,
-    });
+    await getDb()
+      .insert(metrics)
+      .values({
+        id: metricId,
+        name: "Steps",
+        unit: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        lastReminderAt: null,
+        reminderRecipientUserId: null,
+        createdByUserId: user.id,
+        createdAt: new Date("2026-06-05T00:00:00Z"),
+        updatedAt: now,
+      });
 
-    await getDb().insert(metricEntries).values({
-      id: crypto.randomUUID(),
-      metricId,
-      value: "8000",
-      note: null,
-      recordedAt: new Date("2026-06-01T00:00:00Z"),
-      createdByUserId: user.id,
-      createdAt: now,
-    });
+    await getDb()
+      .insert(metricEntries)
+      .values({
+        id: crypto.randomUUID(),
+        metricId,
+        value: "8000",
+        note: null,
+        recordedAt: new Date("2026-06-01T00:00:00Z"),
+        createdByUserId: user.id,
+        createdAt: now,
+      });
 
     const reminders = await listUpcomingReminders({
       viewerUserId: user.id,

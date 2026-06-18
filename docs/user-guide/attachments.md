@@ -6,12 +6,12 @@ Attach photos to records across hearth — restaurant reviews, projects, metric 
 
 ### Images (all entities)
 
-| Type | Extensions |
-| ---- | ---------- |
+| Type | Extensions      |
+| ---- | --------------- |
 | JPEG | `.jpg`, `.jpeg` |
-| PNG | `.png` |
-| WebP | `.webp` |
-| GIF | `.gif` |
+| PNG  | `.png`          |
+| WebP | `.webp`         |
+| GIF  | `.gif`          |
 
 **Limits:** 10 MB per image, up to 10 files per item.
 
@@ -19,7 +19,7 @@ Attach photos to records across hearth — restaurant reviews, projects, metric 
 
 | Type | Extensions |
 | ---- | ---------- |
-| PDF | `.pdf` |
+| PDF  | `.pdf`     |
 
 **Limits:** 25 MB per document, counted toward the 10-file-per-item limit.
 
@@ -48,4 +48,4 @@ On the server, files live in `data/uploads/` alongside the SQLite database. Oper
 Delete individual attachments from the detail page. Removing a file deletes it from storage.
 
 !!! note
-    Deleting a parent item (e.g. a restaurant) does not automatically delete attached files in v1. Orphan cleanup may be added later.
+Deleting a parent item (e.g. a restaurant) does not automatically delete attached files in v1. Orphan cleanup may be added later.

@@ -4,10 +4,10 @@ hearth serves a machine-readable **OpenAPI 3.x** specification and an interactiv
 
 ## Live endpoints
 
-| Surface | URL | Auth |
-| ------- | --- | ---- |
+| Surface             | URL                     | Auth   |
+| ------------------- | ----------------------- | ------ |
 | OpenAPI spec (JSON) | `GET /api/openapi.json` | Public |
-| Interactive docs | `/api/docs` | Public |
+| Interactive docs    | `/api/docs`             | Public |
 
 Replace the host with your instance URL, e.g. `https://hearth.example.com/api/openapi.json`.
 

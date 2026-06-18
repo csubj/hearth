@@ -235,13 +235,13 @@ stack:
 
 ## API & OpenAPI
 
-| Field           | Value                                                                                                                                                                                                 |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Choice**      | Next.js Route Handlers + Zod + `@asteasolutions/zod-to-openapi` + Scalar (`@scalar/nextjs-api-reference`)                                                                                                                   |
-| **Role**        | Versioned REST API under `/api/v1/*` with a self-describing OpenAPI spec                                                                                                                              |
-| **Rationale**   | Route Handlers fit the App Router stack. Zod schemas validate request/response bodies and double as OpenAPI source via `zod-to-openapi`, keeping the spec in sync with runtime validation. Scalar or Redoc provides interactive docs without maintaining a separate spec by hand. |
+| Field           | Value                                                                                                                                                                                                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Next.js Route Handlers + Zod + `@asteasolutions/zod-to-openapi` + Scalar (`@scalar/nextjs-api-reference`)                                                                                                                                                                                                           |
+| **Role**        | Versioned REST API under `/api/v1/*` with a self-describing OpenAPI spec                                                                                                                                                                                                                                            |
+| **Rationale**   | Route Handlers fit the App Router stack. Zod schemas validate request/response bodies and double as OpenAPI source via `zod-to-openapi`, keeping the spec in sync with runtime validation. Scalar or Redoc provides interactive docs without maintaining a separate spec by hand.                                   |
 | **Conventions** | Handlers live under `app/api/v1/`. Shared Zod schemas in `src/lib/api/schemas/`. Register paths with the OpenAPI registry; emit spec at `GET /api/openapi.json`. Interactive UI at `/api/docs`. Bearer token auth on all `/api/v1/*` routes. Web UI continues using server actions — REST is an additional surface. |
-| **References**  | `docs/design/04_routes.md` · https://zod.dev · https://github.com/asteasolutions/zod-to-openapi · https://github.com/scalar/scalar |
+| **References**  | `docs/design/04_routes.md` · https://zod.dev · https://github.com/asteasolutions/zod-to-openapi · https://github.com/scalar/scalar                                                                                                                                                                                  |
 
 ### API stack (machine-readable)
 
@@ -261,13 +261,13 @@ api:
 
 ## Charting
 
-| Field           | Value                                                                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Choice**      | Recharts                                                                                                                                       |
-| **Role**        | Line/point charts for numeric metric history on `/metrics/[id]`                                                                              |
-| **Rationale**   | React-native charting library; composable with Server + Client Components. Fits the existing React/Tailwind stack without a separate charting framework. |
+| Field           | Value                                                                                                                                                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Choice**      | Recharts                                                                                                                                                                                                               |
+| **Role**        | Line/point charts for numeric metric history on `/metrics/[id]`                                                                                                                                                        |
+| **Rationale**   | React-native charting library; composable with Server + Client Components. Fits the existing React/Tailwind stack without a separate charting framework.                                                               |
 | **Conventions** | Chart component in `src/components/metrics/MetricChart.tsx` (client component). Numeric values only — text metrics fall back to table/list. Axis labels use the metric's `unit` field. See `05_styling.md` for layout. |
-| **References**  | https://recharts.org · `docs/design/05_styling.md`                                                                                             |
+| **References**  | https://recharts.org · `docs/design/05_styling.md`                                                                                                                                                                     |
 
 ---
 

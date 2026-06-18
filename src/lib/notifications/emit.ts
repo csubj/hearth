@@ -3,12 +3,7 @@ import { getDb } from "@/db";
 import { mentions, notifications, users } from "@/db/schema";
 import { parseMentions, type MentionCandidate } from "@/lib/mentions/parse";
 
-export type EntityType =
-  | "restaurant"
-  | "project"
-  | "metric"
-  | "metric_entry"
-  | "inventory_item";
+export type EntityType = "restaurant" | "project" | "metric" | "metric_entry" | "inventory_item";
 
 export interface EmitHouseholdActivityInput {
   type: string;

@@ -95,7 +95,9 @@ export async function uploadAttachment(
   }
 
   if (input.data.byteLength > getMaxBytesForMime(input.entityType, mimeResult.mimeType)) {
-    const limitMb = Math.round(getMaxBytesForMime(input.entityType, mimeResult.mimeType) / (1024 * 1024));
+    const limitMb = Math.round(
+      getMaxBytesForMime(input.entityType, mimeResult.mimeType) / (1024 * 1024),
+    );
     return { ok: false, status: 413, error: `File exceeds the ${limitMb} MB limit.` };
   }
 

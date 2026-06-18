@@ -32,14 +32,14 @@ docker compose exec app pnpm run auth:bootstrap
 
 You'll be prompted for:
 
-| Field | Notes |
-| ----- | ----- |
-| Username | Login identifier (unique within the instance) |
-| Password | Minimum 8 characters |
+| Field        | Notes                                                   |
+| ------------ | ------------------------------------------------------- |
+| Username     | Login identifier (unique within the instance)           |
+| Password     | Minimum 8 characters                                    |
 | Display name | Optional — used for @-mentions and activity attribution |
 
 !!! tip "Save credentials securely"
-    There is no "forgot password" email flow. Store the admin password somewhere your household can access if needed.
+There is no "forgot password" email flow. Store the admin password somewhere your household can access if needed.
 
 ## Step 2: Log in
 
@@ -78,12 +78,12 @@ Your project appears in the list. Other household members will see it on their h
 
 ## Step 5: Explore other features
 
-| Feature | Good first action |
-| ------- | ----------------- |
-| Restaurants | Add a place someone mentioned: "Emily said the pasta is great" |
-| Projects | Log something around the house: "fix the back gate latch" |
-| Metrics | Create one metric (e.g. pet weight), add an entry, and watch the chart |
-| Inventory | Add an appliance with its model and manual link |
+| Feature     | Good first action                                                      |
+| ----------- | ---------------------------------------------------------------------- |
+| Restaurants | Add a place someone mentioned: "Emily said the pasta is great"         |
+| Projects    | Log something around the house: "fix the back gate latch"              |
+| Metrics     | Create one metric (e.g. pet weight), add an entry, and watch the chart |
+| Inventory   | Add an appliance with its model and manual link                        |
 
 Each feature has a dedicated page in the [User guide](../user-guide/index.md).
 
@@ -95,10 +95,10 @@ Open the **bell icon** in the nav to see household activity since you last visit
 
 All authenticated users share the same data. There are no private notes or per-user views of content — hearth is a shared surface by design.
 
-| Role | Can do |
-| ---- | ------ |
-| **Member** | Read/write all household data, change own password |
-| **Admin** | Everything above, plus create/disable users and reset passwords |
+| Role       | Can do                                                          |
+| ---------- | --------------------------------------------------------------- |
+| **Member** | Read/write all household data, change own password              |
+| **Admin**  | Everything above, plus create/disable users and reset passwords |
 
 ## Common first-day checklist
 
@@ -111,11 +111,11 @@ All authenticated users share the same data. There are no private notes or per-u
 
 ## Troubleshooting
 
-| Problem | Solution |
-| ------- | -------- |
-| Bootstrap says users already exist | An admin was already created; log in or reset via CLI/DB |
-| Can't reach `/admin/users` | You need the admin role; ask the instance admin |
-| Login fails | Check username/password; account may be disabled |
-| Blank page after login | Check browser console; restart the app (migrations run on startup) |
+| Problem                            | Solution                                                           |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| Bootstrap says users already exist | An admin was already created; log in or reset via CLI/DB           |
+| Can't reach `/admin/users`         | You need the admin role; ask the instance admin                    |
+| Login fails                        | Check username/password; account may be disabled                   |
+| Blank page after login             | Check browser console; restart the app (migrations run on startup) |
 
 More help: [Troubleshooting](../operations/troubleshooting.md)

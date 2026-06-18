@@ -18,11 +18,11 @@ Creating a new metric is a compact, secondary action in the header — the list 
 
 Open a metric (`/metrics/[id]`) and add a dated entry:
 
-| Field | Required | Notes |
-| ----- | -------- | ----- |
-| Value | Yes | Number or text |
-| Recorded at | No | Defaults to now; set when the measurement applies |
-| Note | No | Context — "after morning walk" |
+| Field       | Required | Notes                                             |
+| ----------- | -------- | ------------------------------------------------- |
+| Value       | Yes      | Number or text                                    |
+| Recorded at | No       | Defaults to now; set when the measurement applies |
+| Note        | No       | Context — "after morning walk"                    |
 
 Entries appear in history, newest first. The detail page shows the chart, then a table or card list of past entries below it.
 
@@ -57,11 +57,11 @@ Stale metrics also appear in the **Upcoming reminders** section on Home and on `
 
 ## Use cases
 
-| Metric | Example entries |
-| ------- | ----------------- |
-| Pet weight | 42.5 lbs on Jan 15, 43.1 lbs on Jan 22 |
-| Plant watering | "watered" on Mon, "skipped — rain" on Wed |
-| Utility reading | 12450 kWh on the 1st of each month |
+| Metric          | Example entries                           |
+| --------------- | ----------------------------------------- |
+| Pet weight      | 42.5 lbs on Jan 15, 43.1 lbs on Jan 22    |
+| Plant watering  | "watered" on Mon, "skipped — rain" on Wed |
+| Utility reading | 12450 kWh on the 1st of each month        |
 
 ## Photos
 

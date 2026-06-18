@@ -37,9 +37,7 @@ export async function InventoryDetailView({
         </Link>
         <h1 className="mt-4 font-serif text-2xl text-text">{item.name}</h1>
         {subtitle ? <p className="mt-1 text-sm text-text-muted">{subtitle}</p> : null}
-        {item.serial ? (
-          <p className="mt-1 text-sm text-text-muted">Serial: {item.serial}</p>
-        ) : null}
+        {item.serial ? <p className="mt-1 text-sm text-text-muted">Serial: {item.serial}</p> : null}
         {purchaseLabel || item.store || item.price ? (
           <p className="mt-2 text-sm text-text-muted">
             {[purchaseLabel && `Purchased ${purchaseLabel}`, item.store, item.price]

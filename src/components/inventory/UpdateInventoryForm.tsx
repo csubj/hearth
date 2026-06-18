@@ -38,7 +38,10 @@ export function UpdateInventoryForm({
   const [state, action, pending] = useActionState<InventoryActionState, FormData>(update, {});
 
   return (
-    <form action={action} className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card">
+    <form
+      action={action}
+      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
+    >
       <h2 className="text-sm font-medium text-text">Details</h2>
       <input type="hidden" name="id" value={item.id} />
       <div className="grid gap-3 sm:grid-cols-2">

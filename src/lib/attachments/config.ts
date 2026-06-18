@@ -9,10 +9,7 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 
 export const ALLOWED_DOCUMENT_MIME_TYPES = ["application/pdf"] as const;
 
-export const DOCUMENT_ENTITY_TYPES: readonly AttachmentEntityType[] = [
-  "inventory_item",
-  "project",
-];
+export const DOCUMENT_ENTITY_TYPES: readonly AttachmentEntityType[] = ["inventory_item", "project"];
 
 /** @deprecated Use ALLOWED_IMAGE_MIME_TYPES */
 export const ALLOWED_MIME_TYPES = ALLOWED_IMAGE_MIME_TYPES;
@@ -34,15 +31,10 @@ export function allowsDocuments(entityType: AttachmentEntityType): boolean {
 }
 
 export function getMaxBytesForEntity(entityType: AttachmentEntityType): number {
-  return allowsDocuments(entityType)
-    ? MAX_ATTACHMENT_BYTES_DOCUMENT
-    : MAX_ATTACHMENT_BYTES_IMAGE;
+  return allowsDocuments(entityType) ? MAX_ATTACHMENT_BYTES_DOCUMENT : MAX_ATTACHMENT_BYTES_IMAGE;
 }
 
-export function getMaxBytesForMime(
-  entityType: AttachmentEntityType,
-  mimeType: string,
-): number {
+export function getMaxBytesForMime(entityType: AttachmentEntityType, mimeType: string): number {
   if (allowsDocuments(entityType) && mimeType === "application/pdf") {
     return MAX_ATTACHMENT_BYTES_DOCUMENT;
   }

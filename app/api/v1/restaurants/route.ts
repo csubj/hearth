@@ -2,11 +2,7 @@ import type { NextRequest } from "next/server";
 import { requireApiToken } from "@/lib/api/auth";
 import { validationError } from "@/lib/api/errors";
 import { paginationQuerySchema } from "@/lib/api/pagination";
-import {
-  createRestaurantApi,
-  listRestaurantsApi,
-  serializeRestaurant,
-} from "@/lib/api/resources";
+import { createRestaurantApi, listRestaurantsApi, serializeRestaurant } from "@/lib/api/resources";
 import { createRestaurantSchema } from "@/lib/api/schemas";
 
 export async function GET(request: NextRequest) {

@@ -1,8 +1,4 @@
-import {
-  type Metric,
-  type MetricEntry,
-  type MetricReminderUnit,
-} from "@/db/schema";
+import { type Metric, type MetricEntry, type MetricReminderUnit } from "@/db/schema";
 import {
   hasReminderInterval as hasReminderIntervalState,
   isDueForReminder,
@@ -62,4 +58,3 @@ export function isMetricDueForReminder(
     now,
   );
 }
-

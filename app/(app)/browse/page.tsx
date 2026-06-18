@@ -31,7 +31,10 @@ const browseAreas = [
   },
 ] as const;
 
-function formatCount(statsKey: (typeof browseAreas)[number]["statsKey"], stats: Awaited<ReturnType<typeof loadBrowseStats>>): string {
+function formatCount(
+  statsKey: (typeof browseAreas)[number]["statsKey"],
+  stats: Awaited<ReturnType<typeof loadBrowseStats>>,
+): string {
   switch (statsKey) {
     case "projects":
       return `${stats.projects.active} active`;

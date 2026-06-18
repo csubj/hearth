@@ -19,7 +19,11 @@ function ReminderGroup({
       <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</h3>
       <ul className={compact ? "space-y-1" : "space-y-2"}>
         {reminders.map((reminder) => (
-          <ReminderFeedItem key={`${reminder.kind}-${reminder.id}`} reminder={reminder} compact={compact} />
+          <ReminderFeedItem
+            key={`${reminder.kind}-${reminder.id}`}
+            reminder={reminder}
+            compact={compact}
+          />
         ))}
       </ul>
     </section>

@@ -50,9 +50,6 @@ export async function processMetricReminders(): Promise<void> {
       recipientUserId: metric.reminderRecipientUserId,
     });
 
-    await db
-      .update(metrics)
-      .set({ lastReminderAt: now })
-      .where(eq(metrics.id, metric.id));
+    await db.update(metrics).set({ lastReminderAt: now }).where(eq(metrics.id, metric.id));
   }
 }

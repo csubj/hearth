@@ -16,39 +16,39 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
 - :material-bell-ring-outline: **Reminders**
 
-    ---
+  ***
 
-    Recurring maintenance and metric check-ins surface when they're due — on the home page and a dedicated reminders feed.
+  Recurring maintenance and metric check-ins surface when they're due — on the home page and a dedicated reminders feed.
 
 - :material-silverware-fork-knife: **Restaurants**
 
-    ---
+  ***
 
-    A shared wishlist of places to try. Rate and review after you visit.
+  A shared wishlist of places to try. Rate and review after you visit.
 
 - :material-hammer-wrench: **Projects**
 
-    ---
+  ***
 
-    House projects from idea to done — fix the gate, paint the guest room, organize the garage.
+  House projects from idea to done — fix the gate, paint the guest room, organize the garage.
 
 - :material-chart-line: **Metrics**
 
-    ---
+  ***
 
-    Flexible lists for recurring measurements with charts — pet weight, plant watering, utility readings.
+  Flexible lists for recurring measurements with charts — pet weight, plant watering, utility readings.
 
 - :material-archive-outline: **Inventory**
 
-    ---
+  ***
 
-    A searchable record of household things — appliances, electronics, and tools, with manuals, photos, and tags.
+  A searchable record of household things — appliances, electronics, and tools, with manuals, photos, and tags.
 
 - :material-bell-outline: **Notifications**
 
-    ---
+  ***
 
-    Catch up on household activity and @-mentions since you last visited.
+  Catch up on household activity and @-mentions since you last visited.
 
 </div>
 
@@ -63,15 +63,15 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
 ## Quick links
 
-| I want to… | Start here |
-| ---------- | ---------- |
-| Install and run hearth | [Installation](getting-started/installation.md) |
-| Get running with Docker in minutes | [Docker quickstart](getting-started/docker-quickstart.md) |
-| Set up my household for the first time | [First use guide](getting-started/first-use.md) |
-| Learn how to use each feature | [User guide](user-guide/index.md) |
-| Deploy and operate an instance | [Operating guide](operations/index.md) |
-| Understand the architecture | [Architecture overview](architecture/index.md) |
-| Contribute code | [Contributing](contributing.md) |
+| I want to…                             | Start here                                                |
+| -------------------------------------- | --------------------------------------------------------- |
+| Install and run hearth                 | [Installation](getting-started/installation.md)           |
+| Get running with Docker in minutes     | [Docker quickstart](getting-started/docker-quickstart.md) |
+| Set up my household for the first time | [First use guide](getting-started/first-use.md)           |
+| Learn how to use each feature          | [User guide](user-guide/index.md)                         |
+| Deploy and operate an instance         | [Operating guide](operations/index.md)                    |
+| Understand the architecture            | [Architecture overview](architecture/index.md)            |
+| Contribute code                        | [Contributing](contributing.md)                           |
 
 ## License
 

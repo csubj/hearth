@@ -27,13 +27,13 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 
 ## Enums
 
-| Enum                | Values                                                                                              | Used by                              |
-| ------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `user_role`         | `member`, `admin`                                                                                   | `users.role`                         |
-| `restaurant_status` | `want_to_try`, `visited`                                                                            | `restaurants.status`                 |
-| `project_status`    | `idea`, `in_progress`, `done`                                                                       | `projects.status`                    |
-| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`        | attachments, mentions, notifications |
-| `notification_type` | see `06_notifications.md`                                                                           | `notifications.type`                 |
+| Enum                | Values                                                              | Used by                              |
+| ------------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| `user_role`         | `member`, `admin`                                                   | `users.role`                         |
+| `restaurant_status` | `want_to_try`, `visited`                                            | `restaurants.status`                 |
+| `project_status`    | `idea`, `in_progress`, `done`                                       | `projects.status`                    |
+| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item` | attachments, mentions, notifications |
+| `notification_type` | see `06_notifications.md`                                           | `notifications.type`                 |
 
 ---
 
@@ -43,18 +43,18 @@ Defined in detail in `02_auth.md`. Included here for ERD completeness.
 
 ### `users`
 
-| Column          | Type                 | Notes                                   |
-| --------------- | -------------------- | --------------------------------------- |
-| `id`            | text PK              |                                         |
-| `username`      | text UNIQUE NOT NULL | login identifier                        |
-| `display_name`  | text NULL            | @-mention label; falls back to username |
-| `password_hash` | text NOT NULL        | Argon2id                                |
-| `role`          | text NOT NULL        | `member` \| `admin`                     |
+| Column          | Type                 | Notes                                                       |
+| --------------- | -------------------- | ----------------------------------------------------------- |
+| `id`            | text PK              |                                                             |
+| `username`      | text UNIQUE NOT NULL | login identifier                                            |
+| `display_name`  | text NULL            | @-mention label; falls back to username                     |
+| `password_hash` | text NOT NULL        | Argon2id                                                    |
+| `role`          | text NOT NULL        | `member` \| `admin`                                         |
 | `theme`         | text NOT NULL        | `default` \| `warm` \| `dark` \| `gamer`; default `default` |
-| `disabled_at`   | integer NULL         | ms; NULL = active                       |
-| `last_seen_at`  | integer NULL         | ms; updated on authenticated page load  |
-| `created_at`    | integer NOT NULL     |                                         |
-| `updated_at`    | integer NOT NULL     |                                         |
+| `disabled_at`   | integer NULL         | ms; NULL = active                                           |
+| `last_seen_at`  | integer NULL         | ms; updated on authenticated page load                      |
+| `created_at`    | integer NOT NULL     |                                                             |
+| `updated_at`    | integer NOT NULL     |                                                             |
 
 ### `sessions`
 
@@ -62,16 +62,16 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 ### `api_tokens`
 
-| Column         | Type             | Notes                              |
-| -------------- | ---------------- | ---------------------------------- |
-| `id`           | text PK          |                                    |
-| `user_id`      | text FK → users  | Attribution target for API writes  |
-| `name`         | text NOT NULL    | Human label                        |
-| `prefix`       | text NOT NULL    | First chars shown in admin list    |
-| `token_hash`   | text NOT NULL    | Hash of full bearer token          |
-| `last_used_at` | integer NULL     | ms                                 |
-| `revoked_at`   | integer NULL     | ms; NULL = active                  |
-| `created_at`   | integer NOT NULL |                                    |
+| Column         | Type             | Notes                             |
+| -------------- | ---------------- | --------------------------------- |
+| `id`           | text PK          |                                   |
+| `user_id`      | text FK → users  | Attribution target for API writes |
+| `name`         | text NOT NULL    | Human label                       |
+| `prefix`       | text NOT NULL    | First chars shown in admin list   |
+| `token_hash`   | text NOT NULL    | Hash of full bearer token         |
+| `last_used_at` | integer NULL     | ms                                |
+| `revoked_at`   | integer NULL     | ms; NULL = active                 |
+| `created_at`   | integer NOT NULL |                                   |
 
 **Indexes:** `(user_id)`, `(prefix)`.
 
@@ -127,28 +127,28 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 ### `project_links`
 
-| Column       | Type             | Notes             |
-| ------------ | ---------------- | ----------------- |
-| `id`         | text PK          |                   |
+| Column       | Type               | Notes             |
+| ------------ | ------------------ | ----------------- |
+| `id`         | text PK            |                   |
 | `project_id` | text FK → projects | ON DELETE CASCADE |
-| `label`      | text NOT NULL    | e.g. "Manual"     |
-| `url`        | text NOT NULL    |                   |
-| `created_at` | integer NOT NULL |                   |
+| `label`      | text NOT NULL      | e.g. "Manual"     |
+| `url`        | text NOT NULL      |                   |
+| `created_at` | integer NOT NULL   |                   |
 
 ### `project_tags`
 
-| Column       | Type                 | Notes  |
-| ------------ | -------------------- | ------ |
-| `id`         | text PK              |        |
-| `name`       | text UNIQUE NOT NULL |        |
-| `created_at` | integer NOT NULL     |        |
+| Column       | Type                 | Notes |
+| ------------ | -------------------- | ----- |
+| `id`         | text PK              |       |
+| `name`       | text UNIQUE NOT NULL |       |
+| `created_at` | integer NOT NULL     |       |
 
 ### `project_item_tags`
 
-| Column       | Type                    | Notes             |
-| ------------ | ----------------------- | ----------------- |
-| `project_id` | text FK → projects      | ON DELETE CASCADE |
-| `tag_id`     | text FK → project_tags  | ON DELETE CASCADE |
+| Column       | Type                   | Notes             |
+| ------------ | ---------------------- | ----------------- |
+| `project_id` | text FK → projects     | ON DELETE CASCADE |
+| `tag_id`     | text FK → project_tags | ON DELETE CASCADE |
 
 **Indexes:** `(project_id)`, `(tag_id)`. Composite primary key `(project_id, tag_id)`.
 
@@ -156,21 +156,21 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 Budget line items for a project — materials, labor, fees, and other costs.
 
-| Column           | Type             | Notes                                              |
-| ---------------- | ---------------- | -------------------------------------------------- |
-| `id`             | text PK          |                                                    |
-| `project_id`     | text FK          | ON DELETE CASCADE                                  |
-| `name`           | text NOT NULL    |                                                    |
-| `kind`           | text NOT NULL    | `item` \| `labor` \| `fee` \| `other` (default `item`) |
-| `quantity`       | integer NOT NULL | default 1                                          |
-| `unit_cost_cents`| integer NOT NULL | default 0                                          |
-| `acquired`       | integer NOT NULL | boolean — marked owned/done/paid                   |
-| `acquired_at`    | integer NULL     | ms — when marked acquired                          |
-| `purchase_url`   | text NULL        | link to buy or order                               |
-| `sort_order`     | integer NOT NULL | display order                                      |
-| `note`           | text NULL        | how to acquire / freeform notes                    |
-| `created_at`     | integer NOT NULL |                                                    |
-| `updated_at`     | integer NOT NULL |                                                    |
+| Column            | Type             | Notes                                                  |
+| ----------------- | ---------------- | ------------------------------------------------------ |
+| `id`              | text PK          |                                                        |
+| `project_id`      | text FK          | ON DELETE CASCADE                                      |
+| `name`            | text NOT NULL    |                                                        |
+| `kind`            | text NOT NULL    | `item` \| `labor` \| `fee` \| `other` (default `item`) |
+| `quantity`        | integer NOT NULL | default 1                                              |
+| `unit_cost_cents` | integer NOT NULL | default 0                                              |
+| `acquired`        | integer NOT NULL | boolean — marked owned/done/paid                       |
+| `acquired_at`     | integer NULL     | ms — when marked acquired                              |
+| `purchase_url`    | text NULL        | link to buy or order                                   |
+| `sort_order`      | integer NOT NULL | display order                                          |
+| `note`            | text NULL        | how to acquire / freeform notes                        |
+| `created_at`      | integer NOT NULL |                                                        |
+| `updated_at`      | integer NOT NULL |                                                        |
 
 **Indexes:** `(project_id)`.
 
@@ -182,18 +182,18 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 
 ### `metrics`
 
-| Column               | Type             | Notes                           |
-| -------------------- | ---------------- | ------------------------------- |
-| `id`                 | text PK          |                                 |
-| `name`               | text NOT NULL    | e.g. "Flora's weight"           |
-| `unit`               | text NULL        | e.g. "lbs", "°F" — display only |
-| `reminder_interval_count` | integer NULL | days/weeks/months/years between reminders |
-| `reminder_interval_unit` | text NULL | `day`, `week`, `month`, `year` |
-| `reminder_recipient_user_id` | text NULL FK → users | `NULL` = whole household |
-| `last_reminder_at`   | integer NULL     | ms — throttle for in-app reminders |
-| `created_by_user_id` | text FK → users  |                                 |
-| `created_at`         | integer NOT NULL |                                 |
-| `updated_at`         | integer NOT NULL |                                 |
+| Column                       | Type                 | Notes                                     |
+| ---------------------------- | -------------------- | ----------------------------------------- |
+| `id`                         | text PK              |                                           |
+| `name`                       | text NOT NULL        | e.g. "Flora's weight"                     |
+| `unit`                       | text NULL            | e.g. "lbs", "°F" — display only           |
+| `reminder_interval_count`    | integer NULL         | days/weeks/months/years between reminders |
+| `reminder_interval_unit`     | text NULL            | `day`, `week`, `month`, `year`            |
+| `reminder_recipient_user_id` | text NULL FK → users | `NULL` = whole household                  |
+| `last_reminder_at`           | integer NULL         | ms — throttle for in-app reminders        |
+| `created_by_user_id`         | text FK → users      |                                           |
+| `created_at`                 | integer NOT NULL     |                                           |
+| `updated_at`                 | integer NOT NULL     |                                           |
 
 ### `metric_entries`
 
@@ -215,24 +215,24 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 
 ### `inventory_items`
 
-| Column               | Type             | Notes                                    |
-| -------------------- | ---------------- | ---------------------------------------- |
-| `id`                 | text PK          |                                          |
-| `name`               | text NOT NULL    | e.g. "Washer"                            |
-| `brand`              | text NULL        |                                          |
-| `model`              | text NULL        |                                          |
-| `serial`             | text NULL        | serial number                            |
-| `item_type`          | text NULL        | e.g. appliance, electronics, furniture   |
-| `location`           | text NULL        | e.g. basement, garage                    |
-| `purchase_date`      | integer NULL     | ms                                       |
-| `store`              | text NULL        | where purchased                          |
-| `price`              | text NULL        | freeform — "$899"                        |
-| `warranty_note`      | text NULL        | expiry, claim info                       |
-| `notes`              | text NULL        | freeform                                 |
-| `created_by_user_id` | text FK → users  |                                          |
-| `updated_by_user_id` | text FK → users  |                                          |
-| `created_at`         | integer NOT NULL |                                          |
-| `updated_at`         | integer NOT NULL |                                          |
+| Column               | Type             | Notes                                  |
+| -------------------- | ---------------- | -------------------------------------- |
+| `id`                 | text PK          |                                        |
+| `name`               | text NOT NULL    | e.g. "Washer"                          |
+| `brand`              | text NULL        |                                        |
+| `model`              | text NULL        |                                        |
+| `serial`             | text NULL        | serial number                          |
+| `item_type`          | text NULL        | e.g. appliance, electronics, furniture |
+| `location`           | text NULL        | e.g. basement, garage                  |
+| `purchase_date`      | integer NULL     | ms                                     |
+| `store`              | text NULL        | where purchased                        |
+| `price`              | text NULL        | freeform — "$899"                      |
+| `warranty_note`      | text NULL        | expiry, claim info                     |
+| `notes`              | text NULL        | freeform                               |
+| `created_by_user_id` | text FK → users  |                                        |
+| `updated_by_user_id` | text FK → users  |                                        |
+| `created_at`         | integer NOT NULL |                                        |
+| `updated_at`         | integer NOT NULL |                                        |
 
 **Indexes:** `(name)`, `(item_type)`, `(location)`, `(updated_at DESC)` for search/list.
 
@@ -248,11 +248,11 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 
 ### `inventory_tags`
 
-| Column       | Type             | Notes              |
-| ------------ | ---------------- | ------------------ |
-| `id`         | text PK          |                    |
-| `name`       | text UNIQUE NOT NULL | e.g. kitchen   |
-| `created_at` | integer NOT NULL |                    |
+| Column       | Type                 | Notes        |
+| ------------ | -------------------- | ------------ |
+| `id`         | text PK              |              |
+| `name`       | text UNIQUE NOT NULL | e.g. kitchen |
+| `created_at` | integer NOT NULL     |              |
 
 ### `inventory_item_tags`
 
@@ -267,32 +267,32 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 
 Per-item recurring upkeep schedules (filter changes, inspections, etc.).
 
-| Column                       | Type                     | Notes                              |
-| ---------------------------- | ------------------------ | ---------------------------------- |
-| `id`                         | text PK                  |                                    |
-| `inventory_item_id`          | text FK → inventory_items | ON DELETE CASCADE               |
-| `title`                      | text NOT NULL            | subject line                       |
-| `notes`                      | text NULL                | optional context                   |
-| `reminder_interval_count`    | integer NULL             | `NULL` = reminders off             |
-| `reminder_interval_unit`     | text NULL                | `day`, `week`, `month`, `year`     |
-| `reminder_recipient_user_id` | text NULL FK → users     | `NULL` = whole household           |
-| `last_completed_at`          | integer NULL             | ms — anchor after "mark done"      |
-| `last_reminder_at`           | integer NULL             | ms — notification throttle         |
-| `created_by_user_id`         | text FK → users          |                                    |
-| `created_at`                 | integer NOT NULL         |                                    |
-| `updated_at`                 | integer NOT NULL         |                                    |
+| Column                       | Type                      | Notes                          |
+| ---------------------------- | ------------------------- | ------------------------------ |
+| `id`                         | text PK                   |                                |
+| `inventory_item_id`          | text FK → inventory_items | ON DELETE CASCADE              |
+| `title`                      | text NOT NULL             | subject line                   |
+| `notes`                      | text NULL                 | optional context               |
+| `reminder_interval_count`    | integer NULL              | `NULL` = reminders off         |
+| `reminder_interval_unit`     | text NULL                 | `day`, `week`, `month`, `year` |
+| `reminder_recipient_user_id` | text NULL FK → users      | `NULL` = whole household       |
+| `last_completed_at`          | integer NULL              | ms — anchor after "mark done"  |
+| `last_reminder_at`           | integer NULL              | ms — notification throttle     |
+| `created_by_user_id`         | text FK → users           |                                |
+| `created_at`                 | integer NOT NULL          |                                |
+| `updated_at`                 | integer NOT NULL          |                                |
 
 **Indexes:** `(inventory_item_id)`.
 
 ### `inventory_maintenance_reminder_links`
 
-| Column        | Type                              | Notes             |
-| ------------- | --------------------------------- | ----------------- |
-| `id`          | text PK                           |                   |
+| Column        | Type                                      | Notes             |
+| ------------- | ----------------------------------------- | ----------------- |
+| `id`          | text PK                                   |                   |
 | `reminder_id` | text FK → inventory_maintenance_reminders | ON DELETE CASCADE |
-| `label`       | text NOT NULL                     |                   |
-| `url`         | text NOT NULL                     |                   |
-| `created_at`  | integer NOT NULL                  |                   |
+| `label`       | text NOT NULL                             |                   |
+| `url`         | text NOT NULL                             |                   |
+| `created_at`  | integer NOT NULL                          |                   |
 
 **Indexes:** `(reminder_id)`.
 
@@ -433,7 +433,15 @@ schema:
       restaurants: [restaurants]
       projects: [projects, project_links, project_tags, project_item_tags, project_components]
       metrics: [metrics, metric_entries]
-      inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags, inventory_maintenance_reminders, inventory_maintenance_reminder_links]
+      inventory:
+        [
+          inventory_items,
+          inventory_links,
+          inventory_tags,
+          inventory_item_tags,
+          inventory_maintenance_reminders,
+          inventory_maintenance_reminder_links,
+        ]
     cross_cutting:
       - mentions
       - notifications

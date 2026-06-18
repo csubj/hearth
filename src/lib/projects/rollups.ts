@@ -1,6 +1,8 @@
 import type { ProjectComponent } from "@/db/schema";
 
-function componentLineCost(component: Pick<ProjectComponent, "quantity" | "unitCostCents">): number {
+function componentLineCost(
+  component: Pick<ProjectComponent, "quantity" | "unitCostCents">,
+): number {
   return component.quantity * component.unitCostCents;
 }
 
@@ -18,9 +20,10 @@ export function sumAcquiredCosts(
     .reduce((sum, component) => sum + componentLineCost(component), 0);
 }
 
-export function countAcquired(
-  components: Pick<ProjectComponent, "acquired">[],
-): { acquiredCount: number; componentCount: number } {
+export function countAcquired(components: Pick<ProjectComponent, "acquired">[]): {
+  acquiredCount: number;
+  componentCount: number;
+} {
   return {
     acquiredCount: components.filter((component) => component.acquired).length,
     componentCount: components.length,

@@ -93,7 +93,9 @@ describe("hasReminderInterval", () => {
   it("requires positive count and unit", () => {
     expect(hasReminderInterval(makeIntervalState())).toBe(true);
     expect(
-      hasReminderInterval(makeIntervalState({ reminderIntervalCount: null, reminderIntervalUnit: null })),
+      hasReminderInterval(
+        makeIntervalState({ reminderIntervalCount: null, reminderIntervalUnit: null }),
+      ),
     ).toBe(false);
   });
 });
@@ -122,12 +124,8 @@ describe("formatReminderDueLabel", () => {
   const now = new Date("2026-06-15T12:00:00Z");
 
   it("labels overdue reminders", () => {
-    expect(formatReminderDueLabel(new Date("2026-06-12T12:00:00Z"), now)).toBe(
-      "Overdue by 3 days",
-    );
-    expect(formatReminderDueLabel(new Date("2026-06-14T12:00:00Z"), now)).toBe(
-      "Overdue by 1 day",
-    );
+    expect(formatReminderDueLabel(new Date("2026-06-12T12:00:00Z"), now)).toBe("Overdue by 3 days");
+    expect(formatReminderDueLabel(new Date("2026-06-14T12:00:00Z"), now)).toBe("Overdue by 1 day");
   });
 
   it("labels due today", () => {

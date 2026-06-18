@@ -20,23 +20,23 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 
 ## Notification types
 
-| Type                     | When emitted                       | Recipients                                               |
-| ------------------------ | ---------------------------------- | -------------------------------------------------------- |
-| `restaurant.created`     | New restaurant                     | All users except actor                                   |
-| `restaurant.updated`     | Restaurant edit                    | All except actor                                         |
-| `restaurant.visited`     | Marked visited                     | All except actor                                         |
-| `restaurant.rated`       | Rating set / changed               | All except actor                                         |
-| `project.created`        | New project                        | All except actor                                         |
-| `project.updated`        | Project edit (REST)                | All except actor                                         |
-| `project.status_changed` | Status update                      | All except actor                                         |
-| `project.deleted`        | Project removed                    | All except actor                                         |
-| `metric.entry_added`     | New metric entry                   | All except actor                                         |
-| `inventory.created`      | New inventory item                 | All except actor                                         |
-| `inventory.updated`      | Inventory item edit                | All except actor                                         |
-| `metric.reminder`        | Metric overdue for logging         | Whole household or assigned user (see `reminder_recipient_user_id`) |
-| `inventory.maintenance_reminder` | Maintenance reminder due   | Whole household or assigned user                         |
-| `mention`                | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
-| `user.admin_action`      | Admin create/disable/reset user    | All admins except actor (audit)                          |
+| Type                             | When emitted                       | Recipients                                                          |
+| -------------------------------- | ---------------------------------- | ------------------------------------------------------------------- |
+| `restaurant.created`             | New restaurant                     | All users except actor                                              |
+| `restaurant.updated`             | Restaurant edit                    | All except actor                                                    |
+| `restaurant.visited`             | Marked visited                     | All except actor                                                    |
+| `restaurant.rated`               | Rating set / changed               | All except actor                                                    |
+| `project.created`                | New project                        | All except actor                                                    |
+| `project.updated`                | Project edit (REST)                | All except actor                                                    |
+| `project.status_changed`         | Status update                      | All except actor                                                    |
+| `project.deleted`                | Project removed                    | All except actor                                                    |
+| `metric.entry_added`             | New metric entry                   | All except actor                                                    |
+| `inventory.created`              | New inventory item                 | All except actor                                                    |
+| `inventory.updated`              | Inventory item edit                | All except actor                                                    |
+| `metric.reminder`                | Metric overdue for logging         | Whole household or assigned user (see `reminder_recipient_user_id`) |
+| `inventory.maintenance_reminder` | Maintenance reminder due           | Whole household or assigned user                                    |
+| `mention`                        | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional            |
+| `user.admin_action`              | Admin create/disable/reset user    | All admins except actor (audit)                                     |
 
 ---
 
@@ -60,16 +60,16 @@ Pre-rendered string stored in `notifications.summary` for stable feed display wi
 
 Templates (actor display name interpolated):
 
-| Type                     | Template example                                 |
-| ------------------------ | ------------------------------------------------ |
-| `restaurant.created`     | `{actor} added {restaurant.name}`                |
-| `restaurant.visited`     | `{actor} visited {restaurant.name}`              |
-| `project.status_changed` | `{actor} moved "{project.title}" to In progress` |
-| `metric.entry_added`     | `{actor} logged {value} for {metric.name}`       |
+| Type                     | Template example                                   |
+| ------------------------ | -------------------------------------------------- |
+| `restaurant.created`     | `{actor} added {restaurant.name}`                  |
+| `restaurant.visited`     | `{actor} visited {restaurant.name}`                |
+| `project.status_changed` | `{actor} moved "{project.title}" to In progress`   |
+| `metric.entry_added`     | `{actor} logged {value} for {metric.name}`         |
 | `inventory.created`      | `{actor} added {inventory_item.name} to inventory` |
-| `inventory.updated`      | `{actor} updated {inventory_item.name}`          |
-| `mention`                | `{actor} mentioned you in a project`             |
-| `user.admin_action`      | `{actor} created user @{username}`               |
+| `inventory.updated`      | `{actor} updated {inventory_item.name}`            |
+| `mention`                | `{actor} mentioned you in a project`               |
+| `user.admin_action`      | `{actor} created user @{username}`                 |
 
 Include enough context to scan; full detail on click-through to entity route.
 
@@ -127,12 +127,12 @@ Fields supporting mentions in v1:
 
 Map `(entity_type, entity_id)` → route:
 
-| entity_type                 | Route                                    |
-| --------------------------- | ---------------------------------------- |
-| `restaurant`                | `/restaurants/[id]`                      |
-| `project`                   | `/projects/[id]`                         |
-| `metric` / `metric_entry`   | `/metrics/[metricId]`                    |
-| `inventory_item`            | `/inventory/[id]`                        |
+| entity_type               | Route                 |
+| ------------------------- | --------------------- |
+| `restaurant`              | `/restaurants/[id]`   |
+| `project`                 | `/projects/[id]`      |
+| `metric` / `metric_entry` | `/metrics/[metricId]` |
+| `inventory_item`          | `/inventory/[id]`     |
 
 Notification row click marks read and navigates.
 

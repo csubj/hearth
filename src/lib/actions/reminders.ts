@@ -7,7 +7,11 @@ import {
   type UpcomingReminder,
 } from "@/lib/reminders/feed";
 
-export type { UpcomingReminder, UpcomingReminderKind, UpcomingReminderStatus } from "@/lib/reminders/feed";
+export type {
+  UpcomingReminder,
+  UpcomingReminderKind,
+  UpcomingReminderStatus,
+} from "@/lib/reminders/feed";
 
 export async function getUpcomingReminders(
   options: Omit<ListUpcomingRemindersInput, "viewerUserId"> = {},

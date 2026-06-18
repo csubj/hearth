@@ -7,11 +7,7 @@ import { getLucia, resetLuciaForTests } from "@/lib/auth/lucia";
 import { verifyPassword } from "@/lib/auth/password";
 import { canDemoteAdmin, canDisableUser } from "@/lib/auth/admin-guards";
 import { login } from "@/lib/actions/auth";
-import {
-  createUser,
-  demoteFromAdmin,
-  disableUser,
-} from "@/lib/actions/admin/users";
+import { createUser, demoteFromAdmin, disableUser } from "@/lib/actions/admin/users";
 import {
   createAdminSession,
   createTestUser,
@@ -108,10 +104,7 @@ describe("auth login", () => {
   });
 
   it("rejects login for unknown usernames without revealing absence", async () => {
-    const result = await login(
-      {},
-      formData({ username: "nobody", password: "password123" }),
-    );
+    const result = await login({}, formData({ username: "nobody", password: "password123" }));
 
     expect(result).toEqual({ error: "Invalid username or password" });
     expect(mockRedirect).not.toHaveBeenCalled();
@@ -124,10 +117,7 @@ describe("auth login", () => {
       disabledAt: new Date(),
     });
 
-    const result = await login(
-      {},
-      formData({ username: "disabled", password: "password123" }),
-    );
+    const result = await login({}, formData({ username: "disabled", password: "password123" }));
 
     expect(result).toEqual({ error: "Invalid username or password" });
     expect(mockRedirect).not.toHaveBeenCalled();

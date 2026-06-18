@@ -234,10 +234,7 @@ describe("project components API", () => {
 
     const projectDetail = await getProjectWithRollupsApi(projectId);
     expect(projectDetail).not.toBeNull();
-    const projectBody = serializeProjectDetail(
-      projectDetail!.project,
-      projectDetail!.rollups,
-    );
+    const projectBody = serializeProjectDetail(projectDetail!.project, projectDetail!.rollups);
     expect(projectBody.estimatedCostCents).toBe(3000);
     expect(projectBody.acquiredCostCents).toBe(0);
     expect(projectBody.remainingCostCents).toBe(3000);

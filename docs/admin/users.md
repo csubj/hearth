@@ -4,15 +4,15 @@ Admin-only user management at `/admin/users`. Only users with the **admin** role
 
 ## Roles
 
-| Role | Capabilities |
-| ---- | ------------ |
-| **Member** | Log in, read/write all household data, change own password |
-| **Admin** | Everything a member can do, plus create/disable users, reset passwords, promote to admin |
+| Role       | Capabilities                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------- |
+| **Member** | Log in, read/write all household data, change own password                               |
+| **Admin**  | Everything a member can do, plus create/disable users, reset passwords, promote to admin |
 
 There is no read-only or guest role. Every authenticated user has full access to shared household data.
 
 !!! warning "Last admin protection"
-    At least one active admin must always exist. The UI blocks disabling or demoting the last admin.
+At least one active admin must always exist. The UI blocks disabling or demoting the last admin.
 
 ## List users
 

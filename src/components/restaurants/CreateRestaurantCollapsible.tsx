@@ -4,11 +4,7 @@ import { useState } from "react";
 import { CreateRestaurantForm } from "@/components/restaurants/CreateRestaurantForm";
 import { Button } from "@/components/ui/Button";
 import type { MentionUser } from "@/components/MentionTextarea";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/Collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/Collapsible";
 
 export function CreateRestaurantCollapsible({ users }: { users: MentionUser[] }) {
   const [open, setOpen] = useState(false);

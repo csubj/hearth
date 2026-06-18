@@ -22,10 +22,7 @@ export async function resolveReminderRecipientIds(
     return target ? [target.id] : [];
   }
 
-  const rows = await getDb()
-    .select({ id: users.id })
-    .from(users)
-    .where(isNull(users.disabledAt));
+  const rows = await getDb().select({ id: users.id }).from(users).where(isNull(users.disabledAt));
 
   return rows.map((row) => row.id);
 }

@@ -10,10 +10,10 @@ Go to **Inventory** (`/inventory`). The page opens with a search bar and your ex
 
 ## Searching and filtering
 
-| Control | What it matches |
-| ------- | --------------- |
-| Search box | Name, brand, model, serial, location, notes |
-| Tag chips | Filter by tag (e.g. kitchen, under-warranty) |
+| Control     | What it matches                                    |
+| ----------- | -------------------------------------------------- |
+| Search box  | Name, brand, model, serial, location, notes        |
+| Tag chips   | Filter by tag (e.g. kitchen, under-warranty)       |
 | Type filter | Filter by item type (appliance, electronics, etc.) |
 
 Search is instant as you type. Clear filters to see the full catalog.
@@ -25,19 +25,19 @@ Creating a new item is a compact action in the page header — the list stays th
 1. On **Inventory**, click **Add item** in the header
 2. Fill in what you know — only **name** is required
 
-| Field | Required | Notes |
-| ----- | -------- | ----- |
-| Name | Yes | e.g. "Washer", "Guest room paint" |
-| Brand | No | Manufacturer |
-| Model | No | Model number |
-| Serial | No | Serial number |
-| Type | No | appliance, electronics, furniture, etc. |
-| Location | No | basement, garage, kitchen |
-| Purchase date | No | When you bought it |
-| Store | No | Where purchased |
-| Price | No | Freeform — "$899" |
-| Warranty | No | Expiry, claim info |
-| Notes | No | Anything else |
+| Field         | Required | Notes                                   |
+| ------------- | -------- | --------------------------------------- |
+| Name          | Yes      | e.g. "Washer", "Guest room paint"       |
+| Brand         | No       | Manufacturer                            |
+| Model         | No       | Model number                            |
+| Serial        | No       | Serial number                           |
+| Type          | No       | appliance, electronics, furniture, etc. |
+| Location      | No       | basement, garage, kitchen               |
+| Purchase date | No       | When you bought it                      |
+| Store         | No       | Where purchased                         |
+| Price         | No       | Freeform — "$899"                       |
+| Warranty      | No       | Expiry, claim info                      |
+| Notes         | No       | Anything else                           |
 
 ## Tags
 
@@ -47,10 +47,10 @@ Tags group items flexibly — "kitchen", "needs-repair", "under-warranty". Add t
 
 Attach labeled URLs to an item — product pages, manuals online, warranty portals, receipts stored elsewhere.
 
-| Field | Example |
-| ----- | ------- |
+| Field | Example                                |
+| ----- | -------------------------------------- |
 | Label | "Manual", "Warranty portal", "Receipt" |
-| URL | `https://...` |
+| URL   | `https://...`                          |
 
 ## Photos and documents
 
@@ -68,13 +68,13 @@ Schedule recurring upkeep on any item — filter changes, annual inspections, ba
 
 On the item detail page, use **Maintenance reminders**:
 
-| Field | Required | Notes |
-| ----- | -------- | ----- |
-| Title | Yes | e.g. "Replace HVAC filter" |
-| Notes | No | Size, part number, instructions |
+| Field    | Required         | Notes                           |
+| -------- | ---------------- | ------------------------------- |
+| Title    | Yes              | e.g. "Replace HVAC filter"      |
+| Notes    | No               | Size, part number, instructions |
 | Interval | Yes when enabled | Every N days/weeks/months/years |
-| Notify | Yes when enabled | Whole household or one member |
-| Links | No | Manuals, parts pages |
+| Notify   | Yes when enabled | Whole household or one member   |
+| Links    | No               | Manuals, parts pages            |
 
 When maintenance is done, click **Mark done** to reset the interval from today. Due reminders show a badge on the item in the list and home page.
 
@@ -90,10 +90,10 @@ Inventory maintenance reminders with an interval appear in the household **Remin
 
 Bulk operations for backup, migration, or loading an existing spreadsheet:
 
-| Operation | How |
-| --------- | --- |
-| Export | `GET /api/inventory/export` — returns all inventory as JSON (no UI button; use the endpoint or a script) |
-| Import | `POST /api/inventory/import` with JSON matching the export format |
+| Operation | How                                                                                                      |
+| --------- | -------------------------------------------------------------------------------------------------------- |
+| Export    | `GET /api/inventory/export` — returns all inventory as JSON (no UI button; use the endpoint or a script) |
+| Import    | `POST /api/inventory/import` with JSON matching the export format                                        |
 
 File attachments are not included in the export JSON — back up `data/uploads/` separately for a full restore. See [Backup & restore](../operations/backup-restore.md).
 

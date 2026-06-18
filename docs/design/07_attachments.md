@@ -42,35 +42,35 @@ data/
 
 ## Per-entity mime policy
 
-| entity_type     | Images | Documents (PDF) | Notes                                |
-| --------------- | ------ | --------------- | ------------------------------------ |
-| `restaurant`    | Yes    | No              | Menu pics, visit photos              |
-| `project`       | Yes    | Yes             | Notes attachments, progress photos, PDFs |
-| `metric_entry`  | Yes    | No              | Scale reading, condition photo       |
-| `inventory_item`| Yes    | Yes             | Photos + manuals, receipts, warranties |
+| entity_type      | Images | Documents (PDF) | Notes                                    |
+| ---------------- | ------ | --------------- | ---------------------------------------- |
+| `restaurant`     | Yes    | No              | Menu pics, visit photos                  |
+| `project`        | Yes    | Yes             | Notes attachments, progress photos, PDFs |
+| `metric_entry`   | Yes    | No              | Scale reading, condition photo           |
+| `inventory_item` | Yes    | Yes             | Photos + manuals, receipts, warranties   |
 
 ### Allowed mime types
 
 **Images (all supported entities):**
 
-| Mime type      | Extensions   |
-| -------------- | ------------ |
-| `image/jpeg`   | `.jpg`, `.jpeg` |
-| `image/png`    | `.png`       |
-| `image/webp`   | `.webp`      |
-| `image/gif`    | `.gif`       |
+| Mime type    | Extensions      |
+| ------------ | --------------- |
+| `image/jpeg` | `.jpg`, `.jpeg` |
+| `image/png`  | `.png`          |
+| `image/webp` | `.webp`         |
+| `image/gif`  | `.gif`          |
 
 **Documents (inventory only):**
 
-| Mime type       | Extensions |
-| --------------- | ---------- |
-| `application/pdf` | `.pdf`   |
+| Mime type         | Extensions |
+| ----------------- | ---------- |
+| `application/pdf` | `.pdf`     |
 
 | Rule           | Value                                                |
 | -------------- | ---------------------------------------------------- |
 | Max size       | 10 MB per file (images); 25 MB per file (documents)  |
 | Max per entity | 10 files (images + documents combined for inventory) |
-| Extensions     | Derived from mime; reject mismatch                     |
+| Extensions     | Derived from mime; reject mismatch                   |
 
 Validate mime from magic bytes (file-type lib or manual header check), not client-provided extension alone.
 
@@ -121,11 +121,11 @@ Do not expose direct static URLs under `/public` — all access authenticated.
 
 Attachments link polymorphically via `entity_type` + `entity_id`:
 
-| entity_type      | When attached                        |
-| ---------------- | ------------------------------------ |
-| `restaurant`     | Notes, visit review                  |
-| `project`        | Description updates, progress photos |
-| `metric_entry`   | Entry note (e.g. scale photo)        |
+| entity_type      | When attached                         |
+| ---------------- | ------------------------------------- |
+| `restaurant`     | Notes, visit review                   |
+| `project`        | Description updates, progress photos  |
+| `metric_entry`   | Entry note (e.g. scale photo)         |
 | `inventory_item` | Photos, manuals, receipts, warranties |
 
 Upload requires entity to exist first — UI flow: create entry → edit/add files. Optional: allow pending uploads on create form after first save.

@@ -3,10 +3,7 @@ import { z } from "zod";
 import { getDb } from "@/db";
 import { metricEntries, metrics, users, type Metric, type MetricEntry } from "@/db/schema";
 import { requireUser } from "@/lib/auth/session";
-import {
-  isMetricStale,
-  metricReminderUnitSchema,
-} from "@/lib/metrics/reminder-interval";
+import { isMetricStale, metricReminderUnitSchema } from "@/lib/metrics/reminder-interval";
 import {
   parseReminderIntervalFromForm as parseReminderIntervalFromFormShared,
   parseReminderRecipientFromForm,
@@ -212,7 +209,9 @@ export async function getMetricsHomeSummary(limit = 5): Promise<MetricHomeItem[]
 
 export async function getMetricsHomeStats(): Promise<{ total: number; stale: number }> {
   await requireUser();
-  const [totalRow] = await getDb().select({ count: sql<number>`count(*)` }).from(metrics);
+  const [totalRow] = await getDb()
+    .select({ count: sql<number>`count(*)` })
+    .from(metrics);
   const items = await listMetricsWithLatest();
   return {
     total: totalRow?.count ?? 0,
@@ -246,11 +245,7 @@ export async function updateMetricRecord(
   input: z.infer<typeof updateMetricSchema>,
 ): Promise<Metric | null> {
   const db = getDb();
-  const [existing] = await db
-    .select()
-    .from(metrics)
-    .where(eq(metrics.id, input.metricId))
-    .limit(1);
+  const [existing] = await db.select().from(metrics).where(eq(metrics.id, input.metricId)).limit(1);
   if (!existing) {
     return null;
   }
@@ -287,11 +282,7 @@ export async function addEntryRecord(
   input: z.infer<typeof addEntrySchema>,
 ): Promise<{ entry: MetricEntry; metric: Metric } | null> {
   const db = getDb();
-  const [metric] = await db
-    .select()
-    .from(metrics)
-    .where(eq(metrics.id, input.metricId))
-    .limit(1);
+  const [metric] = await db.select().from(metrics).where(eq(metrics.id, input.metricId)).limit(1);
   if (!metric) {
     return null;
   }

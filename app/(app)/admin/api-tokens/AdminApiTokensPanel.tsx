@@ -1,11 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import {
-  createToken,
-  revokeToken,
-  type ApiTokenActionState,
-} from "@/lib/actions/admin/api-tokens";
+import { createToken, revokeToken, type ApiTokenActionState } from "@/lib/actions/admin/api-tokens";
 
 type TokenRow = {
   id: string;
@@ -49,14 +45,14 @@ export function AdminApiTokensPanel({
   tokens: TokenRow[];
   users: UserOption[];
 }) {
-  const [createState, createAction, createPending] = useActionState<
-    ApiTokenActionState,
-    FormData
-  >(createToken, {});
-  const [revokeState, revokeAction, revokePending] = useActionState<
-    ApiTokenActionState,
-    FormData
-  >(revokeToken, {});
+  const [createState, createAction, createPending] = useActionState<ApiTokenActionState, FormData>(
+    createToken,
+    {},
+  );
+  const [revokeState, revokeAction, revokePending] = useActionState<ApiTokenActionState, FormData>(
+    revokeToken,
+    {},
+  );
 
   return (
     <div className="space-y-8">

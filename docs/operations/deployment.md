@@ -4,11 +4,11 @@ Deploy hearth as a single container or Node process on a VPS, home server, or Pa
 
 ## Hosting target
 
-| Approach | Notes |
-| -------- | ----- |
+| Approach       | Notes                                                                          |
+| -------------- | ------------------------------------------------------------------------------ |
 | Docker Compose | Recommended — see [Docker quickstart](../getting-started/docker-quickstart.md) |
-| GHCR image | Pull `ghcr.io/<owner>/hearth:latest` — no local build |
-| Node directly | `pnpm build && pnpm start` with persistent `data/` directory |
+| GHCR image     | Pull `ghcr.io/<owner>/hearth:latest` — no local build                          |
+| Node directly  | `pnpm build && pnpm start` with persistent `data/` directory                   |
 
 Supported platforms: any single-container host — Hetzner, Fly.io, Railway, a home NAS, etc.
 
@@ -38,11 +38,11 @@ docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
 
 ### Image tags
 
-| Tag | When |
-| --- | ---- |
-| `latest` | Every push to `main` |
-| `sha-<short-sha>` | Specific commit |
-| `1.2.3` | Version release (`v*` tag) |
+| Tag               | When                       |
+| ----------------- | -------------------------- |
+| `latest`          | Every push to `main`       |
+| `sha-<short-sha>` | Specific commit            |
+| `1.2.3`           | Version release (`v*` tag) |
 
 ### Package visibility
 
@@ -92,10 +92,10 @@ server {
 
 ## Health checks
 
-| Probe | Endpoint |
-| ----- | -------- |
-| Liveness | `GET /api/health` → `200 {"ok":true}` |
-| Readiness | Same |
+| Probe     | Endpoint                              |
+| --------- | ------------------------------------- |
+| Liveness  | `GET /api/health` → `200 {"ok":true}` |
+| Readiness | Same                                  |
 
 Configure Docker Compose, Fly, Railway, or your load balancer to probe `/api/health`.
 

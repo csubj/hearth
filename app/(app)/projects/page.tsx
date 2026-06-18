@@ -19,8 +19,7 @@ export default async function ProjectsPage({
     loadMentionUsers(),
   ]);
 
-  const currentQ =
-    typeof resolvedSearchParams.q === "string" ? resolvedSearchParams.q : undefined;
+  const currentQ = typeof resolvedSearchParams.q === "string" ? resolvedSearchParams.q : undefined;
   const currentTag =
     typeof resolvedSearchParams.tag === "string" ? resolvedSearchParams.tag : undefined;
   const currentSort =

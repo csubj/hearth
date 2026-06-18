@@ -39,20 +39,20 @@ flowchart TB
 
 ## Stack summary
 
-| Layer | Technology |
-| ----- | ---------- |
-| Runtime | Node.js 22 |
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| UI | React 19, Tailwind CSS v4, Radix UI |
-| Charting | Recharts (metrics) |
-| API | Route Handlers, Zod, zod-to-openapi, Scalar |
-| Database | SQLite via `better-sqlite3` |
-| ORM | Drizzle |
-| Auth | Lucia v3 + Argon2id; optional open web mode; API bearer tokens |
-| Testing | Vitest |
-| Containers | Docker + Compose |
-| CI | GitHub Actions |
+| Layer      | Technology                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Runtime    | Node.js 22                                                     |
+| Framework  | Next.js 15 (App Router)                                        |
+| Language   | TypeScript                                                     |
+| UI         | React 19, Tailwind CSS v4, Radix UI                            |
+| Charting   | Recharts (metrics)                                             |
+| API        | Route Handlers, Zod, zod-to-openapi, Scalar                    |
+| Database   | SQLite via `better-sqlite3`                                    |
+| ORM        | Drizzle                                                        |
+| Auth       | Lucia v3 + Argon2id; optional open web mode; API bearer tokens |
+| Testing    | Vitest                                                         |
+| Containers | Docker + Compose                                               |
+| CI         | GitHub Actions                                                 |
 
 ## Request flow
 
@@ -144,17 +144,17 @@ docs/                   # this documentation site
 
 ## Key design decisions
 
-| Decision | Rationale |
-| -------- | --------- |
-| One household per instance | No multi-tenant complexity; instance _is_ the household |
-| SQLite embedded | Zero-config, file-backed, fits single-instance deploy |
-| Server actions for web mutations | Colocated with UI; progressive enhancement |
-| REST API as additional surface | Scripts, integrations, bulk ops — `/api/v1/*` with OpenAPI |
-| Bearer tokens always for REST | Independent of web auth mode (`required` or `open`) |
-| API routes for uploads + bulk | Multipart/binary awkward in server actions |
-| Configurable web auth mode | `required` (default) or `open` for trusted networks |
-| Local file storage | Matches embedded DB; simple Docker volume backup |
-| Show what exists first | List pages lead with content; capture is secondary |
+| Decision                         | Rationale                                                  |
+| -------------------------------- | ---------------------------------------------------------- |
+| One household per instance       | No multi-tenant complexity; instance _is_ the household    |
+| SQLite embedded                  | Zero-config, file-backed, fits single-instance deploy      |
+| Server actions for web mutations | Colocated with UI; progressive enhancement                 |
+| REST API as additional surface   | Scripts, integrations, bulk ops — `/api/v1/*` with OpenAPI |
+| Bearer tokens always for REST    | Independent of web auth mode (`required` or `open`)        |
+| API routes for uploads + bulk    | Multipart/binary awkward in server actions                 |
+| Configurable web auth mode       | `required` (default) or `open` for trusted networks        |
+| Local file storage               | Matches embedded DB; simple Docker volume backup           |
+| Show what exists first           | List pages lead with content; capture is secondary         |
 
 ## Cross-cutting concerns
 
@@ -195,19 +195,19 @@ Details: [Deployment Design](../design/09_deploy.md)
 
 Detailed design references (source of truth for implementation):
 
-| Doc | Topic |
-| --- | ----- |
-| [Product Vision](../design/00_init.md) | Features, principles, scope |
-| [Tech Choices](../design/01_tech.md) | Stack decisions |
-| [Authentication](../design/02_auth.md) | Users, sessions, auth modes, API tokens |
-| [Data Model](../design/03_schema.md) | Tables, enums, relationships |
-| [Routes & Structure](../design/04_routes.md) | App Router layout, REST, actions |
-| [Styling](../design/05_styling.md) | Tailwind, Radix, charts, layout patterns |
-| [Notifications](../design/06_notifications.md) | Fan-out, mentions |
-| [Attachments](../design/07_attachments.md) | Upload flow, per-entity mime policy |
-| [MVP Phases](../design/08_mvp.md) | Build phases 0–10 |
-| [Deployment Design](../design/09_deploy.md) | Docker, env, backup |
-| [CI/CD](../design/10_ci.md) | GitHub Actions |
+| Doc                                            | Topic                                    |
+| ---------------------------------------------- | ---------------------------------------- |
+| [Product Vision](../design/00_init.md)         | Features, principles, scope              |
+| [Tech Choices](../design/01_tech.md)           | Stack decisions                          |
+| [Authentication](../design/02_auth.md)         | Users, sessions, auth modes, API tokens  |
+| [Data Model](../design/03_schema.md)           | Tables, enums, relationships             |
+| [Routes & Structure](../design/04_routes.md)   | App Router layout, REST, actions         |
+| [Styling](../design/05_styling.md)             | Tailwind, Radix, charts, layout patterns |
+| [Notifications](../design/06_notifications.md) | Fan-out, mentions                        |
+| [Attachments](../design/07_attachments.md)     | Upload flow, per-entity mime policy      |
+| [MVP Phases](../design/08_mvp.md)              | Build phases 0–10                        |
+| [Deployment Design](../design/09_deploy.md)    | Docker, env, backup                      |
+| [CI/CD](../design/10_ci.md)                    | GitHub Actions                           |
 
 ## Contributing
 

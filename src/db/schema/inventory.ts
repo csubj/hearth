@@ -1,4 +1,11 @@
-import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { metricReminderUnits } from "./metrics";
 import { users } from "./users";
 
@@ -110,9 +117,7 @@ export const inventoryMaintenanceReminderLinks = sqliteTable(
     url: text("url").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [
-    index("inventory_maintenance_reminder_links_reminder_id_idx").on(table.reminderId),
-  ],
+  (table) => [index("inventory_maintenance_reminder_links_reminder_id_idx").on(table.reminderId)],
 );
 
 export type InventoryItem = typeof inventoryItems.$inferSelect;

@@ -4,11 +4,7 @@ import { useState } from "react";
 import { ProjectCreateForm } from "@/components/projects/ProjectCreateForm";
 import { Button } from "@/components/ui/Button";
 import type { MentionUser } from "@/components/MentionTextarea";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/Collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/Collapsible";
 
 export function ProjectCreateCollapsible({ users }: { users: MentionUser[] }) {
   const [open, setOpen] = useState(false);

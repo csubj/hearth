@@ -28,11 +28,7 @@ async function resolveOpenModeUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  const [row] = await getDb()
-    .select()
-    .from(users)
-    .where(eq(users.username, username))
-    .limit(1);
+  const [row] = await getDb().select().from(users).where(eq(users.username, username)).limit(1);
 
   if (!row || row.disabledAt) {
     return null;

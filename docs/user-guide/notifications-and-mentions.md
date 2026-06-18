@@ -25,15 +25,15 @@ An optional **Since you last visited** block on the home page summarizes recent 
 
 ## What triggers notifications
 
-| Activity | Who gets notified |
-| -------- | ----------------- |
-| Restaurant added, visited, or rated | Everyone except the actor |
-| Project created, status changed, or deleted | Everyone except the actor |
-| Metric entry added | Everyone except the actor |
-| Inventory item created or updated | Everyone except the actor |
-| Metric or maintenance reminder due | The household or the assigned member |
-| @-mention | The mentioned user (always) |
-| Admin user management | All other admins |
+| Activity                                    | Who gets notified                    |
+| ------------------------------------------- | ------------------------------------ |
+| Restaurant added, visited, or rated         | Everyone except the actor            |
+| Project created, status changed, or deleted | Everyone except the actor            |
+| Metric entry added                          | Everyone except the actor            |
+| Inventory item created or updated           | Everyone except the actor            |
+| Metric or maintenance reminder due          | The household or the assigned member |
+| @-mention                                   | The mentioned user (always)          |
+| Admin user management                       | All other admins                     |
 
 You do **not** receive notifications for your own routine actions — you were there.
 

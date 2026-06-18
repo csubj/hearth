@@ -177,9 +177,7 @@ describe("inventory records", () => {
     await db.delete(inventoryItems);
 
     await importInventoryData(exported, user.id);
-    const detail = await getInventoryItemById(
-      (await listInventoryItems({}))[0]!.id,
-    );
+    const detail = await getInventoryItemById((await listInventoryItems({}))[0]!.id);
     expect(detail?.maintenanceReminders).toHaveLength(1);
     expect(detail?.maintenanceReminders[0]?.title).toBe("Replace filter");
     expect(detail?.maintenanceReminders[0]?.links[0]?.label).toBe("Filter");

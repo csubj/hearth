@@ -17,7 +17,11 @@ export function ProjectDeleteButton({ projectId }: { projectId: string }) {
       }}
     >
       <input type="hidden" name="id" value={projectId} />
-      <Button type="submit" disabled={pending} className="border-red-200 text-red-700 hover:bg-red-50">
+      <Button
+        type="submit"
+        disabled={pending}
+        className="border-red-200 text-red-700 hover:bg-red-50"
+      >
         {pending ? "Deleting…" : "Delete project"}
       </Button>
       {state.error ? (

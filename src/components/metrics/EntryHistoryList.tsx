@@ -13,13 +13,7 @@ function formatValue(value: string, unit: string | null): string {
   return unit ? `${value} ${unit}` : value;
 }
 
-export function EntryHistoryList({
-  metric,
-  entries,
-}: {
-  metric: Metric;
-  entries: MetricEntry[];
-}) {
+export function EntryHistoryList({ metric, entries }: { metric: Metric; entries: MetricEntry[] }) {
   if (entries.length === 0) {
     return (
       <p className="text-sm text-text-muted">No entries yet. Add the first measurement above.</p>

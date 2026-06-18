@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import {
-  inventoryItems,
-  inventoryMaintenanceReminders,
-} from "@/db/schema";
+import { inventoryItems, inventoryMaintenanceReminders } from "@/db/schema";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import {
   isMaintenanceReminderDueForReminder,
@@ -45,12 +42,12 @@ describe("isMaintenanceReminderStale", () => {
       updatedAt: new Date("2026-01-01T00:00:00Z"),
     };
 
-    expect(
-      isMaintenanceReminderStale(reminder, new Date("2026-01-20T00:00:00Z"), "user-a"),
-    ).toBe(true);
-    expect(
-      isMaintenanceReminderStale(reminder, new Date("2026-01-20T00:00:00Z"), "user-b"),
-    ).toBe(false);
+    expect(isMaintenanceReminderStale(reminder, new Date("2026-01-20T00:00:00Z"), "user-a")).toBe(
+      true,
+    );
+    expect(isMaintenanceReminderStale(reminder, new Date("2026-01-20T00:00:00Z"), "user-b")).toBe(
+      false,
+    );
   });
 });
 
@@ -92,39 +89,43 @@ describe("processInventoryMaintenanceReminders", () => {
     const reminderId = crypto.randomUUID();
     const now = new Date("2026-06-20T00:00:00Z");
 
-    await getDb().insert(inventoryItems).values({
-      id: itemId,
-      name: "Dehumidifier",
-      brand: null,
-      model: null,
-      serial: null,
-      itemType: null,
-      location: null,
-      purchaseDate: null,
-      store: null,
-      price: null,
-      warrantyNote: null,
-      notes: null,
-      createdByUserId: user.id,
-      updatedByUserId: user.id,
-      createdAt: new Date("2026-01-01T00:00:00Z"),
-      updatedAt: new Date("2026-01-01T00:00:00Z"),
-    });
+    await getDb()
+      .insert(inventoryItems)
+      .values({
+        id: itemId,
+        name: "Dehumidifier",
+        brand: null,
+        model: null,
+        serial: null,
+        itemType: null,
+        location: null,
+        purchaseDate: null,
+        store: null,
+        price: null,
+        warrantyNote: null,
+        notes: null,
+        createdByUserId: user.id,
+        updatedByUserId: user.id,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        updatedAt: new Date("2026-01-01T00:00:00Z"),
+      });
 
-    await getDb().insert(inventoryMaintenanceReminders).values({
-      id: reminderId,
-      inventoryItemId: itemId,
-      title: "Replace filter",
-      notes: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      reminderRecipientUserId: null,
-      lastCompletedAt: null,
-      lastReminderAt: null,
-      createdByUserId: user.id,
-      createdAt: new Date("2026-01-01T00:00:00Z"),
-      updatedAt: new Date("2026-01-01T00:00:00Z"),
-    });
+    await getDb()
+      .insert(inventoryMaintenanceReminders)
+      .values({
+        id: reminderId,
+        inventoryItemId: itemId,
+        title: "Replace filter",
+        notes: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        reminderRecipientUserId: null,
+        lastCompletedAt: null,
+        lastReminderAt: null,
+        createdByUserId: user.id,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        updatedAt: new Date("2026-01-01T00:00:00Z"),
+      });
 
     vi.useFakeTimers();
     vi.setSystemTime(now);

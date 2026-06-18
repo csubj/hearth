@@ -85,9 +85,7 @@ async function getOrCreateTagId(name: string, now: Date): Promise<string> {
   }
 
   const id = crypto.randomUUID();
-  await getDb()
-    .insert(inventoryTags)
-    .values({ id, name: trimmed, createdAt: now });
+  await getDb().insert(inventoryTags).values({ id, name: trimmed, createdAt: now });
   return id;
 }
 
@@ -133,10 +131,7 @@ export function serializeInventoryTag(row: InventoryTag) {
   };
 }
 
-export function serializeInventoryItem(
-  row: InventoryItem,
-  tags: InventoryTag[] = [],
-) {
+export function serializeInventoryItem(row: InventoryItem, tags: InventoryTag[] = []) {
   return {
     id: row.id,
     name: row.name,
@@ -214,9 +209,9 @@ export async function listInventoryItemsApi(query: InventoryListQuery) {
   const last = data.at(-1);
   const nextCursor =
     hasMore && last
-      ? Buffer.from(
-          JSON.stringify({ t: last.updatedAt.getTime(), id: last.id }),
-        ).toString("base64url")
+      ? Buffer.from(JSON.stringify({ t: last.updatedAt.getTime(), id: last.id })).toString(
+          "base64url",
+        )
       : null;
 
   return {
@@ -301,7 +296,11 @@ export async function updateInventoryItemApi(
   input: z.infer<typeof updateInventoryItemSchema>,
 ) {
   const db = getDb();
-  const [existing] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, id)).limit(1);
+  const [existing] = await db
+    .select()
+    .from(inventoryItems)
+    .where(eq(inventoryItems.id, id))
+    .limit(1);
   if (!existing) {
     return null;
   }
@@ -349,7 +348,11 @@ export async function updateInventoryItemApi(
 
 export async function deleteInventoryItemApi(id: string) {
   const db = getDb();
-  const [existing] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, id)).limit(1);
+  const [existing] = await db
+    .select()
+    .from(inventoryItems)
+    .where(eq(inventoryItems.id, id))
+    .limit(1);
   if (!existing) {
     return false;
   }
@@ -431,9 +434,7 @@ export async function listInventoryTypesApi() {
     .where(sql`${inventoryItems.itemType} IS NOT NULL AND ${inventoryItems.itemType} != ''`)
     .orderBy(inventoryItems.itemType);
 
-  return rows
-    .map((row) => row.itemType)
-    .filter((value): value is string => Boolean(value?.trim()));
+  return rows.map((row) => row.itemType).filter((value): value is string => Boolean(value?.trim()));
 }
 
 export async function renameInventoryTypeApi(
@@ -471,10 +472,7 @@ export async function deleteInventoryTypeApi(name: string) {
     return false;
   }
 
-  await db
-    .update(inventoryItems)
-    .set({ itemType: null })
-    .where(eq(inventoryItems.itemType, name));
+  await db.update(inventoryItems).set({ itemType: null }).where(eq(inventoryItems.itemType, name));
 
   return true;
 }

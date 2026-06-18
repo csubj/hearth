@@ -128,13 +128,13 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ### Status chips
 
-| Feature                | Chip styles                    |
-| ---------------------- | ------------------------------ |
-| Restaurant want_to_try | accent outline                 |
-| Restaurant visited     | muted + stars                  |
-| Project idea           | neutral                        |
-| Project in_progress    | accent soft background         |
-| Project done           | muted green                    |
+| Feature                | Chip styles            |
+| ---------------------- | ---------------------- |
+| Restaurant want_to_try | accent outline         |
+| Restaurant visited     | muted + stars          |
+| Project idea           | neutral                |
+| Project in_progress    | accent soft background |
+| Project done           | muted green            |
 
 ### Notifications bell
 
@@ -152,26 +152,26 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 Implement as needed during MVP phases:
 
-| Component      | Radix package                   | Notes                                                          |
-| -------------- | ------------------------------- | -------------------------------------------------------------- |
-| `Button`       | —                               | native button + Tailwind variants (see below)                  |
-| `Dialog`       | `@radix-ui/react-dialog`        | edit forms, photo lightbox                                     |
-| `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu                                         |
-| `Popover`      | `@radix-ui/react-popover`       | @-mention autocomplete                                         |
-| `Tabs`         | `@radix-ui/react-tabs`          | metric chart/table toggle if needed      |
-| `Collapsible`  | `@radix-ui/react-collapsible`   | compact create forms, expandable capture                       |
+| Component      | Radix package                   | Notes                                         |
+| -------------- | ------------------------------- | --------------------------------------------- |
+| `Button`       | —                               | native button + Tailwind variants (see below) |
+| `Dialog`       | `@radix-ui/react-dialog`        | edit forms, photo lightbox                    |
+| `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu                        |
+| `Popover`      | `@radix-ui/react-popover`       | @-mention autocomplete                        |
+| `Tabs`         | `@radix-ui/react-tabs`          | metric chart/table toggle if needed           |
+| `Collapsible`  | `@radix-ui/react-collapsible`   | compact create forms, expandable capture      |
 
 ### Button variants
 
 Use variants to reflect **where** the action lives in the UI:
 
-| Variant       | Use case                                      | Example                          |
-| ------------- | --------------------------------------------- | -------------------------------- |
-| `primary`     | Section form submit                           | Add reminder, Save changes       |
-| `secondary`   | Page-header create / expand triggers          | New metric, Add item             |
-| `soft`        | In-card / list-item actions                   | Mark done, Add link              |
-| `destructive` | Delete within a card                          | Delete reminder                  |
-| `ghost`       | Minimal chrome (nav-adjacent, rare)           | —                                |
+| Variant       | Use case                             | Example                    |
+| ------------- | ------------------------------------ | -------------------------- |
+| `primary`     | Section form submit                  | Add reminder, Save changes |
+| `secondary`   | Page-header create / expand triggers | New metric, Add item       |
+| `soft`        | In-card / list-item actions          | Mark done, Add link        |
+| `destructive` | Delete within a card                 | Delete reminder            |
+| `ghost`       | Minimal chrome (nav-adjacent, rare)  | —                          |
 
 Do not use `ghost` for primary create or card actions — it reads as plain text.
 
@@ -200,12 +200,12 @@ User-selectable themes are implemented. Each user picks a theme on `/settings` v
 
 Available themes:
 
-| Theme     | `users.theme` value | Notes                          |
-| --------- | ------------------- | ------------------------------ |
-| Default   | `default`           | Warm off-white (base `@theme`) |
-| Warm Earth| `warm`              | Earthy neutrals                |
-| Dark      | `dark`              | Dark (`color-scheme: dark`)    |
-| Gamer     | `gamer`             | Dark, neon-purple accent       |
+| Theme      | `users.theme` value | Notes                          |
+| ---------- | ------------------- | ------------------------------ |
+| Default    | `default`           | Warm off-white (base `@theme`) |
+| Warm Earth | `warm`              | Earthy neutrals                |
+| Dark       | `dark`              | Dark (`color-scheme: dark`)    |
+| Gamer      | `gamer`             | Dark, neon-purple accent       |
 
 Tokens are CSS variables, so additional themes can be added by defining a new `[data-theme="…"]` block without component refactors.
 

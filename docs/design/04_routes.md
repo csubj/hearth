@@ -107,24 +107,24 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 
 ### Web UI
 
-| Path                        | Access | Purpose                                      |
-| --------------------------- | ------ | -------------------------------------------- |
-| `/login`                    | public | Login form; redirect to `/` if session valid |
-| `/`                         | auth\* | Home dashboard — stats, reminders, feature previews |
-| `/browse`                   | auth\* | Hub for Projects, Restaurants, Metrics, Inventory |
-| `/reminders`                | auth\* | Upcoming maintenance and metric reminders         |
-| `/restaurants`              | auth\* | Restaurant list (v1: no map)                 |
-| `/restaurants/[id]`         | auth\* | Detail, mark visited, rating, notes          |
-| `/projects`                 | auth\* | Project list                                 |
-| `/projects/[id]`            | auth\* | Project detail + status updates              |
-| `/metrics`                  | auth\* | Metric list + chart links                    |
-| `/metrics/[id]`             | auth\* | Entry history, chart, add entry              |
-| `/inventory`                | auth\* | Searchable inventory list                    |
-| `/inventory/[id]`           | auth\* | Item detail — tags, links, files, notes      |
-| `/notifications`            | auth\* | Per-user activity stream                     |
-| `/settings`                 | auth\* | Change own password; choose theme            |
-| `/admin/users`              | admin  | User CRUD                                    |
-| `/admin/api-tokens`         | admin  | API token create/revoke                      |
+| Path                | Access | Purpose                                             |
+| ------------------- | ------ | --------------------------------------------------- |
+| `/login`            | public | Login form; redirect to `/` if session valid        |
+| `/`                 | auth\* | Home dashboard — stats, reminders, feature previews |
+| `/browse`           | auth\* | Hub for Projects, Restaurants, Metrics, Inventory   |
+| `/reminders`        | auth\* | Upcoming maintenance and metric reminders           |
+| `/restaurants`      | auth\* | Restaurant list (v1: no map)                        |
+| `/restaurants/[id]` | auth\* | Detail, mark visited, rating, notes                 |
+| `/projects`         | auth\* | Project list                                        |
+| `/projects/[id]`    | auth\* | Project detail + status updates                     |
+| `/metrics`          | auth\* | Metric list + chart links                           |
+| `/metrics/[id]`     | auth\* | Entry history, chart, add entry                     |
+| `/inventory`        | auth\* | Searchable inventory list                           |
+| `/inventory/[id]`   | auth\* | Item detail — tags, links, files, notes             |
+| `/notifications`    | auth\* | Per-user activity stream                            |
+| `/settings`         | auth\* | Change own password; choose theme                   |
+| `/admin/users`      | admin  | User CRUD                                           |
+| `/admin/api-tokens` | admin  | API token create/revoke                             |
 
 \*In `open` mode (`AUTH_MODE=open`), app pages skip the login gate and attribute writes to `OPEN_MODE_USERNAME`. Admin routes still require a logged-in admin.
 
@@ -132,31 +132,31 @@ Unauthenticated access to protected routes in `required` mode → redirect `/log
 
 ### API (non-versioned)
 
-| Path                        | Access | Purpose                                      |
-| --------------------------- | ------ | -------------------------------------------- |
-| `GET /api/openapi.json`     | public | OpenAPI 3.x spec                             |
-| `/api/docs`                 | public | Interactive API docs (Scalar/Redoc)          |
-| `POST /api/attachments`     | auth   | Multipart upload                             |
-| `GET /api/attachments/[id]` | auth   | Serve file (check session or token)          |
-| `POST /api/inventory/import`| auth   | Bulk inventory import                        |
-| `GET /api/inventory/export` | auth   | Bulk inventory export                        |
-| `GET /api/health`           | public | `{ ok: true }` for probes                    |
+| Path                         | Access | Purpose                             |
+| ---------------------------- | ------ | ----------------------------------- |
+| `GET /api/openapi.json`      | public | OpenAPI 3.x spec                    |
+| `/api/docs`                  | public | Interactive API docs (Scalar/Redoc) |
+| `POST /api/attachments`      | auth   | Multipart upload                    |
+| `GET /api/attachments/[id]`  | auth   | Serve file (check session or token) |
+| `POST /api/inventory/import` | auth   | Bulk inventory import               |
+| `GET /api/inventory/export`  | auth   | Bulk inventory export               |
+| `GET /api/health`            | public | `{ ok: true }` for probes           |
 
 ### REST API (`/api/v1/*`)
 
 All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 
-| Resource            | Base path                         | Operations        |
-| ------------------- | --------------------------------- | ----------------- |
-| Restaurants         | `/api/v1/restaurants`             | list, CRUD        |
-| Projects            | `/api/v1/projects`                | list, CRUD        |
-| Project components  | `/api/v1/projects/{id}/components` | list, create, update, delete |
-| Metrics             | `/api/v1/metrics`                 | list, CRUD        |
-| Metric entries      | `/api/v1/metrics/{id}/entries`    | list, create, update, delete |
-| Inventory           | `/api/v1/inventory`               | list, CRUD, search |
-| Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | list, CRUD, complete |
-| Inventory types     | `/api/v1/inventory/types`         | list, CRUD        |
-| Inventory tags      | `/api/v1/inventory/tags`          | list, CRUD        |
+| Resource                        | Base path                                      | Operations                   |
+| ------------------------------- | ---------------------------------------------- | ---------------------------- |
+| Restaurants                     | `/api/v1/restaurants`                          | list, CRUD                   |
+| Projects                        | `/api/v1/projects`                             | list, CRUD                   |
+| Project components              | `/api/v1/projects/{id}/components`             | list, create, update, delete |
+| Metrics                         | `/api/v1/metrics`                              | list, CRUD                   |
+| Metric entries                  | `/api/v1/metrics/{id}/entries`                 | list, create, update, delete |
+| Inventory                       | `/api/v1/inventory`                            | list, CRUD, search           |
+| Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | list, CRUD, complete         |
+| Inventory types                 | `/api/v1/inventory/types`                      | list, CRUD                   |
+| Inventory tags                  | `/api/v1/inventory/tags`                       | list, CRUD                   |
 
 REST handlers validate with Zod, write via Drizzle, and call the notification emitter. OpenAPI paths are registered from the same schemas.
 
@@ -189,14 +189,14 @@ REST handlers validate with Zod, write via Drizzle, and call the notification em
 
 `middleware.ts` at repo root:
 
-| Matcher                              | Behavior                                            |
-| ------------------------------------ | --------------------------------------------------- |
-| `/login`                             | If session valid → redirect `/`                     |
-| `/(app)/*`                           | `required`: no session → `/login?returnTo=...`; `open`: pass through |
-| `/admin/*`                           | No session → `/login?returnTo=...` (always)         |
-| `/api/v1/*`                          | Skip — bearer auth in route handler                   |
-| `/api/attachments/*`                 | Session or bearer token                             |
-| Static assets, `/_next/*`            | Skip                                                |
+| Matcher                   | Behavior                                                             |
+| ------------------------- | -------------------------------------------------------------------- |
+| `/login`                  | If session valid → redirect `/`                                      |
+| `/(app)/*`                | `required`: no session → `/login?returnTo=...`; `open`: pass through |
+| `/admin/*`                | No session → `/login?returnTo=...` (always)                          |
+| `/api/v1/*`               | Skip — bearer auth in route handler                                  |
+| `/api/attachments/*`      | Session or bearer token                                              |
+| Static assets, `/_next/*` | Skip                                                                 |
 
 Use Lucia session validation helper from `src/lib/auth/session.ts`. Keep middleware edge-compatible — defer DB-heavy work to layouts if needed (Lucia often validates in Node runtime).
 
@@ -212,18 +212,18 @@ Colocate in `src/lib/actions/` by domain. Each action:
 4. Calls notification emitter when appropriate
 5. Calls `revalidatePath()` for affected routes
 
-| File               | Actions                                                                    |
-| ------------------ | -------------------------------------------------------------------------- |
-| `auth.ts`          | `login`, `logout`, `changePassword`                                        |
-| `settings.ts`      | `updateTheme`                                                              |
-| `restaurants.ts`   | `create`, `update`, `markVisited`, `setRating`                             |
-| `projects.ts`      | `create`, `updateTitle`, `updateNotes`, `setStatus`, `setPriority`, `setTags`, link/component CRUD, `deleteProject` |
-| `metrics.ts`       | `createMetric`, `addEntry`, `updateMetric`                                 |
-| `inventory.ts`     | `create`, `update`, `addLink`, `removeLink`, `setTags`                     |
+| File                       | Actions                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.ts`                  | `login`, `logout`, `changePassword`                                                                                             |
+| `settings.ts`              | `updateTheme`                                                                                                                   |
+| `restaurants.ts`           | `create`, `update`, `markVisited`, `setRating`                                                                                  |
+| `projects.ts`              | `create`, `updateTitle`, `updateNotes`, `setStatus`, `setPriority`, `setTags`, link/component CRUD, `deleteProject`             |
+| `metrics.ts`               | `createMetric`, `addEntry`, `updateMetric`                                                                                      |
+| `inventory.ts`             | `create`, `update`, `addLink`, `removeLink`, `setTags`                                                                          |
 | `inventory-maintenance.ts` | `createMaintenanceReminder`, `updateMaintenanceReminder`, `deleteMaintenanceReminder`, `completeMaintenanceReminder`, link CRUD |
-| `notifications.ts` | `markRead`, `markAllRead`                                                  |
-| `admin/users.ts`   | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin` |
-| `admin/api-tokens.ts` | `createToken`, `revokeToken`                                            |
+| `notifications.ts`         | `markRead`, `markAllRead`                                                                                                       |
+| `admin/users.ts`           | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin`                                                      |
+| `admin/api-tokens.ts`      | `createToken`, `revokeToken`                                                                                                    |
 
 Forms use `<form action={...}>` or `useActionState` in client wrappers where UX needs pending states.
 
@@ -240,23 +240,23 @@ Forms use `<form action={...}>` or `useActionState` in client wrappers where UX 
 
 ### Inventory bulk
 
-| Route                    | Method | Body              | Response              |
-| ------------------------ | ------ | ----------------- | --------------------- |
-| `/api/inventory/import`  | POST   | JSON or CSV file  | `{ imported: n }`     |
-| `/api/inventory/export`  | GET    | —                 | JSON export file      |
+| Route                   | Method | Body             | Response          |
+| ----------------------- | ------ | ---------------- | ----------------- |
+| `/api/inventory/import` | POST   | JSON or CSV file | `{ imported: n }` |
+| `/api/inventory/export` | GET    | —                | JSON export file  |
 
 ### OpenAPI
 
-| Route                   | Method | Response                        |
-| ----------------------- | ------ | ------------------------------- |
-| `/api/openapi.json`     | GET    | OpenAPI 3.x JSON                |
-| `/api/docs`             | GET    | HTML interactive docs UI        |
+| Route               | Method | Response                 |
+| ------------------- | ------ | ------------------------ |
+| `/api/openapi.json` | GET    | OpenAPI 3.x JSON         |
+| `/api/docs`         | GET    | HTML interactive docs UI |
 
 ### Health
 
-| Route           | Method | Response           |
-| --------------- | ------ | ------------------ |
-| `/api/health`   | GET    | `{ ok: true }`     |
+| Route         | Method | Response       |
+| ------------- | ------ | -------------- |
+| `/api/health` | GET    | `{ ok: true }` |
 
 The web UI uses server actions for mutations. REST under `/api/v1/*` is an **additional** programmatic surface — same validation rules, same data.
 
@@ -300,14 +300,14 @@ Bootstrap is CLI-only (`scripts/auth-bootstrap.ts`), not a web route. API token 
 
 ## File naming
 
-| Kind                 | Pattern              | Example                              |
-| -------------------- | -------------------- | ------------------------------------ |
-| Page                 | `page.tsx`           | `app/(app)/restaurants/page.tsx`     |
-| Layout               | `layout.tsx`         | `app/(app)/layout.tsx`               |
-| REST handler         | `route.ts`           | `app/api/v1/restaurants/route.ts`    |
-| Server action module | kebab or domain name | `src/lib/actions/restaurants.ts`     |
+| Kind                 | Pattern              | Example                                   |
+| -------------------- | -------------------- | ----------------------------------------- |
+| Page                 | `page.tsx`           | `app/(app)/restaurants/page.tsx`          |
+| Layout               | `layout.tsx`         | `app/(app)/layout.tsx`                    |
+| REST handler         | `route.ts`           | `app/api/v1/restaurants/route.ts`         |
+| Server action module | kebab or domain name | `src/lib/actions/restaurants.ts`          |
 | Component            | PascalCase file      | `src/components/settings/ThemePicker.tsx` |
-| Test                 | co-located           | `src/lib/mentions/parse.test.ts`     |
+| Test                 | co-located           | `src/lib/mentions/parse.test.ts`          |
 
 ---
 

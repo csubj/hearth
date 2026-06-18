@@ -22,11 +22,11 @@ Use **New project** in the header for the same flow with redirect to the detail 
 
 ## Statuses
 
-| Status | Meaning |
-| ------ | ------- |
-| Idea | Not started yet |
+| Status      | Meaning                |
+| ----------- | ---------------------- |
+| Idea        | Not started yet        |
 | In progress | Actively working on it |
-| Done | Finished |
+| Done        | Finished               |
 
 Update status from the project detail page (`/projects/[id]`).
 
@@ -44,12 +44,12 @@ Each project includes:
 
 Each project has a **Budget** section for everything the project needs to cost out:
 
-| Kind | Use for |
-| ---- | ------- |
-| Item | Materials, parts, supplies you buy |
-| Labor | Work or installation |
-| Fee | Permits, delivery, service charges |
-| Other | Anything else |
+| Kind  | Use for                            |
+| ----- | ---------------------------------- |
+| Item  | Materials, parts, supplies you buy |
+| Labor | Work or installation               |
+| Fee   | Permits, delivery, service charges |
+| Other | Anything else                      |
 
 For each line you can set **quantity**, **unit cost**, a **purchase link**, and **how to acquire / notes**. The header shows **Estimated**, **Acquired**, and **Remaining** totals (and compares to an optional project budget).
 

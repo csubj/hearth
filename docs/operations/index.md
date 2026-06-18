@@ -13,20 +13,20 @@ hearth is designed as a **single-process, single-database** application:
 
 ## Operator checklist
 
-| Task | Guide |
-| ---- | ----- |
-| Set environment variables | [Configuration](configuration.md) |
-| Deploy with Docker or VPS | [Deployment](deployment.md) |
-| Back up household data | [Backup & restore](backup-restore.md) |
-| Upgrade to a new version | [Upgrading](upgrading.md) |
-| Fix common problems | [Troubleshooting](troubleshooting.md) |
+| Task                      | Guide                                 |
+| ------------------------- | ------------------------------------- |
+| Set environment variables | [Configuration](configuration.md)     |
+| Deploy with Docker or VPS | [Deployment](deployment.md)           |
+| Back up household data    | [Backup & restore](backup-restore.md) |
+| Upgrade to a new version  | [Upgrading](upgrading.md)             |
+| Fix common problems       | [Troubleshooting](troubleshooting.md) |
 
 ## Resource guidance
 
-| Scale | Suggestion |
-| ----- | ---------- |
-| Household (2–6 users) | 512 MB–1 GB RAM, 1 vCPU |
-| Disk | Grows with photos; monitor `data/` volume size |
+| Scale                 | Suggestion                                     |
+| --------------------- | ---------------------------------------------- |
+| Household (2–6 users) | 512 MB–1 GB RAM, 1 vCPU                        |
+| Disk                  | Grows with photos; monitor `data/` volume size |
 
 SQLite handles this workload easily. Scale vertically if needed — do not run multiple app replicas against one database file.
 

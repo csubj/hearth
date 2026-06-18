@@ -31,11 +31,7 @@ export function isMaintenanceReminderStale(
     return false;
   }
 
-  return isStale(
-    reminderIntervalState(reminder),
-    getMaintenanceReminderAnchor(reminder),
-    now,
-  );
+  return isStale(reminderIntervalState(reminder), getMaintenanceReminderAnchor(reminder), now);
 }
 
 export function isMaintenanceReminderDueForReminder(

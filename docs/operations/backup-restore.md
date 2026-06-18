@@ -65,11 +65,11 @@ curl http://localhost:3000/api/health
 
 ## Backup schedule
 
-| Environment | Suggestion |
-| ----------- | ---------- |
-| Home server | Weekly automated tar + off-site copy |
-| VPS | Daily cron + remote storage (S3, another machine) |
-| Dev only | Optional — data is disposable |
+| Environment | Suggestion                                        |
+| ----------- | ------------------------------------------------- |
+| Home server | Weekly automated tar + off-site copy              |
+| VPS         | Daily cron + remote storage (S3, another machine) |
+| Dev only    | Optional — data is disposable                     |
 
 ## What backups do not include
 

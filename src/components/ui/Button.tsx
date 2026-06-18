@@ -4,8 +4,7 @@ const variantClasses = {
   primary: "bg-accent text-white hover:bg-accent/90 focus-visible:ring-accent disabled:opacity-50",
   secondary:
     "border border-border bg-surface text-text hover:bg-accent-soft focus-visible:ring-accent disabled:opacity-50",
-  soft:
-    "border border-accent/15 bg-accent-soft/60 text-text hover:bg-accent-soft focus-visible:ring-accent disabled:opacity-50",
+  soft: "border border-accent/15 bg-accent-soft/60 text-text hover:bg-accent-soft focus-visible:ring-accent disabled:opacity-50",
   ghost:
     "bg-transparent text-text hover:bg-accent-soft focus-visible:ring-accent disabled:opacity-50",
   destructive:

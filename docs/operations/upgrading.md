@@ -82,7 +82,7 @@ If something goes wrong:
 3. Start the previous image tag
 
 !!! warning
-    SQLite migrations are generally forward-only. Test upgrades on a backup copy when jumping multiple versions.
+SQLite migrations are generally forward-only. Test upgrades on a backup copy when jumping multiple versions.
 
 ## Release tags
 

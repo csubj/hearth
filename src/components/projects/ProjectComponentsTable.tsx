@@ -2,11 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/Collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/Collapsible";
 import { PROJECT_COMPONENT_KINDS } from "@/db/schema";
 import type { ProjectDetail } from "@/lib/actions/projects";
 import {
@@ -63,18 +59,18 @@ function ComponentRow({
   index: number;
   total: number;
 }) {
-  const [updateState, updateAction, updatePending] = useActionState<
-    ProjectActionState,
-    FormData
-  >(updateComponent, {});
+  const [updateState, updateAction, updatePending] = useActionState<ProjectActionState, FormData>(
+    updateComponent,
+    {},
+  );
   const [acquireState, acquireAction, acquirePending] = useActionState<
     ProjectActionState,
     FormData
   >(setComponentAcquired, {});
-  const [removeState, removeAction, removePending] = useActionState<
-    ProjectActionState,
-    FormData
-  >(removeComponent, {});
+  const [removeState, removeAction, removePending] = useActionState<ProjectActionState, FormData>(
+    removeComponent,
+    {},
+  );
   const [reorderState, reorderAction, reorderPending] = useActionState<
     ProjectActionState,
     FormData
@@ -90,7 +86,9 @@ function ComponentRow({
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <KindChip kind={component.kind} />
         <div className="min-w-0 flex-1">
-          <p className={`text-sm font-medium ${component.acquired ? "text-text-muted line-through" : "text-text"}`}>
+          <p
+            className={`text-sm font-medium ${component.acquired ? "text-text-muted line-through" : "text-text"}`}
+          >
             {component.name}
           </p>
           <p className="text-xs text-text-muted">
@@ -180,7 +178,9 @@ function ComponentRow({
                   if (!form) {
                     return;
                   }
-                  const hidden = form.querySelector<HTMLInputElement>('input[name="unitCostCents"]');
+                  const hidden = form.querySelector<HTMLInputElement>(
+                    'input[name="unitCostCents"]',
+                  );
                   if (hidden) {
                     hidden.value = String(parseDollarsToCents(event.target.value));
                   }
@@ -282,19 +282,17 @@ export function ProjectComponentsTable({ project }: { project: ProjectDetail }) 
         <h2 className="text-lg font-medium text-text">Budget</h2>
         <div className="text-right text-sm text-text-muted">
           <p>
-            Estimated: <span className="font-medium text-text">{formatCents(project.estimatedCostCents)}</span>
+            Estimated:{" "}
+            <span className="font-medium text-text">{formatCents(project.estimatedCostCents)}</span>
           </p>
           <p>
-            Acquired: <span className="font-medium text-text">{formatCents(project.acquiredCostCents)}</span>
+            Acquired:{" "}
+            <span className="font-medium text-text">{formatCents(project.acquiredCostCents)}</span>
           </p>
           <p>
-            Remaining: <span className="font-medium text-text">{formatCents(project.remainingCostCents)}</span>
-            {project.budgetCents != null ? (
-              <>
-                {" "}
-                / budget {formatCents(project.budgetCents)}
-              </>
-            ) : null}
+            Remaining:{" "}
+            <span className="font-medium text-text">{formatCents(project.remainingCostCents)}</span>
+            {project.budgetCents != null ? <> / budget {formatCents(project.budgetCents)}</> : null}
           </p>
           {project.componentCount > 0 ? (
             <p className="mt-1 text-xs">
@@ -320,7 +318,10 @@ export function ProjectComponentsTable({ project }: { project: ProjectDetail }) 
         <p className="mt-3 text-sm text-text-muted">No budget items yet.</p>
       )}
 
-      <form action={addAction} className="mt-4 space-y-2 rounded-md border border-dashed border-border p-3">
+      <form
+        action={addAction}
+        className="mt-4 space-y-2 rounded-md border border-dashed border-border p-3"
+      >
         <p className="text-sm font-medium text-text">Add item</p>
         <input type="hidden" name="projectId" value={project.id} />
         <div className="grid gap-2 sm:grid-cols-2">

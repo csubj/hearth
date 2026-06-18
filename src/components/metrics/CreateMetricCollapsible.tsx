@@ -4,11 +4,7 @@ import { useState } from "react";
 import { CreateMetricForm } from "@/components/metrics/CreateMetricForm";
 import type { MentionUser } from "@/components/MentionTextarea";
 import { Button } from "@/components/ui/Button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/Collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/Collapsible";
 
 export function CreateMetricCollapsible({ users = [] }: { users?: MentionUser[] }) {
   const [open, setOpen] = useState(false);

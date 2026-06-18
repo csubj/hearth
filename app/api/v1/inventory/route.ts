@@ -42,9 +42,12 @@ export async function POST(request: NextRequest) {
 
   const row = await createInventoryItemApi(auth.user, parsed.data);
   if (!row) {
-    return Response.json({ error: { code: "internal_error", message: "Failed to create item" } }, {
-      status: 500,
-    });
+    return Response.json(
+      { error: { code: "internal_error", message: "Failed to create item" } },
+      {
+        status: 500,
+      },
+    );
   }
   return Response.json(serializeInventoryItem(row, row.tags), { status: 201 });
 }

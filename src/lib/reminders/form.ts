@@ -30,7 +30,9 @@ export function parseReminderIntervalFromForm(formData: FormData): {
   return {
     remindersEnabled: true,
     reminderIntervalCount: countRaw ? Number(countRaw) : DEFAULT_REMINDER_INTERVAL_COUNT,
-    reminderIntervalUnit: unitRaw ? reminderUnitSchema.parse(unitRaw) : DEFAULT_REMINDER_INTERVAL_UNIT,
+    reminderIntervalUnit: unitRaw
+      ? reminderUnitSchema.parse(unitRaw)
+      : DEFAULT_REMINDER_INTERVAL_UNIT,
   };
 }
 

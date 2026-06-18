@@ -116,8 +116,7 @@ function parseListFilters(
 ): InventoryListFilters {
   const q = typeof searchParams.q === "string" ? searchParams.q.trim() : undefined;
   const tag = typeof searchParams.tag === "string" ? searchParams.tag.trim() : undefined;
-  const itemType =
-    typeof searchParams.type === "string" ? searchParams.type.trim() : undefined;
+  const itemType = typeof searchParams.type === "string" ? searchParams.type.trim() : undefined;
 
   return {
     q: q || undefined,
@@ -184,9 +183,7 @@ async function getOrCreateTagId(name: string, now: Date): Promise<string> {
   }
 
   const id = crypto.randomUUID();
-  await getDb()
-    .insert(inventoryTags)
-    .values({ id, name: trimmed, createdAt: now });
+  await getDb().insert(inventoryTags).values({ id, name: trimmed, createdAt: now });
   return id;
 }
 
@@ -225,9 +222,7 @@ export async function listInventoryItemTypes(): Promise<string[]> {
     .where(sql`${inventoryItems.itemType} IS NOT NULL AND ${inventoryItems.itemType} != ''`)
     .orderBy(inventoryItems.itemType);
 
-  return rows
-    .map((row) => row.itemType)
-    .filter((value): value is string => Boolean(value?.trim()));
+  return rows.map((row) => row.itemType).filter((value): value is string => Boolean(value?.trim()));
 }
 
 async function loadOverdueReminderItemIds(viewerUserId: string): Promise<Set<string>> {
@@ -350,7 +345,9 @@ export async function getInventoryHomeSummary(limit = 5): Promise<InventoryListI
 
 export async function getInventoryHomeStats(): Promise<{ total: number; dueItems: number }> {
   const { user } = await requireUser();
-  const [totalRow] = await getDb().select({ count: sql<number>`count(*)` }).from(inventoryItems);
+  const [totalRow] = await getDb()
+    .select({ count: sql<number>`count(*)` })
+    .from(inventoryItems);
   const overdueItemIds = await loadOverdueReminderItemIds(user.id);
   return {
     total: totalRow?.count ?? 0,
@@ -436,22 +433,20 @@ export async function update(
 ): Promise<InventoryActionState> {
   const { user } = await requireUser();
 
-  const parsed = itemFieldsSchema
-    .extend({ id: z.string().uuid() })
-    .safeParse({
-      id: String(formData.get("id") ?? ""),
-      name: String(formData.get("name") ?? ""),
-      brand: String(formData.get("brand") ?? "") || undefined,
-      model: String(formData.get("model") ?? "") || undefined,
-      serial: String(formData.get("serial") ?? "") || undefined,
-      itemType: String(formData.get("itemType") ?? "") || undefined,
-      location: String(formData.get("location") ?? "") || undefined,
-      purchaseDate: String(formData.get("purchaseDate") ?? "") || undefined,
-      store: String(formData.get("store") ?? "") || undefined,
-      price: String(formData.get("price") ?? "") || undefined,
-      warrantyNote: String(formData.get("warrantyNote") ?? "") || undefined,
-      notes: String(formData.get("notes") ?? "") || undefined,
-    });
+  const parsed = itemFieldsSchema.extend({ id: z.string().uuid() }).safeParse({
+    id: String(formData.get("id") ?? ""),
+    name: String(formData.get("name") ?? ""),
+    brand: String(formData.get("brand") ?? "") || undefined,
+    model: String(formData.get("model") ?? "") || undefined,
+    serial: String(formData.get("serial") ?? "") || undefined,
+    itemType: String(formData.get("itemType") ?? "") || undefined,
+    location: String(formData.get("location") ?? "") || undefined,
+    purchaseDate: String(formData.get("purchaseDate") ?? "") || undefined,
+    store: String(formData.get("store") ?? "") || undefined,
+    price: String(formData.get("price") ?? "") || undefined,
+    warrantyNote: String(formData.get("warrantyNote") ?? "") || undefined,
+    notes: String(formData.get("notes") ?? "") || undefined,
+  });
 
   if (!parsed.success) {
     return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
@@ -881,8 +876,7 @@ export async function importInventoryData(
           serial: item.serial ?? null,
           itemType: item.itemType ?? null,
           location: item.location ?? null,
-          purchaseDate:
-            purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
+          purchaseDate: purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
           store: item.store ?? null,
           price: item.price ?? null,
           warrantyNote: item.warrantyNote ?? null,
@@ -905,8 +899,7 @@ export async function importInventoryData(
         serial: item.serial ?? null,
         itemType: item.itemType ?? null,
         location: item.location ?? null,
-        purchaseDate:
-          purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
+        purchaseDate: purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
         store: item.store ?? null,
         price: item.price ?? null,
         warrantyNote: item.warrantyNote ?? null,
@@ -973,4 +966,3 @@ export async function importInventoryData(
 
   return { imported };
 }
-

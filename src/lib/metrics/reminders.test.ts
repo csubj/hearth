@@ -148,17 +148,19 @@ describe("processMetricReminders", () => {
     const user = await createTestUser();
     const now = new Date("2026-06-20T00:00:00Z");
     const metricId = crypto.randomUUID();
-    await getDb().insert(metrics).values({
-      id: metricId,
-      name: "Flora's weight",
-      unit: "lbs",
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      lastReminderAt: null,
-      createdByUserId: user.id,
-      createdAt: new Date("2026-01-01T00:00:00Z"),
-      updatedAt: new Date("2026-01-01T00:00:00Z"),
-    });
+    await getDb()
+      .insert(metrics)
+      .values({
+        id: metricId,
+        name: "Flora's weight",
+        unit: "lbs",
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        lastReminderAt: null,
+        createdByUserId: user.id,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        updatedAt: new Date("2026-01-01T00:00:00Z"),
+      });
 
     vi.useFakeTimers();
     vi.setSystemTime(now);
@@ -179,17 +181,19 @@ describe("processMetricReminders", () => {
   it("skips metrics that are not yet due for retry", async () => {
     const user = await createTestUser();
     const metricId = crypto.randomUUID();
-    await getDb().insert(metrics).values({
-      id: metricId,
-      name: "Fresh metric",
-      unit: null,
-      reminderIntervalCount: 7,
-      reminderIntervalUnit: "day",
-      lastReminderAt: new Date("2026-06-18T00:00:00Z"),
-      createdByUserId: user.id,
-      createdAt: new Date("2026-01-01T00:00:00Z"),
-      updatedAt: new Date("2026-01-01T00:00:00Z"),
-    });
+    await getDb()
+      .insert(metrics)
+      .values({
+        id: metricId,
+        name: "Fresh metric",
+        unit: null,
+        reminderIntervalCount: 7,
+        reminderIntervalUnit: "day",
+        lastReminderAt: new Date("2026-06-18T00:00:00Z"),
+        createdByUserId: user.id,
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        updatedAt: new Date("2026-01-01T00:00:00Z"),
+      });
 
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-20T00:00:00Z"));

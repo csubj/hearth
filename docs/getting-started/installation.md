@@ -4,16 +4,16 @@ Install hearth locally for development or to run your household instance on your
 
 ## Prerequisites
 
-| Requirement | Version |
-| ----------- | ------- |
-| Node.js | 22 LTS |
-| pnpm | 10.x |
-| OS | macOS or Linux (SQLite via `better-sqlite3`) |
+| Requirement | Version                                      |
+| ----------- | -------------------------------------------- |
+| Node.js     | 22 LTS                                       |
+| pnpm        | 10.x                                         |
+| OS          | macOS or Linux (SQLite via `better-sqlite3`) |
 
 Optional for documentation:
 
-| Requirement | Purpose |
-| ----------- | ------- |
+| Requirement  | Purpose                                  |
+| ------------ | ---------------------------------------- |
 | Python 3.12+ | MkDocs local preview (`make docs-serve`) |
 
 ## Local setup
@@ -101,11 +101,11 @@ This directory is gitignored. Back it up regularly — see [Backup & restore](..
 
 ## Verify the install
 
-| Check | Command / URL |
-| ----- | ------------- |
-| Health endpoint | `curl http://localhost:3000/api/health` → `{"ok":true}` |
-| Tests | `pnpm test` |
-| Lint + typecheck | `pnpm lint && pnpm typecheck` |
+| Check            | Command / URL                                           |
+| ---------------- | ------------------------------------------------------- |
+| Health endpoint  | `curl http://localhost:3000/api/health` → `{"ok":true}` |
+| Tests            | `pnpm test`                                             |
+| Lint + typecheck | `pnpm lint && pnpm typecheck`                           |
 
 ## Next steps
 

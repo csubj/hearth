@@ -11,21 +11,21 @@ Go to **Restaurants** (`/restaurants`). The list leads the page — what you wan
 1. Use the **New restaurant** button in the header
 2. Fill in:
 
-| Field | Required | Notes |
-| ----- | -------- | ----- |
-| Name | Yes | Restaurant name |
-| Neighborhood | No | General area |
-| Address | No | Freeform address text |
-| Notes | No | Why you want to go — "Emily said the pasta is great" |
+| Field        | Required | Notes                                                |
+| ------------ | -------- | ---------------------------------------------------- |
+| Name         | Yes      | Restaurant name                                      |
+| Neighborhood | No       | General area                                         |
+| Address      | No       | Freeform address text                                |
+| Notes        | No       | Why you want to go — "Emily said the pasta is great" |
 
 New restaurants start with status **Want to try**.
 
 ## Statuses
 
-| Status | Meaning |
-| ------ | ------- |
-| Want to try | On the wishlist |
-| Visited | You've been there |
+| Status      | Meaning           |
+| ----------- | ----------------- |
+| Want to try | On the wishlist   |
+| Visited     | You've been there |
 
 ## After a visit
 
@@ -56,7 +56,7 @@ The home restaurants section shows a few **want to try** suggestions. Click thro
 ## Map view
 
 !!! note "Coming later"
-    A map view using Google Maps is planned but not in v1. Restaurants are list-only for now.
+A map view using Google Maps is planned but not in v1. Restaurants are list-only for now.
 
 ## @-mentions and photos
 

@@ -33,25 +33,18 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <Link
-          href="/metrics"
-          className="text-sm text-text-muted transition-colors hover:text-text"
-        >
+        <Link href="/metrics" className="text-sm text-text-muted transition-colors hover:text-text">
           ← Back to metrics
         </Link>
         <div>
           <h1 className="font-serif text-2xl text-text">{metric.name}</h1>
-          {metric.unit ? (
-            <p className="mt-1 text-sm text-text-muted">Unit: {metric.unit}</p>
-          ) : null}
+          {metric.unit ? <p className="mt-1 text-sm text-text-muted">Unit: {metric.unit}</p> : null}
           {hasReminderInterval(metric) ? (
             <p className="mt-1 text-sm text-text-muted">
               Reminds{" "}
-              {formatReminderInterval(
-                metric.reminderIntervalCount!,
-                metric.reminderIntervalUnit!,
-                { prefixEvery: true },
-              )}{" "}
+              {formatReminderInterval(metric.reminderIntervalCount!, metric.reminderIntervalUnit!, {
+                prefixEvery: true,
+              })}{" "}
               ({formatRecipientLabel(metric.reminderRecipientUserId, mentionUsers)})
             </p>
           ) : null}

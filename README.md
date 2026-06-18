@@ -59,27 +59,27 @@ The defaults in `.env.example` work out of the box. Optionally set `AUTH_MODE` (
 
 ## Documentation
 
-| Resource | Description |
-| -------- | ----------- |
+| Resource                                              | Description                                   |
+| ----------------------------------------------------- | --------------------------------------------- |
 | [Documentation site](https://csubj.github.io/hearth/) | User guide, operations, architecture (MkDocs) |
-| [docs/design/README.md](docs/design/README.md) | Internal design index |
-| [docs/contributing.md](docs/contributing.md) | Contributor guide |
-| [AGENTS.md](AGENTS.md) | AI agent and contributor conventions |
-| [docs/design/08_mvp.md](docs/design/08_mvp.md) | Build phases (v1 MVP complete) |
-| [docs/design/09_deploy.md](docs/design/09_deploy.md) | Backup, HTTPS, and hosting |
-| [docs/design/10_ci.md](docs/design/10_ci.md) | CI pipeline details |
+| [docs/design/README.md](docs/design/README.md)        | Internal design index                         |
+| [docs/contributing.md](docs/contributing.md)          | Contributor guide                             |
+| [AGENTS.md](AGENTS.md)                                | AI agent and contributor conventions          |
+| [docs/design/08_mvp.md](docs/design/08_mvp.md)        | Build phases (v1 MVP complete)                |
+| [docs/design/09_deploy.md](docs/design/09_deploy.md)  | Backup, HTTPS, and hosting                    |
+| [docs/design/10_ci.md](docs/design/10_ci.md)          | CI pipeline details                           |
 
 ## Tech stack
 
-| Layer | Choice |
-| ----- | ------ |
+| Layer     | Choice                             |
+| --------- | ---------------------------------- |
 | Framework | Next.js 15 (App Router) + React 19 |
-| Language | TypeScript |
-| Database | SQLite + Drizzle ORM |
-| Auth | Lucia v3 + Argon2id |
-| Styling | Tailwind CSS v4 + Radix UI |
-| Testing | Vitest |
-| Docs | MkDocs Material → GitHub Pages |
+| Language  | TypeScript                         |
+| Database  | SQLite + Drizzle ORM               |
+| Auth      | Lucia v3 + Argon2id                |
+| Styling   | Tailwind CSS v4 + Radix UI         |
+| Testing   | Vitest                             |
+| Docs      | MkDocs Material → GitHub Pages     |
 
 See [docs/design/01_tech.md](docs/design/01_tech.md) for full rationale and conventions.
 
@@ -87,21 +87,21 @@ See [docs/design/01_tech.md](docs/design/01_tech.md) for full rationale and conv
 
 ### Scripts
 
-| Command | Purpose |
-| ------- | ------- |
-| `pnpm dev` | Next.js dev server |
-| `pnpm build` | Production build |
-| `pnpm start` | Run production server |
-| `pnpm test` | Vitest (in-memory SQLite) |
-| `pnpm lint` | ESLint |
-| `pnpm format` | Prettier write |
-| `pnpm format:check` | Prettier check |
-| `pnpm typecheck` | TypeScript |
-| `pnpm db:migrate` | Apply Drizzle migrations manually (optional; app migrates on startup) |
-| `pnpm db:generate` | Generate migration from schema changes |
-| `pnpm run auth:bootstrap` | Create first admin user |
-| `pnpm run auth:create-token` | Create a REST API bearer token |
-| `pnpm smoke:docker` | Docker smoke test |
+| Command                      | Purpose                                                               |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `pnpm dev`                   | Next.js dev server                                                    |
+| `pnpm build`                 | Production build                                                      |
+| `pnpm start`                 | Run production server                                                 |
+| `pnpm test`                  | Vitest (in-memory SQLite)                                             |
+| `pnpm lint`                  | ESLint                                                                |
+| `pnpm format`                | Prettier write                                                        |
+| `pnpm format:check`          | Prettier check                                                        |
+| `pnpm typecheck`             | TypeScript                                                            |
+| `pnpm db:migrate`            | Apply Drizzle migrations manually (optional; app migrates on startup) |
+| `pnpm db:generate`           | Generate migration from schema changes                                |
+| `pnpm run auth:bootstrap`    | Create first admin user                                               |
+| `pnpm run auth:create-token` | Create a REST API bearer token                                        |
+| `pnpm smoke:docker`          | Docker smoke test                                                     |
 
 ### Make targets
 

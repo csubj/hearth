@@ -31,10 +31,7 @@ function ActionMessage({ state }: { state: InventoryActionState }) {
   return null;
 }
 
-function formatScope(
-  recipientUserId: string | null,
-  users: MentionUser[],
-): string {
+function formatScope(recipientUserId: string | null, users: MentionUser[]): string {
   if (!recipientUserId) {
     return "Whole household";
   }
@@ -55,14 +52,14 @@ function ReminderCard({
     InventoryActionState,
     FormData
   >(completeMaintenanceReminder, {});
-  const [deleteState, deleteAction, deletePending] = useActionState<
-    InventoryActionState,
-    FormData
-  >(deleteMaintenanceReminder, {});
-  const [updateState, updateAction, updatePending] = useActionState<
-    InventoryActionState,
-    FormData
-  >(updateMaintenanceReminder, {});
+  const [deleteState, deleteAction, deletePending] = useActionState<InventoryActionState, FormData>(
+    deleteMaintenanceReminder,
+    {},
+  );
+  const [updateState, updateAction, updatePending] = useActionState<InventoryActionState, FormData>(
+    updateMaintenanceReminder,
+    {},
+  );
   const [addLinkState, addLinkAction, addLinkPending] = useActionState<
     InventoryActionState,
     FormData
@@ -240,10 +237,10 @@ export function MaintenanceRemindersPanel({
   reminders: MaintenanceReminderWithLinks[];
   users: MentionUser[];
 }) {
-  const [createState, createAction, createPending] = useActionState<
-    InventoryActionState,
-    FormData
-  >(createMaintenanceReminder, {});
+  const [createState, createAction, createPending] = useActionState<InventoryActionState, FormData>(
+    createMaintenanceReminder,
+    {},
+  );
 
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">

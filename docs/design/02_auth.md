@@ -34,10 +34,10 @@ There is no read-only or guest role in v1. Every authenticated user has full acc
 
 The **web UI** access model is configurable per instance via the `AUTH_MODE` environment variable. The **REST API is unaffected** — it always requires a token (see [API tokens](#api-tokens)).
 
-| Mode                 | Web login gate                          | Write attribution                                         | Admin routes                       |
-| -------------------- | --------------------------------------- | --------------------------------------------------------- | ---------------------------------- |
-| `required` (default) | Enforced — unauthenticated → `/login`   | The logged-in user                                        | Require session + `role = admin`   |
-| `open`               | Skipped for app pages                   | A single shared identity (`OPEN_MODE_USERNAME`)           | Still require a logged-in admin    |
+| Mode                 | Web login gate                        | Write attribution                               | Admin routes                     |
+| -------------------- | ------------------------------------- | ----------------------------------------------- | -------------------------------- |
+| `required` (default) | Enforced — unauthenticated → `/login` | The logged-in user                              | Require session + `role = admin` |
+| `open`               | Skipped for app pages                 | A single shared identity (`OPEN_MODE_USERNAME`) | Still require a logged-in admin  |
 
 **`required` (default).** Behaves exactly as the rest of this doc describes: middleware validates a session for every protected route and redirects to `/login?returnTo=...` when missing.
 
@@ -124,14 +124,14 @@ sequenceDiagram
 
 ## Route protection
 
-| Surface                                        | `required` mode                                                  | `open` mode                                                      |
-| ---------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `/login`                                       | Public; redirect to `/` if already authenticated                 | Same                                                             |
-| App pages (`/`, feature routes, notifications) | Require valid session → else `/login?returnTo=...`              | No session required; actor = `OPEN_MODE_USERNAME` user           |
-| Admin pages (`/admin/users`, `/admin/api-tokens`) | Require session + `role = admin`                              | Same — admin must log in                                         |
-| `/api/v1/*`                                    | Bearer token required (see [API tokens](#api-tokens))            | Same — token required regardless of web mode                     |
-| Other API routes (`/api/attachments`, etc.)    | Session or bearer token                                          | Session or bearer token; open mode uses shared identity for session-less web uploads |
-| Server actions                                 | `requireUser()` / `requireAdmin()` in handler                    | `requireUser()` resolves shared identity in open mode            |
+| Surface                                           | `required` mode                                       | `open` mode                                                                          |
+| ------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `/login`                                          | Public; redirect to `/` if already authenticated      | Same                                                                                 |
+| App pages (`/`, feature routes, notifications)    | Require valid session → else `/login?returnTo=...`    | No session required; actor = `OPEN_MODE_USERNAME` user                               |
+| Admin pages (`/admin/users`, `/admin/api-tokens`) | Require session + `role = admin`                      | Same — admin must log in                                                             |
+| `/api/v1/*`                                       | Bearer token required (see [API tokens](#api-tokens)) | Same — token required regardless of web mode                                         |
+| Other API routes (`/api/attachments`, etc.)       | Session or bearer token                               | Session or bearer token; open mode uses shared identity for session-less web uploads |
+| Server actions                                    | `requireUser()` / `requireAdmin()` in handler         | `requireUser()` resolves shared identity in open mode                                |
 
 Never rely on client-side checks alone.
 
@@ -141,27 +141,27 @@ Never rely on client-side checks alone.
 
 Machine-to-machine auth for the programmatic REST API (`/api/v1/*`). Tokens are **always required** for REST — independent of `AUTH_MODE`.
 
-| Field           | Value                                                                                                      |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Storage**     | `api_tokens` table — hashed token value, never plaintext after creation                                     |
-| **Format**      | `hearth_pat_<random>` prefix shown at creation; only the hash is stored                                    |
-| **Attribution** | Each token is tied to a `user_id`; API writes attribute to that user                                       |
-| **Creation**    | Admin UI at `/admin/api-tokens` or CLI script `pnpm run auth:create-token`                                 |
-| **Revocation**  | Set `revoked_at`; revoked tokens fail immediately                                                          |
-| **Header**      | `Authorization: Bearer <token>`                                                                            |
+| Field           | Value                                                                      |
+| --------------- | -------------------------------------------------------------------------- |
+| **Storage**     | `api_tokens` table — hashed token value, never plaintext after creation    |
+| **Format**      | `hearth_pat_<random>` prefix shown at creation; only the hash is stored    |
+| **Attribution** | Each token is tied to a `user_id`; API writes attribute to that user       |
+| **Creation**    | Admin UI at `/admin/api-tokens` or CLI script `pnpm run auth:create-token` |
+| **Revocation**  | Set `revoked_at`; revoked tokens fail immediately                          |
+| **Header**      | `Authorization: Bearer <token>`                                            |
 
 ### `api_tokens` schema (conceptual)
 
-| Column         | Type             | Notes                              |
-| -------------- | ---------------- | ---------------------------------- |
-| `id`           | text PK          |                                    |
-| `user_id`      | text FK → users  | Attribution target                 |
-| `name`         | text NOT NULL    | Human label — "home automation"    |
-| `prefix`       | text NOT NULL    | First chars for identification     |
-| `token_hash`   | text NOT NULL    | Argon2id or SHA-256 of full token  |
-| `last_used_at` | integer NULL     | ms; updated on successful auth     |
-| `revoked_at`   | integer NULL     | ms; NULL = active                  |
-| `created_at`   | integer NOT NULL |                                    |
+| Column         | Type             | Notes                             |
+| -------------- | ---------------- | --------------------------------- |
+| `id`           | text PK          |                                   |
+| `user_id`      | text FK → users  | Attribution target                |
+| `name`         | text NOT NULL    | Human label — "home automation"   |
+| `prefix`       | text NOT NULL    | First chars for identification    |
+| `token_hash`   | text NOT NULL    | Argon2id or SHA-256 of full token |
+| `last_used_at` | integer NULL     | ms; updated on successful auth    |
+| `revoked_at`   | integer NULL     | ms; NULL = active                 |
+| `created_at`   | integer NOT NULL |                                   |
 
 List view shows name, prefix, user, last used, created — never the full secret.
 
@@ -266,10 +266,10 @@ auth:
     session_secret: SESSION_SECRET
 ```
 
-| Variable              | Required              | Default     | Purpose                                      |
-| --------------------- | --------------------- | ----------- | -------------------------------------------- |
-| `AUTH_MODE`           | no                    | `required`  | Web access: `required` \| `open`             |
-| `OPEN_MODE_USERNAME`  | when `AUTH_MODE=open` | —           | Username of shared identity for open mode    |
+| Variable             | Required              | Default    | Purpose                                   |
+| -------------------- | --------------------- | ---------- | ----------------------------------------- |
+| `AUTH_MODE`          | no                    | `required` | Web access: `required` \| `open`          |
+| `OPEN_MODE_USERNAME` | when `AUTH_MODE=open` | —          | Username of shared identity for open mode |
 
 `SESSION_SECRET` is listed in `.env.example` for backward compatibility but is **not read** by the application. It may be removed in a future release.
 

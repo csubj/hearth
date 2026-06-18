@@ -51,7 +51,13 @@ export function AddEntryForm({
         <label htmlFor="entry-note" className="block text-sm font-medium text-text">
           Note <span className="font-normal text-text-muted">(optional)</span>
         </label>
-        <MentionTextarea id="entry-note" name="note" users={users} rows={3} className="mt-1 text-sm" />
+        <MentionTextarea
+          id="entry-note"
+          name="note"
+          users={users}
+          rows={3}
+          className="mt-1 text-sm"
+        />
       </div>
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">

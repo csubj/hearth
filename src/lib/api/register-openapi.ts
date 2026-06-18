@@ -1,4 +1,9 @@
-import { registerInventoryMaintenanceRemindersResource, registerMetricEntriesResource, registerProjectComponentsResource, registerResource } from "@/lib/api/openapi";
+import {
+  registerInventoryMaintenanceRemindersResource,
+  registerMetricEntriesResource,
+  registerProjectComponentsResource,
+  registerResource,
+} from "@/lib/api/openapi";
 
 registerResource({
   tag: "Restaurants",

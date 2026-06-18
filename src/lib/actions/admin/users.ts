@@ -147,10 +147,7 @@ export async function disableUser(
       assertCanDisableUser(tx, target, admin.id);
       targetUsername = target.username;
 
-      tx.update(users)
-        .set({ disabledAt: now, updatedAt: now })
-        .where(eq(users.id, userId))
-        .run();
+      tx.update(users).set({ disabledAt: now, updatedAt: now }).where(eq(users.id, userId)).run();
     });
   } catch (error) {
     if (error instanceof AdminGuardError) {

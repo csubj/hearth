@@ -1,7 +1,4 @@
-import {
-  OpenAPIRegistry,
-  OpenApiGeneratorV3,
-} from "@asteasolutions/zod-to-openapi";
+import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 
 export const openApiRegistry = new OpenAPIRegistry();
 
@@ -36,7 +33,10 @@ export function registerResource(options: RegisterResourceOptions): void {
     tags: [tag],
     security: [{ [bearerAuth.name]: [] }],
     responses: {
-      200: { description: `List ${tag}`, content: { "application/json": { schema: paginatedList } } },
+      200: {
+        description: `List ${tag}`,
+        content: { "application/json": { schema: paginatedList } },
+      },
       401: { description: "Unauthorized" },
     },
   });

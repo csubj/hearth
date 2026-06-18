@@ -3,12 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { InventoryDetail } from "@/lib/actions/inventory";
-import {
-  addLink,
-  removeLink,
-  setTags,
-  type InventoryActionState,
-} from "@/lib/actions/inventory";
+import { addLink, removeLink, setTags, type InventoryActionState } from "@/lib/actions/inventory";
 
 function ActionMessage({ state }: { state: InventoryActionState }) {
   if (state.error) {
@@ -29,10 +24,10 @@ export function InventoryLinksPanel({ item }: { item: InventoryDetail }) {
     addLink,
     {},
   );
-  const [removeState, removeAction, removePending] = useActionState<
-    InventoryActionState,
-    FormData
-  >(removeLink, {});
+  const [removeState, removeAction, removePending] = useActionState<InventoryActionState, FormData>(
+    removeLink,
+    {},
+  );
 
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">

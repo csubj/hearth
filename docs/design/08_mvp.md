@@ -88,12 +88,12 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** core product loop — capture and glance (Stream was later merged into Projects).
 
-| Deliverable                | Notes                                    |
-| -------------------------- | ---------------------------------------- |
-| `/projects` quick capture  | title-optional notes capture             |
-| `/` home                   | projects section + quick capture         |
-| Basic UI components        | `Button`, list cards per `05_styling.md` |
-| Notification emitter stub  | log-only OK; full fan-out in Phase 6     |
+| Deliverable               | Notes                                    |
+| ------------------------- | ---------------------------------------- |
+| `/projects` quick capture | title-optional notes capture             |
+| `/` home                  | projects section + quick capture         |
+| Basic UI components       | `Button`, list cards per `05_styling.md` |
+| Notification emitter stub | log-only OK; full fan-out in Phase 6     |
 
 **Done when:**
 
@@ -128,12 +128,12 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** remaining feature lists (metrics without charting yet).
 
-| Deliverable                                         | Notes                      |
-| --------------------------------------------------- | -------------------------- |
+| Deliverable                                        | Notes                      |
+| -------------------------------------------------- | -------------------------- |
 | `projects`, `metrics`, `metric_entries` migrations |                            |
-| Routes per `04_routes.md`                           | all list + detail pages    |
-| Home sections                                       | one block per feature      |
-| Metric history                                      | table/cards on detail page |
+| Routes per `04_routes.md`                          | all list + detail pages    |
+| Home sections                                      | one block per feature      |
+| Metric history                                     | table/cards on detail page |
 
 **Done when:**
 
@@ -147,12 +147,12 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** photos on user content.
 
-| Deliverable                 | Notes                                             |
-| --------------------------- | ------------------------------------------------- |
-| `attachments` migration     |                                                   |
-| `POST/GET /api/attachments` | per `07_attachments.md`                           |
-| Upload UI on detail forms   | restaurant, project, metric entry  |
-| Thumbnail grid + lightbox   | Radix Dialog                                      |
+| Deliverable                 | Notes                             |
+| --------------------------- | --------------------------------- |
+| `attachments` migration     |                                   |
+| `POST/GET /api/attachments` | per `07_attachments.md`           |
+| Upload UI on detail forms   | restaurant, project, metric entry |
+| Thumbnail grid + lightbox   | Radix Dialog                      |
 
 **Done when:**
 
@@ -210,16 +210,16 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** optional open web mode and programmatic REST access.
 
-| Deliverable                              | Notes                                    |
-| ---------------------------------------- | ---------------------------------------- |
-| `AUTH_MODE`, `OPEN_MODE_USERNAME` env    | per `02_auth.md`                         |
-| Middleware open-mode branch              | shared identity attribution              |
-| `api_tokens` migration + admin UI        | `/admin/api-tokens`                      |
-| `pnpm run auth:create-token` CLI         | non-interactive token creation           |
-| `/api/v1/*` REST handlers                | all resources per `04_routes.md`         |
-| Zod schemas + OpenAPI registry           | `@asteasolutions/zod-to-openapi`         |
-| `GET /api/openapi.json`, `/api/docs`     | Scalar or Redoc UI                       |
-| Bearer auth middleware for `/api/v1/*`   | always required                          |
+| Deliverable                            | Notes                            |
+| -------------------------------------- | -------------------------------- |
+| `AUTH_MODE`, `OPEN_MODE_USERNAME` env  | per `02_auth.md`                 |
+| Middleware open-mode branch            | shared identity attribution      |
+| `api_tokens` migration + admin UI      | `/admin/api-tokens`              |
+| `pnpm run auth:create-token` CLI       | non-interactive token creation   |
+| `/api/v1/*` REST handlers              | all resources per `04_routes.md` |
+| Zod schemas + OpenAPI registry         | `@asteasolutions/zod-to-openapi` |
+| `GET /api/openapi.json`, `/api/docs`   | Scalar or Redoc UI               |
+| Bearer auth middleware for `/api/v1/*` | always required                  |
 
 **Done when:**
 
@@ -235,12 +235,12 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** charts for metrics and UX shift to content-first pages.
 
-| Deliverable                              | Notes                                    |
-| ---------------------------------------- | ---------------------------------------- |
-| Recharts `MetricChart` component         | per `05_styling.md`                      |
-| Chart on `/metrics/[id]`                 | numeric values only                      |
-| Compact create pattern                   | header button / Collapsible on list pages |
-| Refactor list pages                      | existing content leads, capture secondary |
+| Deliverable                      | Notes                                     |
+| -------------------------------- | ----------------------------------------- |
+| Recharts `MetricChart` component | per `05_styling.md`                       |
+| Chart on `/metrics/[id]`         | numeric values only                       |
+| Compact create pattern           | header button / Collapsible on list pages |
+| Refactor list pages              | existing content leads, capture secondary |
 
 **Done when:**
 
@@ -255,15 +255,15 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 **Goal:** searchable household catalog with import/export.
 
-| Deliverable                                         | Notes                                    |
-| --------------------------------------------------- | ---------------------------------------- |
-| `inventory_*` migrations                            | per `03_schema.md`                       |
-| `/inventory`, `/inventory/[id]` routes            | search, tags, links                      |
-| Document attachments for inventory                  | PDF per `07_attachments.md`              |
-| `inventory.created` / `inventory.updated` notifications | per `06_notifications.md`            |
-| `POST /api/inventory/import`, `GET /api/inventory/export` | bulk ops                           |
-| `/api/v1/inventory` + types + tags REST             | per `04_routes.md`                       |
-| Home inventory section                              | recent items preview                     |
+| Deliverable                                               | Notes                       |
+| --------------------------------------------------------- | --------------------------- |
+| `inventory_*` migrations                                  | per `03_schema.md`          |
+| `/inventory`, `/inventory/[id]` routes                    | search, tags, links         |
+| Document attachments for inventory                        | PDF per `07_attachments.md` |
+| `inventory.created` / `inventory.updated` notifications   | per `06_notifications.md`   |
+| `POST /api/inventory/import`, `GET /api/inventory/export` | bulk ops                    |
+| `/api/v1/inventory` + types + tags REST                   | per `04_routes.md`          |
+| Home inventory section                                    | recent items preview        |
 
 **Done when:**
 

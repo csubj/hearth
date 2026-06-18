@@ -3,12 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import type { ProjectDetail } from "@/lib/actions/projects";
-import {
-  addLink,
-  removeLink,
-  setTags,
-  type ProjectActionState,
-} from "@/lib/actions/projects";
+import { addLink, removeLink, setTags, type ProjectActionState } from "@/lib/actions/projects";
 
 function ActionMessage({ state }: { state: ProjectActionState }) {
   if (state.error) {
@@ -29,10 +24,10 @@ export function ProjectLinksPanel({ project }: { project: ProjectDetail }) {
     addLink,
     {},
   );
-  const [removeState, removeAction, removePending] = useActionState<
-    ProjectActionState,
-    FormData
-  >(removeLink, {});
+  const [removeState, removeAction, removePending] = useActionState<ProjectActionState, FormData>(
+    removeLink,
+    {},
+  );
 
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">

@@ -14,11 +14,7 @@ import {
 } from "@/db/schema";
 import type { AuthUser } from "@/lib/auth/lucia";
 import { componentRollups } from "@/lib/projects/rollups";
-import {
-  addEntryRecord,
-  createMetricRecord,
-  updateMetricRecord,
-} from "@/lib/actions/metrics";
+import { addEntryRecord, createMetricRecord, updateMetricRecord } from "@/lib/actions/metrics";
 import { displayName } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import { combineRestaurantMentionText } from "@/lib/restaurants/mention-text";
@@ -133,20 +129,13 @@ export function serializeMetricEntry(row: MetricEntry) {
   };
 }
 
-function cursorCondition(
-  createdAt: AnyColumn,
-  id: AnyColumn,
-  cursor: string,
-): SQL | undefined {
+function cursorCondition(createdAt: AnyColumn, id: AnyColumn, cursor: string): SQL | undefined {
   const decoded = decodeCursor(cursor);
   if (!decoded) {
     return undefined;
   }
   const cursorDate = new Date(decoded.t);
-  return or(
-    lt(createdAt, cursorDate),
-    and(eq(createdAt, cursorDate), lt(id, decoded.id)),
-  );
+  return or(lt(createdAt, cursorDate), and(eq(createdAt, cursorDate), lt(id, decoded.id)));
 }
 
 export async function listRestaurantsApi(query: PaginationQuery) {
@@ -245,8 +234,7 @@ export async function updateRestaurantApi(
     .update(restaurants)
     .set({
       name: input.name ?? existing.name,
-      neighborhood:
-        input.neighborhood !== undefined ? input.neighborhood : existing.neighborhood,
+      neighborhood: input.neighborhood !== undefined ? input.neighborhood : existing.neighborhood,
       address: input.address !== undefined ? input.address : existing.address,
       notes: input.notes !== undefined ? input.notes : existing.notes,
       status,
@@ -420,14 +408,9 @@ export async function updateProjectComponentApi(
   }
 
   const now = new Date();
-  const acquired =
-    input.acquired !== undefined ? input.acquired : existing.acquired;
+  const acquired = input.acquired !== undefined ? input.acquired : existing.acquired;
   const acquiredAt =
-    input.acquired === undefined
-      ? existing.acquiredAt
-      : input.acquired
-        ? now
-        : null;
+    input.acquired === undefined ? existing.acquiredAt : input.acquired ? now : null;
 
   const [updated] = await db
     .update(projectComponents)

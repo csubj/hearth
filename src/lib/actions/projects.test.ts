@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import {
-  projectComponents,
-  projectItemTags,
-  projectTags,
-  projects,
-} from "@/db/schema";
+import { projectComponents, projectItemTags, projectTags, projects } from "@/db/schema";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { deriveProjectTitle } from "@/components/projects/format";
@@ -241,47 +236,49 @@ describe("project actions", () => {
     const lowId = crypto.randomUUID();
     const unsetId = crypto.randomUUID();
 
-    await getDb().insert(projects).values([
-      {
-        id: highId,
-        title: "High",
-        notes: null,
-        status: "idea",
-        priority: 5,
-        targetWhen: null,
-        budgetCents: null,
-        createdByUserId: user.id,
-        updatedByUserId: user.id,
-        createdAt: now,
-        updatedAt: new Date(now.getTime() + 1000),
-      },
-      {
-        id: lowId,
-        title: "Low",
-        notes: null,
-        status: "idea",
-        priority: 1,
-        targetWhen: null,
-        budgetCents: null,
-        createdByUserId: user.id,
-        updatedByUserId: user.id,
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: unsetId,
-        title: "Unset",
-        notes: null,
-        status: "idea",
-        priority: null,
-        targetWhen: null,
-        budgetCents: null,
-        createdByUserId: user.id,
-        updatedByUserId: user.id,
-        createdAt: now,
-        updatedAt: new Date(now.getTime() + 2000),
-      },
-    ]);
+    await getDb()
+      .insert(projects)
+      .values([
+        {
+          id: highId,
+          title: "High",
+          notes: null,
+          status: "idea",
+          priority: 5,
+          targetWhen: null,
+          budgetCents: null,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: new Date(now.getTime() + 1000),
+        },
+        {
+          id: lowId,
+          title: "Low",
+          notes: null,
+          status: "idea",
+          priority: 1,
+          targetWhen: null,
+          budgetCents: null,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: unsetId,
+          title: "Unset",
+          notes: null,
+          status: "idea",
+          priority: null,
+          targetWhen: null,
+          budgetCents: null,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: new Date(now.getTime() + 2000),
+        },
+      ]);
 
     const items = await listProjects({ sort: "priority_desc" });
     expect(items.map((item) => item.id)).toEqual([highId, lowId, unsetId]);
@@ -331,38 +328,38 @@ describe("project actions", () => {
     const otherId = crypto.randomUUID();
     const tagId = crypto.randomUUID();
 
-    await getDb().insert(projects).values([
-      {
-        id: taggedId,
-        title: "Garage",
-        notes: null,
-        status: "idea",
-        priority: null,
-        targetWhen: null,
-        budgetCents: null,
-        createdByUserId: user.id,
-        updatedByUserId: user.id,
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: otherId,
-        title: "Kitchen",
-        notes: null,
-        status: "idea",
-        priority: null,
-        targetWhen: null,
-        budgetCents: null,
-        createdByUserId: user.id,
-        updatedByUserId: user.id,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ]);
-    await getDb().insert(projectTags).values({ id: tagId, name: "garage", createdAt: now });
     await getDb()
-      .insert(projectItemTags)
-      .values({ projectId: taggedId, tagId });
+      .insert(projects)
+      .values([
+        {
+          id: taggedId,
+          title: "Garage",
+          notes: null,
+          status: "idea",
+          priority: null,
+          targetWhen: null,
+          budgetCents: null,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: otherId,
+          title: "Kitchen",
+          notes: null,
+          status: "idea",
+          priority: null,
+          targetWhen: null,
+          budgetCents: null,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+    await getDb().insert(projectTags).values({ id: tagId, name: "garage", createdAt: now });
+    await getDb().insert(projectItemTags).values({ projectId: taggedId, tagId });
 
     const items = await listProjects({ tag: "garage" });
     expect(items).toHaveLength(1);
@@ -513,38 +510,40 @@ describe("project actions", () => {
       createdAt: now,
       updatedAt: now,
     });
-    await getDb().insert(projectComponents).values([
-      {
-        id: acquiredId,
-        projectId,
-        name: "Paint",
-        kind: "item",
-        quantity: 1,
-        unitCostCents: 2000,
-        acquired: false,
-        acquiredAt: null,
-        purchaseUrl: null,
-        sortOrder: 0,
-        note: null,
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: neededId,
-        projectId,
-        name: "Labor",
-        kind: "labor",
-        quantity: 1,
-        unitCostCents: 5000,
-        acquired: false,
-        acquiredAt: null,
-        purchaseUrl: null,
-        sortOrder: 1,
-        note: null,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ]);
+    await getDb()
+      .insert(projectComponents)
+      .values([
+        {
+          id: acquiredId,
+          projectId,
+          name: "Paint",
+          kind: "item",
+          quantity: 1,
+          unitCostCents: 2000,
+          acquired: false,
+          acquiredAt: null,
+          purchaseUrl: null,
+          sortOrder: 0,
+          note: null,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: neededId,
+          projectId,
+          name: "Labor",
+          kind: "labor",
+          quantity: 1,
+          unitCostCents: 5000,
+          acquired: false,
+          acquiredAt: null,
+          purchaseUrl: null,
+          sortOrder: 1,
+          note: null,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
 
     const markResult = await setComponentAcquired(
       {},

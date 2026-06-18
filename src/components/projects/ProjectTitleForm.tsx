@@ -4,13 +4,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { updateTitle, type ProjectActionState } from "@/lib/actions/projects";
 
-export function ProjectTitleForm({
-  projectId,
-  title,
-}: {
-  projectId: string;
-  title: string;
-}) {
+export function ProjectTitleForm({ projectId, title }: { projectId: string; title: string }) {
   const [state, action, pending] = useActionState<ProjectActionState, FormData>(updateTitle, {});
 
   return (

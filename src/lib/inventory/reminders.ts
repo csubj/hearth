@@ -1,9 +1,6 @@
 import { eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db";
-import {
-  inventoryItems,
-  inventoryMaintenanceReminders,
-} from "@/db/schema";
+import { inventoryItems, inventoryMaintenanceReminders } from "@/db/schema";
 import {
   isMaintenanceReminderDueForReminder,
   reminderIntervalState,
@@ -19,10 +16,7 @@ export async function processInventoryMaintenanceReminders(): Promise<void> {
       itemName: inventoryItems.name,
     })
     .from(inventoryMaintenanceReminders)
-    .innerJoin(
-      inventoryItems,
-      eq(inventoryMaintenanceReminders.inventoryItemId, inventoryItems.id),
-    )
+    .innerJoin(inventoryItems, eq(inventoryMaintenanceReminders.inventoryItemId, inventoryItems.id))
     .where(isNotNull(inventoryMaintenanceReminders.reminderIntervalCount));
 
   const now = new Date();

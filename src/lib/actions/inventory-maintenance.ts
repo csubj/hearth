@@ -19,13 +19,7 @@ import {
 import { reminderUnitSchema } from "@/lib/reminders/interval";
 import type { InventoryActionState } from "@/lib/actions/inventory";
 
-const reminderIntervalCountSchema = z.coerce
-  .number()
-  .int()
-  .min(1)
-  .max(999)
-  .optional()
-  .nullable();
+const reminderIntervalCountSchema = z.coerce.number().int().min(1).max(999).optional().nullable();
 
 export type MaintenanceReminderWithLinks = InventoryMaintenanceReminder & {
   links: InventoryMaintenanceReminderLink[];
@@ -179,18 +173,20 @@ export async function createMaintenanceReminder(
   const intervalFields = resolveReminderFields(data);
   const reminderId = crypto.randomUUID();
 
-  await getDb().insert(inventoryMaintenanceReminders).values({
-    id: reminderId,
-    inventoryItemId: data.inventoryItemId,
-    title: data.title,
-    notes: data.notes?.length ? data.notes : null,
-    ...intervalFields,
-    lastCompletedAt: null,
-    lastReminderAt: null,
-    createdByUserId: user.id,
-    createdAt: now,
-    updatedAt: now,
-  });
+  await getDb()
+    .insert(inventoryMaintenanceReminders)
+    .values({
+      id: reminderId,
+      inventoryItemId: data.inventoryItemId,
+      title: data.title,
+      notes: data.notes?.length ? data.notes : null,
+      ...intervalFields,
+      lastCompletedAt: null,
+      lastReminderAt: null,
+      createdByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
 
   if (data.linkLabel && data.linkUrl) {
     await getDb().insert(inventoryMaintenanceReminderLinks).values({

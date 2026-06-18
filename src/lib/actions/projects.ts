@@ -153,9 +153,7 @@ async function getOrCreateTagId(name: string, now: Date): Promise<string> {
   }
 
   const id = crypto.randomUUID();
-  await getDb()
-    .insert(projectTags)
-    .values({ id, name: trimmed, createdAt: now });
+  await getDb().insert(projectTags).values({ id, name: trimmed, createdAt: now });
   return id;
 }
 
@@ -199,7 +197,10 @@ function parseListFilters(
   };
 }
 
-function sortProjects(items: ProjectListItem[], sort: ProjectListFilters["sort"]): ProjectListItem[] {
+function sortProjects(
+  items: ProjectListItem[],
+  sort: ProjectListFilters["sort"],
+): ProjectListItem[] {
   const copy = [...items];
   switch (sort) {
     case "priority_desc":
@@ -818,8 +819,15 @@ export async function addComponent(
     return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
   }
 
-  const { projectId, name, kind = "item", quantity = 1, unitCostCents = 0, purchaseUrl, note } =
-    parsed.data;
+  const {
+    projectId,
+    name,
+    kind = "item",
+    quantity = 1,
+    unitCostCents = 0,
+    purchaseUrl,
+    note,
+  } = parsed.data;
   const project = await getProjectById(projectId);
   if (!project) {
     return { error: "Project not found" };
@@ -831,21 +839,23 @@ export async function addComponent(
       ? Math.max(...project.components.map((component) => component.sortOrder))
       : -1;
 
-  await getDb().insert(projectComponents).values({
-    id: crypto.randomUUID(),
-    projectId,
-    name,
-    kind,
-    quantity,
-    unitCostCents,
-    acquired: false,
-    acquiredAt: null,
-    purchaseUrl: purchaseUrl ?? null,
-    sortOrder: maxSort + 1,
-    note: note ?? null,
-    createdAt: now,
-    updatedAt: now,
-  });
+  await getDb()
+    .insert(projectComponents)
+    .values({
+      id: crypto.randomUUID(),
+      projectId,
+      name,
+      kind,
+      quantity,
+      unitCostCents,
+      acquired: false,
+      acquiredAt: null,
+      purchaseUrl: purchaseUrl ?? null,
+      sortOrder: maxSort + 1,
+      note: note ?? null,
+      createdAt: now,
+      updatedAt: now,
+    });
 
   await getDb()
     .update(projects)

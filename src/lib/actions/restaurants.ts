@@ -135,9 +135,7 @@ export async function listRestaurants(
     .where(conditions.length > 0 ? and(...conditions) : undefined)
     .orderBy(...orderBy);
 
-  return rows.map((row) =>
-    toListItem(row.restaurant, row.addedByName, row.addedByUsername),
-  );
+  return rows.map((row) => toListItem(row.restaurant, row.addedByName, row.addedByUsername));
 }
 
 export async function getRestaurantById(id: string): Promise<Restaurant | undefined> {
@@ -245,7 +243,11 @@ export async function update(
 
   const data = parsed.data;
   const db = getDb();
-  const [existing] = await db.select().from(restaurants).where(eq(restaurants.id, data.id)).limit(1);
+  const [existing] = await db
+    .select()
+    .from(restaurants)
+    .where(eq(restaurants.id, data.id))
+    .limit(1);
 
   if (!existing) {
     return { error: "Restaurant not found" };
