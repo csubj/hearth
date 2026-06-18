@@ -1,6 +1,27 @@
 # hearth
 
+[![CI](https://github.com/csubj/hearth/actions/workflows/ci.yml/badge.svg)](https://github.com/csubj/hearth/actions/workflows/ci.yml)
+[![Docs](https://github.com/csubj/hearth/actions/workflows/docs.yml/badge.svg)](https://github.com/csubj/hearth/actions/workflows/docs.yml)
+[![Publish image](https://github.com/csubj/hearth/actions/workflows/publish-image.yml/badge.svg)](https://github.com/csubj/hearth/actions/workflows/publish-image.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-22%20LTS-green.svg)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-10.x-f69220.svg)](https://pnpm.io/)
+
 Household coordination — projects, restaurants, metrics, and inventory. One deployment serves one household.
+
+**Documentation:** [csubj.github.io/hearth](https://csubj.github.io/hearth/) · **API docs:** `/api/docs` (when running)
+
+## Table of contents
+
+- [Features](#features)
+- [Quick start](#quick-start)
+- [Documentation](#documentation)
+- [Tech stack](#tech-stack)
+- [Development](#development)
+- [Docker](#docker)
+- [CI](#ci)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -18,61 +39,80 @@ Household coordination — projects, restaurants, metrics, and inventory. One de
 - **REST API** — `/api/v1/*` with OpenAPI spec and Scalar-powered docs (`/api/docs`)
 - **Auth modes** — gated login (`required`) or shared household access (`open`) via `AUTH_MODE`
 
-## Design docs
+## Quick start
 
-- **[Documentation site](https://csubj.github.io/hearth/)** — user guide, operating guide, architecture (MkDocs)
-- **[docs/design/README.md](docs/design/README.md)** — internal design index
-- **[AGENTS.md](AGENTS.md)** — contributor and agent guide
-
-## Requirements
-
-- Node.js 22 LTS
-- [pnpm](https://pnpm.io) 10.x
-- macOS / Linux (SQLite via `better-sqlite3`)
-
-## Local setup
+**Requirements:** Node.js 22 LTS, [pnpm](https://pnpm.io) 10.x, macOS or Linux (SQLite via `better-sqlite3`).
 
 ```bash
+git clone https://github.com/csubj/hearth.git
+cd hearth
 pnpm install
 lefthook install
 cp .env.example .env
-```
-
-The defaults in `.env.example` work out of the box for local development. Optionally set `AUTH_MODE` (`required` or `open`) and the `HEARTH_BOOTSTRAP_*` credentials before bootstrapping.
-
-Create the first admin (once per instance). Migrations run automatically when the dev or production server starts.
-
-```bash
-pnpm run auth:bootstrap
-```
-
-Start the dev server:
-
-```bash
+pnpm run auth:bootstrap   # once per instance; migrations run on startup
 pnpm dev
 ```
 
-Open http://localhost:3000 and sign in with the bootstrap account.
+Open http://localhost:3000 and sign in with the bootstrap account. Database and uploads live in `./data/` (gitignored).
 
-Database and uploads live in `./data/` (gitignored).
+The defaults in `.env.example` work out of the box. Optionally set `AUTH_MODE` (`required` or `open`) and the `HEARTH_BOOTSTRAP_*` credentials before bootstrapping.
 
-## Scripts
+## Documentation
 
-| Command                   | Purpose                                |
-| ------------------------- | -------------------------------------- |
-| `pnpm dev`                | Next.js dev server                     |
-| `pnpm build`              | Production build                       |
-| `pnpm start`              | Run production server                  |
-| `pnpm test`               | Vitest (uses in-memory SQLite)         |
-| `pnpm lint`               | ESLint                                 |
-| `pnpm format`             | Prettier write                         |
-| `pnpm format:check`       | Prettier check                         |
-| `pnpm typecheck`          | TypeScript                             |
-| `pnpm db:migrate`         | Apply Drizzle migrations manually (optional; app migrates on startup) |
-| `pnpm db:generate`        | Generate migration from schema changes |
-| `pnpm run auth:bootstrap` | Create first admin user                |
-| `pnpm run auth:create-token` | Create a REST API bearer token      |
-| `pnpm smoke:docker`       | Docker smoke test (see below)          |
+| Resource | Description |
+| -------- | ----------- |
+| [Documentation site](https://csubj.github.io/hearth/) | User guide, operations, architecture (MkDocs) |
+| [docs/design/README.md](docs/design/README.md) | Internal design index |
+| [docs/contributing.md](docs/contributing.md) | Contributor guide |
+| [AGENTS.md](AGENTS.md) | AI agent and contributor conventions |
+| [docs/design/08_mvp.md](docs/design/08_mvp.md) | Build phases (v1 MVP complete) |
+| [docs/design/09_deploy.md](docs/design/09_deploy.md) | Backup, HTTPS, and hosting |
+| [docs/design/10_ci.md](docs/design/10_ci.md) | CI pipeline details |
+
+## Tech stack
+
+| Layer | Choice |
+| ----- | ------ |
+| Framework | Next.js 15 (App Router) + React 19 |
+| Language | TypeScript |
+| Database | SQLite + Drizzle ORM |
+| Auth | Lucia v3 + Argon2id |
+| Styling | Tailwind CSS v4 + Radix UI |
+| Testing | Vitest |
+| Docs | MkDocs Material → GitHub Pages |
+
+See [docs/design/01_tech.md](docs/design/01_tech.md) for full rationale and conventions.
+
+## Development
+
+### Scripts
+
+| Command | Purpose |
+| ------- | ------- |
+| `pnpm dev` | Next.js dev server |
+| `pnpm build` | Production build |
+| `pnpm start` | Run production server |
+| `pnpm test` | Vitest (in-memory SQLite) |
+| `pnpm lint` | ESLint |
+| `pnpm format` | Prettier write |
+| `pnpm format:check` | Prettier check |
+| `pnpm typecheck` | TypeScript |
+| `pnpm db:migrate` | Apply Drizzle migrations manually (optional; app migrates on startup) |
+| `pnpm db:generate` | Generate migration from schema changes |
+| `pnpm run auth:bootstrap` | Create first admin user |
+| `pnpm run auth:create-token` | Create a REST API bearer token |
+| `pnpm smoke:docker` | Docker smoke test |
+
+### Make targets
+
+Run `make help` for the full list. Common shortcuts:
+
+```bash
+make setup    # pnpm install + lefthook
+make check    # lint + typecheck + test
+make smoke    # docker smoke test
+make docs-serve   # preview docs at http://127.0.0.1:8000
+```
 
 ## Docker
 
@@ -113,17 +153,13 @@ For a manual end-to-end check in the browser:
 2. `docker compose exec app pnpm run auth:bootstrap`
 3. Open http://localhost:3000 → sign in → add a project from Home or `/projects`
 
-See [docs/design/09_deploy.md](docs/design/09_deploy.md) for backup, HTTPS, and hosting notes.
-
 ### Published image (GHCR)
 
 Every push to `main` (and version tags `v*`) publishes a Docker image to [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry):
 
 ```bash
-docker pull ghcr.io/<owner>/hearth:latest
+docker pull ghcr.io/csubj/hearth:latest
 ```
-
-Replace `<owner>` with your GitHub org or username (lowercase).
 
 Run without building locally:
 
@@ -134,7 +170,7 @@ docker run -d \
   -e DATABASE_URL=file:/app/data/hearth.db \
   -e HOSTNAME=0.0.0.0 \
   -v hearth-data:/app/data \
-  ghcr.io/<owner>/hearth:latest
+  ghcr.io/csubj/hearth:latest
 ```
 
 Or use the compose override:
@@ -156,8 +192,16 @@ Image tags: `latest` (main), `sha-<short-sha>` (commit), `main` (branch ref), an
 
 ## CI
 
-GitHub Actions runs lint, format check, typecheck, and tests on push to `main` and on pull requests. See [docs/design/10_ci.md](docs/design/10_ci.md).
+GitHub Actions runs lint, format check, typecheck, tests, and production build on push to `main` and on pull requests. Docs deploy to GitHub Pages on changes under `docs/`. Container images publish after CI passes on `main` and `v*` tags.
 
-## Build phases
+See [docs/design/10_ci.md](docs/design/10_ci.md) for workflow details.
+
+## Contributing
+
+Contributions are welcome. Read [docs/contributing.md](docs/contributing.md) for setup, conventions, and commit message format (Conventional Commits, enforced by lefthook).
 
 Implementation follows [docs/design/08_mvp.md](docs/design/08_mvp.md). The v1 MVP (phases 0–7) is complete.
+
+## License
+
+[MIT](LICENSE) © Cj Buresch
