@@ -1,18 +1,24 @@
-import { SinceLastVisitSection } from "@/components/home/SinceLastVisitSection";
+import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
 import { InventorySection } from "@/components/home/InventorySection";
 import { MetricsSection } from "@/components/home/MetricsSection";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
 import { RestaurantsSection } from "@/components/home/RestaurantsSection";
+import { SinceLastVisitSection } from "@/components/home/SinceLastVisitSection";
+import { UpcomingRemindersSection } from "@/components/home/UpcomingRemindersSection";
 
 export default function HomePage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <header>
         <h1 className="font-serif text-2xl text-text">Home</h1>
-        <p className="mt-1 text-sm text-text-muted">A glance at what&apos;s happening.</p>
+        <p className="text-sm text-text-muted">What needs attention across the household.</p>
       </header>
+
+      <HomeStatsStrip />
+      <UpcomingRemindersSection />
       <SinceLastVisitSection />
-      <div className="grid gap-6 md:grid-cols-2">
+
+      <div className="grid gap-4 md:grid-cols-2">
         <ProjectsSection />
         <RestaurantsSection />
         <MetricsSection />

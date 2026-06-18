@@ -348,6 +348,16 @@ export async function getInventoryHomeSummary(limit = 5): Promise<InventoryListI
     .slice(0, limit);
 }
 
+export async function getInventoryHomeStats(): Promise<{ total: number; dueItems: number }> {
+  const { user } = await requireUser();
+  const [totalRow] = await getDb().select({ count: sql<number>`count(*)` }).from(inventoryItems);
+  const overdueItemIds = await loadOverdueReminderItemIds(user.id);
+  return {
+    total: totalRow?.count ?? 0,
+    dueItems: overdueItemIds.size,
+  };
+}
+
 export async function create(
   _prev: InventoryActionState,
   formData: FormData,

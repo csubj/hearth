@@ -80,7 +80,11 @@ When maintenance is done, click **Mark done** to reset the interval from today. 
 
 ## Home page
 
-The home inventory section shows a few recently added or edited items and a quick search link to the full catalog.
+The home inventory section shows items with overdue maintenance first, then recently updated items. Overdue maintenance also appears in the **Upcoming reminders** section and on `/reminders`.
+
+## Reminders feed
+
+Inventory maintenance reminders with an interval appear in the household **Reminders** feed (`/reminders`) when overdue or due within the next two weeks. Mark maintenance complete from the feed or from the item detail page.
 
 ## Import and export
 

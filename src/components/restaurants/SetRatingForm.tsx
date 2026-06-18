@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import type { Restaurant } from "@/db/schema";
 import { StarRating } from "@/components/restaurants/StarRating";
+import { Button } from "@/components/ui/Button";
 import { setRating, type RestaurantActionState } from "@/lib/actions/restaurants";
 
 export function SetRatingForm({ restaurant }: { restaurant: Restaurant }) {
@@ -52,13 +53,9 @@ export function SetRatingForm({ restaurant }: { restaurant: Restaurant }) {
           {state.success}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-surface px-4 text-sm font-medium text-text transition-colors hover:bg-accent-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:opacity-50"
-      >
+      <Button type="submit" variant="secondary" disabled={pending}>
         {pending ? "Saving…" : "Save rating"}
-      </button>
+      </Button>
     </form>
   );
 }

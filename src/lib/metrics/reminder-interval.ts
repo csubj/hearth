@@ -22,7 +22,7 @@ export {
 
 export { reminderUnitSchema as metricReminderUnitSchema } from "@/lib/reminders/interval";
 
-function metricIntervalState(metric: Metric): ReminderIntervalState {
+export function metricIntervalState(metric: Metric): ReminderIntervalState {
   return {
     reminderIntervalCount: metric.reminderIntervalCount,
     reminderIntervalUnit: metric.reminderIntervalUnit as MetricReminderUnit | null,

@@ -15,6 +15,7 @@ function userRowToAuthUser(row: typeof users.$inferSelect): AuthUser {
     username: row.username,
     displayName: row.displayName,
     role: row.role,
+    theme: row.theme,
     disabledAt: row.disabledAt,
   };
 }

@@ -100,3 +100,48 @@ export function formatReminderInterval(
 export function formatReminderIntervalPhrase(count: number, unit: ReminderUnit): string {
   return formatReminderInterval(count, unit);
 }
+
+export function getReminderDueAt(
+  state: ReminderIntervalState,
+  anchor: Date,
+): Date | null {
+  if (!hasReminderInterval(state)) {
+    return null;
+  }
+
+  return addReminderInterval(
+    anchor,
+    state.reminderIntervalCount!,
+    state.reminderIntervalUnit!,
+  );
+}
+
+function startOfDay(date: Date): Date {
+  const result = new Date(date);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+function calendarDayDiff(from: Date, to: Date): number {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((startOfDay(from).getTime() - startOfDay(to).getTime()) / msPerDay);
+}
+
+function pluralDays(count: number): string {
+  return count === 1 ? "day" : "days";
+}
+
+export function formatReminderDueLabel(dueAt: Date, now: Date = new Date()): string {
+  const diff = calendarDayDiff(dueAt, now);
+
+  if (diff < 0) {
+    const overdueDays = Math.abs(diff);
+    return `Overdue by ${overdueDays} ${pluralDays(overdueDays)}`;
+  }
+
+  if (diff === 0) {
+    return "Due today";
+  }
+
+  return `Due in ${diff} ${pluralDays(diff)}`;
+}

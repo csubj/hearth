@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   addReminderInterval,
+  formatReminderDueLabel,
   formatReminderInterval,
+  getReminderDueAt,
   hasReminderInterval,
   isDueForReminder,
   isStale,
@@ -100,5 +102,40 @@ describe("formatReminderInterval", () => {
   it("formats singular and plural units", () => {
     expect(formatReminderInterval(1, "day")).toBe("1 day");
     expect(formatReminderInterval(2, "week", { prefixEvery: true })).toBe("every 2 weeks");
+  });
+});
+
+describe("getReminderDueAt", () => {
+  it("returns null when reminders are disabled", () => {
+    const state = makeIntervalState({ reminderIntervalCount: null, reminderIntervalUnit: null });
+    expect(getReminderDueAt(state, new Date("2026-01-01T00:00:00Z"))).toBeNull();
+  });
+
+  it("adds the interval to the anchor", () => {
+    const state = makeIntervalState({ reminderIntervalCount: 7, reminderIntervalUnit: "day" });
+    const dueAt = getReminderDueAt(state, new Date("2026-01-01T00:00:00Z"));
+    expect(dueAt?.toISOString()).toBe("2026-01-08T00:00:00.000Z");
+  });
+});
+
+describe("formatReminderDueLabel", () => {
+  const now = new Date("2026-06-15T12:00:00Z");
+
+  it("labels overdue reminders", () => {
+    expect(formatReminderDueLabel(new Date("2026-06-12T12:00:00Z"), now)).toBe(
+      "Overdue by 3 days",
+    );
+    expect(formatReminderDueLabel(new Date("2026-06-14T12:00:00Z"), now)).toBe(
+      "Overdue by 1 day",
+    );
+  });
+
+  it("labels due today", () => {
+    expect(formatReminderDueLabel(new Date("2026-06-15T18:00:00Z"), now)).toBe("Due today");
+  });
+
+  it("labels future reminders", () => {
+    expect(formatReminderDueLabel(new Date("2026-06-18T12:00:00Z"), now)).toBe("Due in 3 days");
+    expect(formatReminderDueLabel(new Date("2026-06-16T12:00:00Z"), now)).toBe("Due in 1 day");
   });
 });

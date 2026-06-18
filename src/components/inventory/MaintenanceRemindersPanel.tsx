@@ -140,14 +140,24 @@ function ReminderCard({
         <form action={completeAction}>
           <input type="hidden" name="reminderId" value={reminder.id} />
           <input type="hidden" name="inventoryItemId" value={inventoryItemId} />
-          <Button type="submit" variant="ghost" disabled={completePending}>
+          <Button
+            type="submit"
+            variant="soft"
+            disabled={completePending}
+            aria-label={`Mark “${reminder.title}” done`}
+          >
             {completePending ? "Saving…" : "Mark done"}
           </Button>
         </form>
         <form action={deleteAction}>
           <input type="hidden" name="reminderId" value={reminder.id} />
           <input type="hidden" name="inventoryItemId" value={inventoryItemId} />
-          <Button type="submit" variant="ghost" disabled={deletePending}>
+          <Button
+            type="submit"
+            variant="destructive"
+            disabled={deletePending}
+            aria-label={`Delete reminder “${reminder.title}”`}
+          >
             Delete
           </Button>
         </form>
@@ -211,7 +221,7 @@ function ReminderCard({
           className="rounded-md border border-border bg-background px-3 py-2 text-sm"
         />
         <div className="sm:col-span-2">
-          <Button type="submit" variant="ghost" disabled={addLinkPending}>
+          <Button type="submit" variant="soft" disabled={addLinkPending}>
             Add link
           </Button>
           <ActionMessage state={addLinkState} />

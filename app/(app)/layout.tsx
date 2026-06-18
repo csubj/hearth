@@ -1,16 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
+import { BrowseMenu } from "@/components/BrowseMenu";
 import { displayName, touchLastSeen, validateRequest } from "@/lib/auth/session";
 import { processMetricReminders } from "@/lib/metrics/reminders";
 import { getPreviousLastSeenAt, getUnreadNotificationCount } from "@/lib/notifications/queries";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/restaurants", label: "Restaurants" },
-  { href: "/projects", label: "Projects" },
-  { href: "/metrics", label: "Metrics" },
-  { href: "/inventory", label: "Inventory" },
+  { href: "/reminders", label: "Reminders" },
 ] as const;
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -53,7 +51,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               hearth
             </Link>
             <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-              {navLinks.map((link) => (
+              <Link
+                href="/"
+                className="rounded-md px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-accent-soft hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+              >
+                Home
+              </Link>
+              <BrowseMenu />
+              {navLinks.slice(1).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -70,7 +75,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           className="flex gap-1 overflow-x-auto border-t border-border px-4 py-2 md:hidden"
           aria-label="Main mobile"
         >
-          {navLinks.map((link) => (
+          <Link
+            href="/"
+            className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-text-muted hover:bg-accent-soft hover:text-text"
+          >
+            Home
+          </Link>
+          <Link
+            href="/browse"
+            className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-text-muted hover:bg-accent-soft hover:text-text"
+          >
+            Browse
+          </Link>
+          {navLinks.slice(1).map((link) => (
             <Link
               key={link.href}
               href={link.href}

@@ -365,6 +365,15 @@ export async function getProjectsHomeSummary(limit = 5): Promise<ProjectListItem
   return filtered.slice(0, limit);
 }
 
+export async function getProjectsHomeStats(): Promise<{ active: number }> {
+  await requireUser();
+  const [row] = await getDb()
+    .select({ count: sql<number>`count(*)` })
+    .from(projects)
+    .where(sql`${projects.status} != 'done'`);
+  return { active: row?.count ?? 0 };
+}
+
 export async function create(
   _prev: ProjectActionState,
   formData: FormData,

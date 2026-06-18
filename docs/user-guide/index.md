@@ -6,26 +6,28 @@ hearth is organized around a **home page** that summarizes what needs attention,
 
 | Nav item | Route | Purpose |
 | -------- | ----- | ------- |
-| Home | `/` | Glanceable summary across all features |
-| Restaurants | `/restaurants` | Wishlist and visit history |
-| Projects | `/projects` | House projects — notes, costs, files |
-| Metrics | `/metrics` | Named metrics with dated entries and charts |
-| Inventory | `/inventory` | Searchable household items, manuals, and photos |
+| Home | `/` | Dashboard — stats, reminders, and feature previews |
+| Browse | `/browse` | Hub for Projects, Restaurants, Metrics, and Inventory |
+| Reminders | `/reminders` | Upcoming maintenance and metric logging reminders |
 | Notifications | `/notifications` | Activity feed and @-mentions |
 | Settings | `/settings` | Change your password |
+
+From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), or **Inventory** (`/inventory`).
 
 Admins also see **Admin** → `/admin/users` and `/admin/api-tokens`.
 
 ## Home page
 
-The landing page aggregates recent activity from each area:
+The landing page aggregates what needs attention:
 
 | Section | What surfaces |
 | ------- | ------------- |
+| Stats strip | Active projects, want-to-try restaurants, stale metrics, inventory due, reminders due |
+| Upcoming reminders | Maintenance and metric reminders due in the next two weeks |
 | Projects | Quick capture + high-priority / in-progress projects |
 | Restaurants | A few "want to try" suggestions |
 | Metrics | Latest entry per metric |
-| Inventory | Recently added or updated items |
+| Inventory | Items with overdue maintenance first |
 | Since last visit | Notifications since you last opened hearth |
 
 Each section links to its full view. The page is designed to answer **"what's going on?"** in a few seconds.

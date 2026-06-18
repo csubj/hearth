@@ -22,6 +22,7 @@ function createLucia() {
       username: attributes.username,
       displayName: attributes.displayName,
       role: attributes.role,
+      theme: attributes.theme,
       disabledAt: attributes.disabledAt,
     }),
   });
@@ -46,6 +47,7 @@ declare module "lucia" {
       username: string;
       displayName: string | null;
       role: "member" | "admin";
+      theme: "default" | "warm" | "dark" | "gamer";
       disabledAt: Date | null;
     };
   }

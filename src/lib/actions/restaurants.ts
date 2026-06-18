@@ -156,6 +156,15 @@ export async function getWantToTryPreview(limit = 5): Promise<Restaurant[]> {
     .limit(limit);
 }
 
+export async function getRestaurantsHomeStats(): Promise<{ wantToTry: number }> {
+  await requireUser();
+  const [row] = await getDb()
+    .select({ count: sql<number>`count(*)` })
+    .from(restaurants)
+    .where(eq(restaurants.status, "want_to_try"));
+  return { wantToTry: row?.count ?? 0 };
+}
+
 export async function create(
   _prev: RestaurantActionState,
   formData: FormData,

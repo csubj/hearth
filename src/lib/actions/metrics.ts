@@ -210,6 +210,16 @@ export async function getMetricsHomeSummary(limit = 5): Promise<MetricHomeItem[]
     .slice(0, limit);
 }
 
+export async function getMetricsHomeStats(): Promise<{ total: number; stale: number }> {
+  await requireUser();
+  const [totalRow] = await getDb().select({ count: sql<number>`count(*)` }).from(metrics);
+  const items = await listMetricsWithLatest();
+  return {
+    total: totalRow?.count ?? 0,
+    stale: items.filter((item) => item.stale).length,
+  };
+}
+
 export async function createMetricRecord(
   userId: string,
   input: z.infer<typeof createMetricSchema>,

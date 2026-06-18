@@ -109,7 +109,9 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 | Path                        | Access | Purpose                                      |
 | --------------------------- | ------ | -------------------------------------------- |
 | `/login`                    | public | Login form; redirect to `/` if session valid |
-| `/`                         | auth\* | Home summary (all feature sections)          |
+| `/`                         | auth\* | Home dashboard — stats, reminders, feature previews |
+| `/browse`                   | auth\* | Hub for Projects, Restaurants, Metrics, Inventory |
+| `/reminders`                | auth\* | Upcoming maintenance and metric reminders         |
 | `/stream`                   | auth\* | Full stream list + compact capture           |
 | `/restaurants`              | auth\* | Restaurant list (v1: no map)                 |
 | `/restaurants/[id]`         | auth\* | Detail, mark visited, rating, notes          |
@@ -171,7 +173,9 @@ REST handlers validate with Zod, write via Drizzle, and call the notification em
 ### `app/(app)/layout.tsx`
 
 - Validates session in `required` mode (or resolves `OPEN_MODE_USERNAME` in `open` mode)
-- Renders: top nav (Home, Stream, Restaurants, Projects, Metrics, Inventory, Notifications bell)
+- Renders: top nav (Home, Browse dropdown, Reminders, Notifications bell)
+- Browse dropdown links to `/browse`, `/projects`, `/restaurants`, `/metrics`, `/inventory`
+- Mobile nav: Home, Browse (`/browse`), Reminders
 - User menu: display name, Settings, Logout; Admin link if `role === admin`
 - Updates `users.last_seen_at` on load (for "since you last visited")
 
@@ -265,8 +269,10 @@ Home `app/(app)/page.tsx` fetches parallel summaries:
 
 ```yaml
 home_sections:
-  stream:
-    query: pinned + recent open entries, limit 5
+  stats_strip:
+    query: active projects, want-to-try restaurants, stale metrics, inventory due, reminders due
+  reminders:
+    query: upcoming inventory maintenance + metric reminders within 14 days, limit 5
   restaurants:
     query: status=want_to_try, limit 5
   projects:
@@ -274,12 +280,14 @@ home_sections:
   metrics:
     query: each metric latest entry; flag if stale (configurable threshold)
   inventory:
-    query: recently updated items, limit 5
+    query: items with overdue maintenance first, then recently updated, limit 5
   notifications:
     query: unread count since last_seen_at for badge
+  since_last_visit:
+    query: notifications created after previous last_seen_at, limit 3
 ```
 
-Each section is a Server Component with a link to the full feature route.
+`/reminders` shows the full upcoming feed grouped as Overdue and Due soon. `/browse` links to each feature area with counts.
 
 ---
 

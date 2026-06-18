@@ -16,7 +16,7 @@ export function CreateMetricCollapsible({ users = [] }: { users?: MentionUser[] 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger asChild>
-        <Button type="button" variant="ghost" className="shrink-0">
+        <Button type="button" variant="secondary" className="shrink-0">
           New metric
         </Button>
       </CollapsibleTrigger>

@@ -23,6 +23,7 @@ export async function createTestUser(
     displayName: overrides.displayName ?? null,
     passwordHash: await hashPassword(plainPassword),
     role: overrides.role ?? "member",
+    theme: "default",
     disabledAt: overrides.disabledAt ?? null,
     lastSeenAt: null,
     createdAt: now,

@@ -103,6 +103,7 @@ function revalidateInventoryPaths(itemId: string): void {
   revalidatePath("/inventory");
   revalidatePath(`/inventory/${itemId}`);
   revalidatePath("/");
+  revalidatePath("/reminders");
 }
 
 export async function loadMaintenanceRemindersForItem(

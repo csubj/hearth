@@ -43,6 +43,7 @@ async function resolveOpenModeUser(): Promise<AuthUser | null> {
     username: row.username,
     displayName: row.displayName,
     role: row.role,
+    theme: row.theme,
     disabledAt: row.disabledAt,
   };
 }

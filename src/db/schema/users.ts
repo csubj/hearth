@@ -8,6 +8,9 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["member", "admin"] })
     .notNull()
     .default("member"),
+  theme: text("theme", { enum: ["default", "warm", "dark", "gamer"] })
+    .notNull()
+    .default("default"),
   disabledAt: integer("disabled_at", { mode: "timestamp_ms" }),
   lastSeenAt: integer("last_seen_at", { mode: "timestamp_ms" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),

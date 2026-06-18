@@ -25,3 +25,40 @@
     @apply bg-background text-text font-sans antialiased;
   }
 }
+
+[data-theme="warm"] {
+  --color-background: #efe6da;
+  --color-surface: #f7f1e8;
+  --color-border: #d8c9b6;
+  --color-text: #2b211a;
+  --color-text-muted: #6f5d4c;
+  --color-accent: #a8531f;
+  --color-accent-soft: #f0e2d0;
+  --color-success: #5c6b1f;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: #1a1816;
+  --color-surface: #24211e;
+  --color-border: #3a352f;
+  --color-text: #f0ece6;
+  --color-text-muted: #a8a097;
+  --color-accent: #e07a45;
+  --color-accent-soft: #2e241c;
+  --color-success: #9bbf4a;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+}
+
+[data-theme="gamer"] {
+  color-scheme: dark;
+  --color-background: #0b0e14;
+  --color-surface: #131825;
+  --color-border: #273043;
+  --color-text: #e6f1ff;
+  --color-text-muted: #8aa0c0;
+  --color-accent: #b026ff;
+  --color-accent-soft: #1b1430;
+  --color-success: #00e5a0;
+  --shadow-card: 0 0 0 1px rgb(176 38 255 / 0.15), 0 2px 12px -2px rgb(176 38 255 / 0.25);
+}

@@ -21,7 +21,7 @@ export function CreateInventoryForm() {
 
   if (!open) {
     return (
-      <Button type="button" onClick={() => setOpen(true)}>
+      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
         Add item
       </Button>
     );

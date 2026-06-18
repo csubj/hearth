@@ -2,21 +2,27 @@ import Link from "next/link";
 import { ProjectQuickCapture } from "@/components/projects/ProjectQuickCapture";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
 import { formatCents } from "@/components/projects/format";
-import { getProjectsHomeSummary } from "@/lib/actions/projects";
+import { getProjectsHomeStats, getProjectsHomeSummary } from "@/lib/actions/projects";
 import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export async function ProjectsSection() {
-  const [filtered, mentionUsers] = await Promise.all([
+  const [filtered, mentionUsers, stats] = await Promise.all([
     getProjectsHomeSummary(5),
     loadMentionUsers(),
+    getProjectsHomeStats(),
   ]);
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="rounded-lg border border-border bg-surface p-3 shadow-card">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="font-serif text-lg text-text">Projects</h2>
-          <p className="text-sm text-text-muted">High priority & in progress</p>
+          <div className="flex items-center gap-2">
+            <h2 className="font-serif text-base text-text">Projects</h2>
+            <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-medium text-text-muted">
+              {stats.active} active
+            </span>
+          </div>
+          <p className="text-xs text-text-muted">High priority & in progress</p>
         </div>
         <Link
           href="/projects"
@@ -26,19 +32,19 @@ export async function ProjectsSection() {
         </Link>
       </div>
 
-      <div className="mt-4 rounded-md border border-border bg-background p-3">
+      <div className="mt-3 rounded-md border border-border bg-background p-2">
         <ProjectQuickCapture users={mentionUsers} redirect="detail" />
       </div>
 
       {filtered.length === 0 ? (
-        <p className="mt-4 text-sm text-text-muted">Nothing active right now.</p>
+        <p className="mt-3 text-sm text-text-muted">Nothing active right now.</p>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-3 space-y-1">
           {filtered.map((project) => (
             <li key={project.id}>
               <Link
                 href={`/projects/${project.id}`}
-                className="flex items-center justify-between gap-3 rounded-md px-2 py-2 transition-colors hover:bg-accent-soft/50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent-soft/50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
               >
                 <div className="min-w-0">
                   <span className="truncate text-sm font-medium text-text">{project.title}</span>

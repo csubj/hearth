@@ -53,6 +53,8 @@ Logging a new entry resets the reminder clock. While still stale, reminders repe
 
 The home metrics section shows the **latest entry** per metric. Metrics without recent entries may be flagged if something hasn't been logged in a while.
 
+Stale metrics also appear in the **Upcoming reminders** section on Home and on `/reminders` when a reminder interval is configured.
+
 ## Use cases
 
 | Metric | Example entries |

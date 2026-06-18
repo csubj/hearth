@@ -18,6 +18,9 @@ Documentation and design updates for upcoming features (implementation in progre
 
 ### Added (documented)
 
+- **Home dashboard** — stats strip, upcoming reminders preview, and denser feature section cards
+- **Browse hub** — `/browse` groups Projects, Restaurants, Metrics, and Inventory; desktop nav uses a Browse dropdown
+- **Reminders feed** — `/reminders` lists overdue and due-soon inventory maintenance and metric logging reminders
 - **Inventory maintenance reminders** — per-item recurring upkeep with title, notes, links, interval, and household or per-user notification scope
 - **Metric reminder scope** — optional `reminderRecipientUserId` to notify one member instead of the whole household
 - **REST API** — `/api/v1/*` programmatic access with bearer token auth
