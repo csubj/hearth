@@ -1,13 +1,11 @@
 import { and, desc, eq, lt, or, sql, type AnyColumn, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import {
-  events,
   metricEntries,
   metrics,
   projects,
   restaurants,
   streamEntries,
-  type Event,
   type Metric,
   type MetricEntry,
   type Project,
@@ -26,13 +24,11 @@ import { combineRestaurantMentionText } from "@/lib/restaurants/mention-text";
 import { decodeCursor, paginateRows, type PaginationQuery } from "@/lib/api/pagination";
 import { toIso } from "@/lib/api/serialize";
 import type {
-  createEventSchema,
   createMetricEntrySchema,
   createMetricSchema,
   createProjectSchema,
   createRestaurantSchema,
   createStreamEntrySchema,
-  updateEventSchema,
   updateMetricEntrySchema,
   updateMetricSchema,
   updateProjectSchema,
@@ -106,21 +102,6 @@ export function serializeMetricEntry(row: MetricEntry) {
     recordedAt: toIso(row.recordedAt)!,
     createdByUserId: row.createdByUserId,
     createdAt: toIso(row.createdAt)!,
-  };
-}
-
-export function serializeEvent(row: Event) {
-  return {
-    id: row.id,
-    title: row.title,
-    startsAt: toIso(row.startsAt)!,
-    location: row.location,
-    link: row.link,
-    note: row.note,
-    createdByUserId: row.createdByUserId,
-    updatedByUserId: row.updatedByUserId,
-    createdAt: toIso(row.createdAt)!,
-    updatedAt: toIso(row.updatedAt)!,
   };
 }
 
@@ -673,121 +654,6 @@ export async function deleteMetricEntryApi(metricId: string, entryId: string) {
     return false;
   }
   await db.delete(metricEntries).where(eq(metricEntries.id, entryId));
-  return true;
-}
-
-export async function listEventsApi(query: PaginationQuery) {
-  const db = getDb();
-  const conditions = [];
-  const cursorFilter = query.cursor
-    ? cursorCondition(events.createdAt, events.id, query.cursor)
-    : undefined;
-  if (cursorFilter) {
-    conditions.push(cursorFilter);
-  }
-
-  const rows = await db
-    .select()
-    .from(events)
-    .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(events.createdAt), desc(events.id))
-    .limit(query.limit + 1);
-
-  return paginateRows(rows, query.limit);
-}
-
-export async function getEventApi(id: string) {
-  const [row] = await getDb().select().from(events).where(eq(events.id, id)).limit(1);
-  return row ?? null;
-}
-
-export async function createEventApi(user: AuthUser, input: z.infer<typeof createEventSchema>) {
-  const now = new Date();
-  const id = crypto.randomUUID();
-  const row: Event = {
-    id,
-    title: input.title,
-    startsAt: new Date(input.startsAt),
-    location: input.location ?? null,
-    link: input.link ?? null,
-    note: input.note ?? null,
-    createdByUserId: user.id,
-    updatedByUserId: user.id,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await getDb().insert(events).values(row);
-
-  const actor = displayName(user);
-  await emitHouseholdActivity({
-    type: "event.created",
-    actorId: user.id,
-    entityType: "event",
-    entityId: id,
-    summary: `${actor} added event "${input.title}"`,
-  });
-  if (input.note) {
-    await emitMentions({
-      body: input.note,
-      entityType: "event",
-      entityId: id,
-      actorId: user.id,
-    });
-  }
-
-  return row;
-}
-
-export async function updateEventApi(
-  user: AuthUser,
-  id: string,
-  input: z.infer<typeof updateEventSchema>,
-) {
-  const db = getDb();
-  const [existing] = await db.select().from(events).where(eq(events.id, id)).limit(1);
-  if (!existing) {
-    return null;
-  }
-
-  const now = new Date();
-  const [updated] = await db
-    .update(events)
-    .set({
-      title: input.title ?? existing.title,
-      startsAt: input.startsAt ? new Date(input.startsAt) : existing.startsAt,
-      location: input.location !== undefined ? input.location : existing.location,
-      link: input.link !== undefined ? input.link : existing.link,
-      note: input.note !== undefined ? input.note : existing.note,
-      updatedByUserId: user.id,
-      updatedAt: now,
-    })
-    .where(eq(events.id, id))
-    .returning();
-
-  if (!updated) {
-    return null;
-  }
-
-  const actor = displayName(user);
-  await emitHouseholdActivity({
-    type: "event.updated",
-    actorId: user.id,
-    entityType: "event",
-    entityId: id,
-    summary: `${actor} updated event "${updated.title}"`,
-  });
-
-  return updated;
-}
-
-export async function deleteEventApi(id: string) {
-  const db = getDb();
-  const [existing] = await db.select().from(events).where(eq(events.id, id)).limit(1);
-  if (!existing) {
-    return false;
-  }
-  await db.delete(events).where(eq(events.id, id));
   return true;
 }
 

@@ -89,7 +89,7 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ## Component patterns
 
-### Lists (stream, restaurants, projects, metrics, events, inventory)
+### Lists (stream, restaurants, projects, metrics, inventory)
 
 - **Lead with existing content** — the list, history, or searchable catalog is the first element on the page
 - Full-width rows or cards with clear primary line + muted secondary line
@@ -161,7 +161,7 @@ Implement as needed during MVP phases:
 | `Dialog`       | `@radix-ui/react-dialog`        | edit forms, photo lightbox                                     |
 | `DropdownMenu` | `@radix-ui/react-dropdown-menu` | row actions, user menu                                         |
 | `Popover`      | `@radix-ui/react-popover`       | @-mention autocomplete                                         |
-| `Tabs`         | `@radix-ui/react-tabs`          | events upcoming/past; metric chart/table toggle if needed      |
+| `Tabs`         | `@radix-ui/react-tabs`          | metric chart/table toggle if needed      |
 | `Collapsible`  | `@radix-ui/react-collapsible`   | compact create forms, expandable capture                       |
 
 ---

@@ -101,7 +101,6 @@ erDiagram
   users ||--o{ restaurants : creates
   users ||--o{ projects : creates
   users ||--o{ metrics : creates
-  users ||--o{ events : creates
   users ||--o{ inventory_items : creates
   users ||--o{ api_tokens : owns
   users ||--o{ notifications : receives
@@ -112,7 +111,7 @@ erDiagram
   inventory_items ||--o{ attachments : has
 ```
 
-Core entities: **users**, **stream entries**, **restaurants**, **projects**, **metrics** (+ entries), **events**, **inventory** (+ links, tags), **api tokens**, **notifications**, **mentions**, **attachments**.
+Core entities: **users**, **stream entries**, **restaurants**, **projects**, **metrics** (+ entries), **inventory** (+ links, tags), **api tokens**, **notifications**, **mentions**, **attachments**.
 
 Full schema: [Data Model](../design/03_schema.md)
 

@@ -1,6 +1,6 @@
 # hearth
 
-Household coordination — a shared landing page for stream notes, restaurants, projects, metrics, inventory, and events. One deployment serves one household.
+Household coordination — a shared landing page for stream notes, restaurants, projects, metrics, and inventory. One deployment serves one household.
 
 ## Design docs
 

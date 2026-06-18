@@ -4,6 +4,10 @@ All notable changes to hearth. Versioning follows [Semantic Versioning](https://
 
 ## Unreleased
 
+### Removed
+
+- **Events** — calendar-dated items feature removed; use stream notes for date-specific reminders
+
 Documentation and design updates for upcoming features (implementation in progress):
 
 ### Added (documented)
@@ -34,8 +38,7 @@ Initial release. MVP phases 0–7 complete.
 - **Restaurants** — wishlist, visit status, 1–5 star ratings, visit notes
 - **Projects** — idea / in progress / done statuses
 - **Metrics** — named metrics with dated entries (formerly Trackers)
-- **Events** — date-ordered calendar items
-- **Attachments** — photo upload on stream, restaurants, projects, metrics, events
+- **Attachments** — photo upload on stream, restaurants, projects, metrics
 - **Notifications** — in-app activity feed, @-mention delivery, unread badge
 - **Docker** — multi-stage Dockerfile, Compose, GHCR image publishing
 - **CI** — GitHub Actions lint, format, typecheck, test

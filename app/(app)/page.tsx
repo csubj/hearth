@@ -1,5 +1,4 @@
 import { SinceLastVisitSection } from "@/components/home/SinceLastVisitSection";
-import { EventsSection } from "@/components/home/EventsSection";
 import { InventorySection } from "@/components/home/InventorySection";
 import { MetricsSection } from "@/components/home/MetricsSection";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
@@ -19,7 +18,6 @@ export default function HomePage() {
         <RestaurantsSection />
         <ProjectsSection />
         <MetricsSection />
-        <EventsSection />
         <InventorySection />
       </div>
     </div>

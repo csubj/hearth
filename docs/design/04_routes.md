@@ -47,8 +47,6 @@ hearth/
 │   │   ├── metrics/
 │   │   │   ├── page.tsx
 │   │   │   └── [id]/page.tsx
-│   │   ├── events/
-│   │   │   └── page.tsx
 │   │   ├── inventory/
 │   │   │   ├── page.tsx
 │   │   │   └── [id]/page.tsx
@@ -68,7 +66,6 @@ hearth/
 │       │   ├── restaurants/
 │       │   ├── projects/
 │       │   ├── metrics/
-│       │   ├── events/
 │       │   └── inventory/
 │       ├── openapi.json/
 │       │   └── route.ts        # GET OpenAPI spec
@@ -120,7 +117,6 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 | `/projects/[id]`            | auth\* | Project detail + status updates              |
 | `/metrics`                  | auth\* | Metric list + chart links                    |
 | `/metrics/[id]`             | auth\* | Entry history, chart, add entry              |
-| `/events`                   | auth\* | Upcoming + past events                       |
 | `/inventory`                | auth\* | Searchable inventory list                    |
 | `/inventory/[id]`           | auth\* | Item detail — tags, links, files, notes      |
 | `/notifications`            | auth\* | Per-user activity stream                     |
@@ -155,7 +151,6 @@ All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 | Projects            | `/api/v1/projects`                | list, CRUD        |
 | Metrics             | `/api/v1/metrics`                 | list, CRUD        |
 | Metric entries      | `/api/v1/metrics/{id}/entries`    | list, create, update, delete |
-| Events              | `/api/v1/events`                  | list, CRUD        |
 | Inventory           | `/api/v1/inventory`               | list, CRUD, search |
 | Inventory types     | `/api/v1/inventory/types`         | list, CRUD        |
 | Inventory tags      | `/api/v1/inventory/tags`          | list, CRUD        |
@@ -174,7 +169,7 @@ REST handlers validate with Zod, write via Drizzle, and call the notification em
 ### `app/(app)/layout.tsx`
 
 - Validates session in `required` mode (or resolves `OPEN_MODE_USERNAME` in `open` mode)
-- Renders: top nav (Home, Stream, Restaurants, Projects, Metrics, Events, Inventory, Notifications bell)
+- Renders: top nav (Home, Stream, Restaurants, Projects, Metrics, Inventory, Notifications bell)
 - User menu: display name, Settings, Logout; Admin link if `role === admin`
 - Updates `users.last_seen_at` on load (for "since you last visited")
 
@@ -219,7 +214,6 @@ Colocate in `src/lib/actions/` by domain. Each action:
 | `restaurants.ts`   | `create`, `update`, `markVisited`, `setRating`                             |
 | `projects.ts`      | `create`, `update`, `setStatus`                                            |
 | `metrics.ts`       | `createMetric`, `addEntry`, `updateMetric`                                 |
-| `events.ts`        | `create`, `update`, `delete`                                               |
 | `inventory.ts`     | `create`, `update`, `addLink`, `removeLink`, `setTags`                     |
 | `notifications.ts` | `markRead`, `markAllRead`                                                  |
 | `admin/users.ts`   | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin` |
@@ -276,8 +270,6 @@ home_sections:
     query: status=in_progress OR recently updated, limit 5
   metrics:
     query: each metric latest entry; flag if stale (configurable threshold)
-  events:
-    query: starts_at within next 14 days, limit 5
   inventory:
     query: recently updated items, limit 5
   notifications:
@@ -325,7 +317,6 @@ routes:
     - /projects/[id]
     - /metrics
     - /metrics/[id]
-    - /events
     - /inventory
     - /inventory/[id]
     - /notifications

@@ -40,7 +40,6 @@ The API exposes the same entities as the web app. Each resource supports standar
 | Projects | `/api/v1/projects` | Idea / in progress / done |
 | Metrics | `/api/v1/metrics` | Named metrics (see entries below) |
 | Metric entries | `/api/v1/metrics/{id}/entries` | Dated values for a metric |
-| Events | `/api/v1/events` | Date-ordered calendar items |
 | Inventory | `/api/v1/inventory` | Household objects/appliances/electronics |
 
 ### Managed types
@@ -164,7 +163,7 @@ Upload a photo or document attached to an existing entity.
 | Field | Type | Required | Description |
 | ----- | ---- | -------- | ----------- |
 | `file` | File | Yes | Image (all entities) or document (inventory only) — see [Attachments](../user-guide/attachments.md) |
-| `entityType` | string | Yes | `stream_entry`, `restaurant`, `project`, `metric_entry`, `event`, or `inventory_item` |
+| `entityType` | string | Yes | `stream_entry`, `restaurant`, `project`, `metric_entry`, or `inventory_item` |
 | `entityId` | string | Yes | UUID of the parent entity |
 
 ```json

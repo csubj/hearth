@@ -2,7 +2,6 @@ export * from "./stream";
 export * from "./restaurants";
 export * from "./projects";
 export * from "./metrics";
-export * from "./events";
 export * from "./mentions";
 export * from "./notifications";
 export * from "./attachments";

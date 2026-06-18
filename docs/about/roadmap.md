@@ -18,8 +18,7 @@ Items explicitly **out of scope for v1** that may come later. Nothing here is co
 | Feature | Notes |
 | ------- | ----- |
 | Guest / read-only access | View without edit for visitors |
-| Calendar integrations | Sync events with Google Calendar, iCal |
-| SMS reminders | Event reminders via Twilio or similar |
+| SMS reminders | Reminders via Twilio or similar |
 | Multi-household per instance | Unlikely — conflicts with core "one instance = one household" model |
 | Mobile-native apps | Responsive web may be sufficient |
 | Smart home integrations | Display on e-ink dashboards, Home Assistant |
@@ -33,7 +32,7 @@ Phases 0–7 from [MVP Phases](../design/08_mvp.md):
 - [x] Authentication and admin user management
 - [x] Home page and stream
 - [x] Restaurants (list, no map)
-- [x] Projects, events, metrics
+- [x] Projects and metrics
 - [x] Photo attachments
 - [x] Notifications and @-mentions
 - [x] Polish, CI, smoke tests, documentation

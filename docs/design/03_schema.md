@@ -32,7 +32,7 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 | `user_role`         | `member`, `admin`                                                                                   | `users.role`                         |
 | `restaurant_status` | `want_to_try`, `visited`                                                                            | `restaurants.status`                 |
 | `project_status`    | `idea`, `in_progress`, `done`                                                                       | `projects.status`                    |
-| `entity_type`       | `stream_entry`, `restaurant`, `project`, `metric`, `metric_entry`, `event`, `inventory_item`        | attachments, mentions, notifications |
+| `entity_type`       | `stream_entry`, `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`        | attachments, mentions, notifications |
 | `notification_type` | see `06_notifications.md`                                                                           | `notifications.type`                 |
 
 ---
@@ -170,29 +170,6 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 ---
 
-## Events
-
-### `events`
-
-| Column               | Type             | Notes                   |
-| -------------------- | ---------------- | ----------------------- |
-| `id`                 | text PK          |                         |
-| `title`              | text NOT NULL    |                         |
-| `starts_at`          | integer NOT NULL | ms — date/time of event |
-| `location`           | text NULL        |                         |
-| `link`               | text NULL        | URL                     |
-| `note`               | text NULL        |                         |
-| `created_by_user_id` | text FK → users  |                         |
-| `updated_by_user_id` | text FK → users  |                         |
-| `created_at`         | integer NOT NULL |                         |
-| `updated_at`         | integer NOT NULL |                         |
-
-**Indexes:** `(starts_at ASC)` for upcoming lists.
-
-Past events remain in DB; UI filters `starts_at >= now` on home summary. Full list view can toggle archived/past.
-
----
-
 ## Inventory
 
 ### `inventory_items`
@@ -323,7 +300,6 @@ erDiagram
   users ||--o{ projects : creates
   users ||--o{ metrics : creates
   users ||--o{ metric_entries : creates
-  users ||--o{ events : creates
   users ||--o{ inventory_items : creates
   users ||--o{ api_tokens : owns
   users ||--o{ notifications : receives
@@ -335,7 +311,6 @@ erDiagram
   stream_entries ||--o{ attachments : has
   restaurants ||--o{ attachments : has
   projects ||--o{ attachments : has
-  events ||--o{ attachments : has
   metric_entries ||--o{ attachments : has
   inventory_items ||--o{ attachments : has
 ```
@@ -355,7 +330,6 @@ src/db/
     restaurants.ts
     projects.ts
     metrics.ts
-    events.ts
     inventory.ts
     mentions.ts
     notifications.ts
@@ -383,7 +357,6 @@ schema:
       restaurants: [restaurants]
       projects: [projects]
       metrics: [metrics, metric_entries]
-      events: [events]
       inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags]
     cross_cutting:
       - mentions
@@ -393,5 +366,5 @@ schema:
     user_role: [member, admin]
     restaurant_status: [want_to_try, visited]
     project_status: [idea, in_progress, done]
-    entity_type: [stream_entry, restaurant, project, metric, metric_entry, event, inventory_item]
+    entity_type: [stream_entry, restaurant, project, metric, metric_entry, inventory_item]
 ```

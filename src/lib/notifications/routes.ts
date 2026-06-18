@@ -28,8 +28,6 @@ export async function getNotificationHref(
         .limit(1);
       return entry ? `/metrics/${entry.metricId}` : null;
     }
-    case "event":
-      return "/events";
     case "inventory_item":
       return `/inventory/${entityId}`;
     default:

@@ -48,7 +48,6 @@ data/
 | `restaurant`    | Yes    | No              | Menu pics, visit photos              |
 | `project`       | Yes    | No              | Before/after, progress photos        |
 | `metric_entry`  | Yes    | No              | Scale reading, condition photo       |
-| `event`         | Yes    | No              | Event-related photos                 |
 | `inventory_item`| Yes    | Yes             | Photos + manuals, receipts, warranties |
 
 ### Allowed mime types
@@ -129,7 +128,6 @@ Attachments link polymorphically via `entity_type` + `entity_id`:
 | `restaurant`     | Notes, visit review                  |
 | `project`        | Description updates, progress photos |
 | `metric_entry`   | Entry note (e.g. scale photo)        |
-| `event`          | Event note                           |
 | `inventory_item` | Photos, manuals, receipts, warranties |
 
 Upload requires entity to exist first — UI flow: create entry → edit/add files. Optional: allow pending uploads on create form after first save.

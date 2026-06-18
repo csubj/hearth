@@ -30,8 +30,6 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 | `project.created`        | New project                        | All except actor                                         |
 | `project.status_changed` | Status update                      | All except actor                                         |
 | `metric.entry_added`     | New metric entry                  | All except actor                                         |
-| `event.created`          | New event                          | All except actor                                         |
-| `event.updated`          | Event edit                         | All except actor                                         |
 | `inventory.created`      | New inventory item                 | All except actor                                         |
 | `inventory.updated`      | Inventory item edit                | All except actor                                         |
 | `mention`                | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
@@ -121,7 +119,6 @@ Fields supporting mentions in v1:
 - `restaurants.notes`, `restaurants.visit_note`
 - `projects.description`
 - `metric_entries.note`
-- `events.note`
 - `inventory_items.notes`
 
 ---
@@ -136,7 +133,6 @@ Map `(entity_type, entity_id)` → route:
 | `restaurant`                | `/restaurants/[id]`                      |
 | `project`                   | `/projects/[id]`                         |
 | `metric` / `metric_entry`   | `/metrics/[metricId]`                    |
-| `event`                     | `/events`                                |
 | `inventory_item`            | `/inventory/[id]`                        |
 
 Notification row click marks read and navigates.
@@ -205,8 +201,6 @@ notifications:
     - project.created
     - project.status_changed
     - metric.entry_added
-    - event.created
-    - event.updated
     - inventory.created
     - inventory.updated
     - mention

@@ -25,12 +25,6 @@ registerResource({
 });
 
 registerResource({
-  tag: "Events",
-  basePath: "/api/v1/events",
-  entityName: "Event",
-});
-
-registerResource({
   tag: "Inventory",
   basePath: "/api/v1/inventory",
   entityName: "InventoryItem",

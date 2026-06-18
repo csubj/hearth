@@ -2,7 +2,7 @@
 
 hearth is a landing page for coordination between people in a household. Like a refrigerator door or a kitchen whiteboard, it holds shared information everyone can see at a glance — what needs attention now, what we're planning for later, and notes we don't want to lose.
 
-It is not a task manager in the corporate sense. It is a shared surface for the small, ongoing things that make up domestic life: errands half-remembered, restaurants someone mentioned, a house project stalled in the garage, Flora's weight from last week, an event on Saturday we might forget.
+It is not a task manager in the corporate sense. It is a shared surface for the small, ongoing things that make up domestic life: errands half-remembered, restaurants someone mentioned, a house project stalled in the garage, Flora's weight from last week, a vet appointment on Saturday we might forget.
 
 ---
 
@@ -79,16 +79,6 @@ Flexible lists for recurring or ongoing measurements and observations.
 
 Start with one concrete use case; generalize the pattern as needed.
 
-### Events
-
-A date-ordered list of things to go to or remember by calendar date.
-
-- Event name, date (and optional time), location, link, or short note
-- Sorted chronologically; past events archive or fade rather than clutter the present
-- Examples: "concert at the park — June 21," "vet appointment — next Tuesday 3pm," "block party"
-
-Complements the stream-of-consciousness list for anything that is inherently tied to a specific day.
-
 ### Inventory
 
 A searchable catalog of the household's physical things — appliances, electronics, tools, furniture — so details are findable when you actually need them: a model number for a warranty claim, the paint color in the garage, the manual for the dishwasher.
@@ -113,7 +103,6 @@ The landing page aggregates what needs attention across all features:
 | Restaurants | A few "want to try" suggestions (v1: list; later: nearby on map)    |
 | Projects    | Items in progress or recently touched                               |
 | Metrics     | Latest entry or reminder if something hasn't been logged in a while |
-| Events      | Upcoming within the next week or two                                |
 | Inventory   | Quick search box; a few recently added or edited items              |
 
 Each section links to its full view. The page should feel like a summary, not a dashboard with widgets.
@@ -157,7 +146,7 @@ Push notifications and email digests are out of scope for v1; the in-app stream 
 
 Photos can be attached to notes and other user inputs across features.
 
-- Stream entries, restaurant reviews, project updates, metric notes, event details — anywhere freeform text appears
+- Stream entries, restaurant reviews, project updates, metric notes — anywhere freeform text appears
 - Multiple photos per entry when useful (e.g. before/after for a house project, menu pics after a restaurant visit)
 - **Inventory items** additionally accept documents (PDFs, manuals, receipts), not just images — see `07_attachments.md` for the per-entity file policy
 - Stored as part of the instance; no external photo hosting required for v1
@@ -168,7 +157,7 @@ Photos can be attached to notes and other user inputs across features.
 
 hearth exposes a small REST API so the household can manage its data outside the web UI — scripts, home-automation glue, bulk edits, or a future companion app.
 
-- Every resource the UI manages is reachable over REST under `/api/v1/` — stream, restaurants, projects, metrics (and their definitions), events, and inventory (with its tags and types)
+- Every resource the UI manages is reachable over REST under `/api/v1/` — stream, restaurants, projects, metrics (and their definitions), and inventory (with its tags and types)
 - Requests authenticate with a **bearer API token**, separate from web login; tokens are created and revoked by an admin
 - The API is **self-describing**: an OpenAPI spec is served at `/api/openapi.json` with interactive docs at `/api/docs`
 - The web UI keeps using its own server actions; REST is an additional surface, not a replacement

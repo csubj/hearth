@@ -2,7 +2,7 @@
 
 The stream is hearth's catch-all layer — tasks, reminders, and half-formed thoughts anyone can add.
 
-If something doesn't fit restaurants, projects, metrics, events, or inventory yet, it lives here.
+If something doesn't fit restaurants, projects, metrics, or inventory yet, it lives here.
 
 ## Quick capture
 

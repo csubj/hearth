@@ -6,7 +6,7 @@ Frequently asked questions about hearth.
 
 ### What is hearth?
 
-A self-hosted web app for household coordination — shared notes, restaurants, projects, metrics, events, and inventory. Think kitchen whiteboard, not corporate task manager.
+A self-hosted web app for household coordination — shared notes, restaurants, projects, metrics, and inventory. Think kitchen whiteboard, not corporate task manager.
 
 ### Who is it for?
 
@@ -54,7 +54,7 @@ No native app. The responsive web UI works on phones and tablets.
 
 ### Can I sync with Google Calendar?
 
-Not in v1. Events are managed within hearth.
+Not supported. Use stream notes for date-specific reminders.
 
 ### Is there a map for restaurants?
 

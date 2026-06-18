@@ -9,7 +9,6 @@ export type EntityType =
   | "project"
   | "metric"
   | "metric_entry"
-  | "event"
   | "inventory_item";
 
 export interface EmitHouseholdActivityInput {
@@ -34,7 +33,6 @@ const ENTITY_MENTION_LABEL: Record<EntityType, string> = {
   project: "a project",
   metric: "a metric",
   metric_entry: "a metric entry",
-  event: "an event",
   inventory_item: "an inventory item",
 };
 

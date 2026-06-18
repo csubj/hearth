@@ -128,35 +128,6 @@ export const updateMetricEntrySchema = z.object({
   recordedAt: isoDateTime.optional(),
 });
 
-export const eventSchema = z.object({
-  id: z.string().uuid(),
-  title: z.string(),
-  startsAt: isoDateTime,
-  location: z.string().nullable(),
-  link: z.string().nullable(),
-  note: z.string().nullable(),
-  createdByUserId: z.string().uuid(),
-  updatedByUserId: z.string().uuid(),
-  createdAt: isoDateTime,
-  updatedAt: isoDateTime,
-});
-
-export const createEventSchema = z.object({
-  title: z.string().min(1).max(200),
-  startsAt: isoDateTime,
-  location: z.string().max(500).optional(),
-  link: z.string().url().optional(),
-  note: z.string().max(5000).optional(),
-});
-
-export const updateEventSchema = z.object({
-  title: z.string().min(1).max(200).optional(),
-  startsAt: isoDateTime.optional(),
-  location: z.string().max(500).nullable().optional(),
-  link: z.string().url().nullable().optional(),
-  note: z.string().max(5000).nullable().optional(),
-});
-
 export const inventoryTagSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),

@@ -12,7 +12,6 @@ hearth is organized around a **home page** that summarizes what needs attention,
 | Projects | `/projects` | House projects by status |
 | Metrics | `/metrics` | Named metrics with dated entries and charts |
 | Inventory | `/inventory` | Searchable household items, manuals, and photos |
-| Events | `/events` | Upcoming and past events |
 | Notifications | `/notifications` | Activity feed and @-mentions |
 | Settings | `/settings` | Change your password |
 
@@ -29,7 +28,6 @@ The landing page aggregates recent activity from each area:
 | Projects | Items in progress or recently touched |
 | Metrics | Latest entry per metric |
 | Inventory | Recently added or updated items |
-| Events | Upcoming within the next two weeks |
 | Since last visit | Notifications since you last opened hearth |
 
 Each section links to its full view. The page is designed to answer **"what's going on?"** in a few seconds.
@@ -55,7 +53,6 @@ Adding something should feel like writing on a sticky note:
 - [Projects](projects.md) — house projects from idea to done
 - [Metrics](metrics.md) — recurring measurements and charts
 - [Inventory](inventory.md) — searchable household items, manuals, and photos
-- [Events](events.md) — calendar-dated things to remember
 - [Notifications & @-mentions](notifications-and-mentions.md) — activity feed
 - [Attachments](attachments.md) — photos on notes and entries
 - [Your account](account.md) — password and settings

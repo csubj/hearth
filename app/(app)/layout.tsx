@@ -11,7 +11,6 @@ const navLinks = [
   { href: "/projects", label: "Projects" },
   { href: "/metrics", label: "Metrics" },
   { href: "/inventory", label: "Inventory" },
-  { href: "/events", label: "Events" },
 ] as const;
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

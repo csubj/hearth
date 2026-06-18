@@ -38,12 +38,6 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
     Flexible lists for recurring measurements with charts — pet weight, plant watering, utility readings.
 
-- :material-calendar: **Events**
-
-    ---
-
-    Date-ordered things to remember — vet appointments, concerts, block parties.
-
 - :material-archive-outline: **Inventory**
 
     ---

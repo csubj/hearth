@@ -1,6 +1,6 @@
 # Attachments
 
-Attach photos to notes and entries across hearth — stream notes, restaurant reviews, project updates, metric entries, event details, and inventory items. Inventory additionally accepts **PDF documents** (manuals, receipts, warranties).
+Attach photos to notes and entries across hearth — stream notes, restaurant reviews, project updates, metric entries, and inventory items. Inventory additionally accepts **PDF documents** (manuals, receipts, warranties).
 
 ## Supported formats
 

@@ -111,13 +111,13 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ---
 
-## Phase 4 — Projects, Events, Metrics
+## Phase 4 — Projects and Metrics
 
 **Goal:** remaining feature lists (metrics without charting yet).
 
 | Deliverable                                         | Notes                      |
 | --------------------------------------------------- | -------------------------- |
-| `projects`, `metrics`, `metric_entries`, `events` migrations |                            |
+| `projects`, `metrics`, `metric_entries` migrations |                            |
 | Routes per `04_routes.md`                           | all list + detail pages    |
 | Home sections                                       | one block per feature      |
 | Metric history                                      | table/cards on detail page |
@@ -126,8 +126,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 - [ ] Each feature: create, view list, view detail, update
 - [ ] Metric accepts dated entries with value + note
-- [ ] Events sort by `starts_at`; past events visible on full page
-- [ ] Home summarizes all feature areas (through metrics + events)
+- [ ] Home summarizes all feature areas (through metrics)
 
 ---
 
@@ -139,7 +138,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 | --------------------------- | ------------------------------------------------- |
 | `attachments` migration     |                                                   |
 | `POST/GET /api/attachments` | per `07_attachments.md`                           |
-| Upload UI on detail forms   | stream, restaurant, project, metric entry, event  |
+| Upload UI on detail forms   | stream, restaurant, project, metric entry  |
 | Thumbnail grid + lightbox   | Radix Dialog                                      |
 
 **Done when:**
@@ -280,7 +279,7 @@ mvp:
       name: restaurants
       depends_on: [2]
     - id: 4
-      name: projects_events_metrics
+      name: projects_metrics
       depends_on: [3]
     - id: 5
       name: attachments

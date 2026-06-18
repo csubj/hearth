@@ -4,7 +4,7 @@ Thank you for contributing to hearth! This guide covers development setup, conve
 
 ## What this is
 
-**hearth** is a household coordination web app — shared stream, restaurants, projects, metrics, events, and inventory. One instance = one household.
+**hearth** is a household coordination web app — shared stream, restaurants, projects, metrics, and inventory. One instance = one household.
 
 ## Before you code
 
