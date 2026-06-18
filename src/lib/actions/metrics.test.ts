@@ -7,13 +7,11 @@ import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import {
-  STALE_THRESHOLD_MS,
   addEntryRecord,
   createMetricRecord,
   ensureMetricTablesForTests,
   getMetricWithEntries,
   getMetricsHomeSummary,
-  isMetricStale,
   listMetricsWithLatest,
   updateMetricRecord,
 } from "@/lib/actions/metrics";
@@ -27,6 +25,7 @@ vi.mock("@/lib/auth/session", () => ({
 vi.mock("@/lib/notifications/emit", () => ({
   emitHouseholdActivity: vi.fn(),
   emitMentions: vi.fn(),
+  emitMetricReminder: vi.fn(),
 }));
 
 function resetTestDb(): void {
@@ -36,22 +35,6 @@ function resetTestDb(): void {
   migrateTestDb();
   ensureMetricTablesForTests();
 }
-
-describe("isMetricStale", () => {
-  it("flags metrics with no entries as stale", () => {
-    expect(isMetricStale(null)).toBe(true);
-  });
-
-  it("flags entries older than the threshold as stale", () => {
-    const old = new Date(Date.now() - STALE_THRESHOLD_MS - 1);
-    expect(isMetricStale(old)).toBe(true);
-  });
-
-  it("does not flag recent entries as stale", () => {
-    const recent = new Date(Date.now() - STALE_THRESHOLD_MS + 60_000);
-    expect(isMetricStale(recent)).toBe(false);
-  });
-});
 
 describe("metric records", () => {
   beforeEach(() => {
@@ -82,7 +65,7 @@ describe("metric records", () => {
     await expect(getMetricsHomeSummary()).rejects.toThrow("REDIRECT:/login");
   });
 
-  it("creates a metric and lists it with no latest entry", async () => {
+  it("creates a metric with default 7-day reminders and lists it as not stale yet", async () => {
     const user = await createTestUser();
     mockSession(user);
     const metric = await createMetricRecord(user.id, { name: "Flora's weight", unit: "lbs" });
@@ -92,7 +75,9 @@ describe("metric records", () => {
     expect(items[0]?.id).toBe(metric.id);
     expect(items[0]?.name).toBe("Flora's weight");
     expect(items[0]?.latestEntry).toBeNull();
-    expect(items[0]?.stale).toBe(true);
+    expect(items[0]?.reminderIntervalCount).toBe(7);
+    expect(items[0]?.reminderIntervalUnit).toBe("day");
+    expect(items[0]?.stale).toBe(false);
   });
 
   it("adds dated entries with value and note", async () => {
@@ -122,7 +107,22 @@ describe("metric records", () => {
     expect(detail?.entries[0]?.recordedAt.toISOString()).toBe(recordedAt.toISOString());
   });
 
-  it("updates metric name and unit", async () => {
+  it("clears last_reminder_at when a new entry is added", async () => {
+    const user = await createTestUser();
+    mockSession(user);
+    const metric = await createMetricRecord(user.id, { name: "Scale" });
+    await getDb()
+      .update(metrics)
+      .set({ lastReminderAt: new Date("2026-06-01T00:00:00Z") })
+      .where(eq(metrics.id, metric.id));
+
+    await addEntryRecord(user.id, { metricId: metric.id, value: "10" });
+
+    const [updated] = await getDb().select().from(metrics).where(eq(metrics.id, metric.id));
+    expect(updated?.lastReminderAt).toBeNull();
+  });
+
+  it("updates metric name, unit, and reminder interval", async () => {
     const user = await createTestUser();
     mockSession(user);
     const metric = await createMetricRecord(user.id, { name: "Old name", unit: "kg" });
@@ -131,10 +131,30 @@ describe("metric records", () => {
       metricId: metric.id,
       name: "New name",
       unit: "",
+      remindersEnabled: true,
+      reminderIntervalCount: 2,
+      reminderIntervalUnit: "month",
     });
 
     expect(updated?.name).toBe("New name");
     expect(updated?.unit).toBeNull();
+    expect(updated?.reminderIntervalCount).toBe(2);
+    expect(updated?.reminderIntervalUnit).toBe("month");
+  });
+
+  it("can disable reminders on update", async () => {
+    const user = await createTestUser();
+    mockSession(user);
+    const metric = await createMetricRecord(user.id, { name: "Optional" });
+
+    const updated = await updateMetricRecord(user.id, {
+      metricId: metric.id,
+      name: "Optional",
+      remindersEnabled: false,
+    });
+
+    expect(updated?.reminderIntervalCount).toBeNull();
+    expect(updated?.reminderIntervalUnit).toBeNull();
   });
 
   it("returns entries sorted by recorded_at descending", async () => {
@@ -161,7 +181,12 @@ describe("metric records", () => {
     const user = await createTestUser();
     mockSession(user);
     const fresh = await createMetricRecord(user.id, { name: "Fresh" });
-    const stale = await createMetricRecord(user.id, { name: "Stale" });
+    const stale = await createMetricRecord(user.id, {
+      name: "Stale",
+      reminderIntervalCount: 7,
+      reminderIntervalUnit: "day",
+      remindersEnabled: true,
+    });
 
     await addEntryRecord(user.id, {
       metricId: fresh.id,
@@ -171,7 +196,7 @@ describe("metric records", () => {
     await addEntryRecord(user.id, {
       metricId: stale.id,
       value: "2",
-      recordedAt: new Date(Date.now() - STALE_THRESHOLD_MS - 86_400_000),
+      recordedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
     const summary = await getMetricsHomeSummary();

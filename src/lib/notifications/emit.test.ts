@@ -4,7 +4,7 @@ import { getDb, resetDbForTests } from "@/db";
 import { mentions, notifications } from "@/db/schema";
 import { migrateTestDb } from "@/db/test-setup";
 import { createTestUser } from "@/lib/auth/test-helpers";
-import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
+import { emitHouseholdActivity, emitMentions, emitMetricReminder } from "@/lib/notifications/emit";
 
 function resetTestDb(): void {
   resetDbForTests();
@@ -22,11 +22,11 @@ describe("notification emit", () => {
     const other = await createTestUser({ username: "other" });
 
     await emitHouseholdActivity({
-      type: "stream.created",
+      type: "project.created",
       actorId: actor.id,
-      entityType: "stream_entry",
+      entityType: "project",
       entityId: crypto.randomUUID(),
-      summary: "Actor added a stream note",
+      summary: "Actor added a project",
     });
 
     const rows = await getDb().select().from(notifications);
@@ -43,7 +43,7 @@ describe("notification emit", () => {
     const entityId = crypto.randomUUID();
     await emitMentions({
       body: "hello @alex",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId,
       actorId: actor.id,
     });
@@ -65,7 +65,7 @@ describe("notification emit", () => {
 
     await emitMentions({
       body: "note to @actor",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId: crypto.randomUUID(),
       actorId: actor.id,
     });
@@ -84,14 +84,14 @@ describe("notification emit", () => {
 
     await emitMentions({
       body: "hello @alex",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId,
       actorId: actor.id,
     });
 
     await emitMentions({
       body: "hello @alex again",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId,
       actorId: actor.id,
     });
@@ -105,7 +105,7 @@ describe("notification emit", () => {
     const mentionRows = await getDb()
       .select()
       .from(mentions)
-      .where(and(eq(mentions.entityType, "stream_entry"), eq(mentions.entityId, entityId)));
+      .where(and(eq(mentions.entityType, "project"), eq(mentions.entityId, entityId)));
     expect(mentionRows).toHaveLength(1);
     expect(mentionRows[0]!.mentionedUserId).toBe(mentioned.id);
   });
@@ -117,14 +117,14 @@ describe("notification emit", () => {
 
     await emitMentions({
       body: "hello @alex",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId,
       actorId: actor.id,
     });
 
     await emitMentions({
       body: "hello without mentions",
-      entityType: "stream_entry",
+      entityType: "project",
       entityId,
       actorId: actor.id,
     });
@@ -132,7 +132,26 @@ describe("notification emit", () => {
     const mentionRows = await getDb()
       .select()
       .from(mentions)
-      .where(and(eq(mentions.entityType, "stream_entry"), eq(mentions.entityId, entityId)));
+      .where(and(eq(mentions.entityType, "project"), eq(mentions.entityId, entityId)));
     expect(mentionRows).toHaveLength(0);
+  });
+
+  it("broadcasts metric reminders to all active users", async () => {
+    const first = await createTestUser({ username: "first" });
+    const second = await createTestUser({ username: "second" });
+    const metricId = crypto.randomUUID();
+
+    await emitMetricReminder({
+      metricId,
+      metricName: "Flora's weight",
+      intervalLabel: "2 weeks",
+    });
+
+    const rows = await getDb().select().from(notifications);
+    expect(rows).toHaveLength(2);
+    expect(rows.map((row) => row.recipientUserId).sort()).toEqual([first.id, second.id].sort());
+    expect(rows.every((row) => row.type === "metric.reminder")).toBe(true);
+    expect(rows.every((row) => row.actorUserId == null)).toBe(true);
+    expect(rows[0]!.summary).toBe("Flora's weight hasn't been logged in 2 weeks");
   });
 });

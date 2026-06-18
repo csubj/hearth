@@ -6,7 +6,13 @@ All notable changes to hearth. Versioning follows [Semantic Versioning](https://
 
 ### Removed
 
-- **Events** — calendar-dated items feature removed; use stream notes for date-specific reminders
+- **Stream** — quick-capture notes removed; use Projects quick capture and notes instead. Run `tsx scripts/purge-stream.ts` before migrating if upgrading from a version with Stream data.
+- **Events** — calendar-dated items feature removed
+
+### Changed
+
+- **Projects v2** — auto-saving markdown notes (field renamed from `description` to `notes` in REST API), priority, tags, links, component cost rollup, PDF attachments
+- **REST breaking:** `POST/PATCH /api/v1/projects` use `notes` instead of `description`; `/api/v1/stream` removed
 
 Documentation and design updates for upcoming features (implementation in progress):
 

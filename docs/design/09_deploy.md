@@ -76,10 +76,11 @@ Never commit `.env` — already gitignored.
 pnpm install
 lefthook install
 cp .env.example .env
-pnpm db:migrate
 pnpm run auth:bootstrap   # first time only
 pnpm dev
 ```
+
+Migrations run automatically when the dev server starts.
 
 App: http://localhost:3000
 
@@ -130,10 +131,10 @@ docker compose exec app pnpm run auth:bootstrap
 # or pass HEARTH_BOOTSTRAP_* env vars on first run
 ```
 
-Run migrations on container start via entrypoint script:
+Migrations run automatically when the server starts (via Next.js instrumentation). The Docker entrypoint runs legacy purge scripts, then starts the server:
 
 ```bash
-pnpm db:migrate && node server.js
+node server.js
 ```
 
 ---
@@ -143,8 +144,8 @@ pnpm db:migrate && node server.js
 `scripts/docker-entrypoint.sh`:
 
 1. Ensure `data/` and `data/uploads/` exist
-2. `pnpm db:migrate`
-3. Exec Next.js start command
+2. Run legacy purge scripts (events, stream) when applicable
+3. Exec Next.js start command (migrations run on server startup)
 
 Migrations must be idempotent and committed in `drizzle/`.
 

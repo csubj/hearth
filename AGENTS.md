@@ -4,7 +4,7 @@ Instructions for AI agents and contributors working in this repository.
 
 ## What this is
 
-**hearth** is a household coordination web app — shared stream, restaurants, projects, metrics, and inventory. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
+**hearth** is a household coordination web app — projects, restaurants, metrics, and inventory. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
 
 ## Before you code
 
@@ -64,7 +64,7 @@ docs/design/      # design docs (source of truth)
 
 Follow phases in [docs/design/08_mvp.md](docs/design/08_mvp.md):
 
-0. Scaffold → 1. Auth → 2. Stream/Home → 3. Restaurants → 4. Projects/Events/Trackers → 5. Attachments → 6. Notifications → 7. Polish
+0. Scaffold → 1. Auth → 2. Home/Projects → 3. Restaurants → 4. Projects/Metrics → 5. Attachments → 6. Notifications → 7. Polish
 
 ## Questions
 

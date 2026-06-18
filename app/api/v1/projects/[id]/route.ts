@@ -3,8 +3,9 @@ import { requireApiToken } from "@/lib/api/auth";
 import { notFoundError, validationError } from "@/lib/api/errors";
 import {
   deleteProjectApi,
-  getProjectApi,
+  getProjectWithRollupsApi,
   serializeProject,
+  serializeProjectDetail,
   updateProjectApi,
 } from "@/lib/api/resources";
 import { updateProjectSchema } from "@/lib/api/schemas";
@@ -16,9 +17,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
   if (!auth.ok) return auth.response;
 
   const { id } = await context.params;
-  const row = await getProjectApi(id);
-  if (!row) return notFoundError();
-  return Response.json(serializeProject(row));
+  const result = await getProjectWithRollupsApi(id);
+  if (!result) return notFoundError();
+  return Response.json(serializeProjectDetail(result.project, result.rollups));
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {

@@ -10,7 +10,7 @@ Common problems when running hearth.
 
 **Fix:** Ensure Node 22 and build essentials are installed. On macOS: Xcode command line tools. On Linux: `build-essential`, `python3`.
 
-### `pnpm db:migrate` fails
+### Migrations fail on startup
 
 **Cause:** Database path not writable or migrations out of sync.
 
@@ -18,6 +18,12 @@ Common problems when running hearth.
 
 ```bash
 mkdir -p data
+pnpm start   # or restart the container — migrations run on startup
+```
+
+To apply migrations manually without starting the server:
+
+```bash
 pnpm db:migrate
 ```
 
@@ -90,7 +96,7 @@ If connection refused: app not running. If 500: check logs for database errors.
 
 ### Blank page or 500 after login
 
-**Fix:**
+**Fix:** Restart the app (migrations run on startup) or apply manually:
 
 ```bash
 pnpm db:migrate

@@ -106,6 +106,90 @@ export function registerResource(options: RegisterResourceOptions): void {
   });
 }
 
+export function registerProjectComponentsResource(): void {
+  const basePath = "/api/v1/projects/{projectId}/components";
+
+  openApiRegistry.registerPath({
+    method: "get",
+    path: basePath,
+    tags: ["Projects"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "List project components",
+        content: { "application/json": { schema: paginatedList } },
+      },
+      401: { description: "Unauthorized" },
+      404: { description: "Project not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "post",
+    path: basePath,
+    tags: ["Projects"],
+    security: [{ [bearerAuth.name]: [] }],
+    requestBody: {
+      content: { "application/json": { schema: jsonObject } },
+    },
+    responses: {
+      201: {
+        description: "Created project component",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      400: { description: "Validation error" },
+      401: { description: "Unauthorized" },
+      404: { description: "Project not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "get",
+    path: `${basePath}/{id}`,
+    tags: ["Projects"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "Get project component",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "patch",
+    path: `${basePath}/{id}`,
+    tags: ["Projects"],
+    security: [{ [bearerAuth.name]: [] }],
+    requestBody: {
+      content: { "application/json": { schema: jsonObject } },
+    },
+    responses: {
+      200: {
+        description: "Updated project component",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      400: { description: "Validation error" },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "delete",
+    path: `${basePath}/{id}`,
+    tags: ["Projects"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      204: { description: "Deleted" },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+}
+
 export function registerMetricEntriesResource(): void {
   const basePath = "/api/v1/metrics/{metricId}/entries";
 

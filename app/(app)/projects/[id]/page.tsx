@@ -1,26 +1,38 @@
 import { Suspense } from "react";
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { eq } from "drizzle-orm";
 import { Attachments } from "@/components/Attachments";
-import { getDb } from "@/db";
-import { projects } from "@/db/schema";
-import { ProjectDetailForm } from "@/components/projects/ProjectDetailForm";
+import { ProjectComponentsTable } from "@/components/projects/ProjectComponentsTable";
+import { ProjectDeleteButton } from "@/components/projects/ProjectDeleteButton";
+import { ProjectLinksPanel, ProjectTagsForm } from "@/components/projects/ProjectLinksTags";
+import { ProjectNotesEditor } from "@/components/projects/ProjectNotesEditor";
+import { ProjectPrioritySelector } from "@/components/projects/ProjectPrioritySelector";
 import { ProjectStatusActions } from "@/components/projects/ProjectStatusActions";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
+import { ProjectTitleForm } from "@/components/projects/ProjectTitleForm";
+import { getDb } from "@/db";
+import { users } from "@/db/schema";
+import { getProjectById } from "@/lib/actions/projects";
 import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [projectRow, mentionUsers] = await Promise.all([
-    getDb().select().from(projects).where(eq(projects.id, id)).limit(1),
-    loadMentionUsers(),
-  ]);
-  const [project] = projectRow;
+  const [project, mentionUsers] = await Promise.all([getProjectById(id), loadMentionUsers()]);
 
   if (!project) {
     notFound();
   }
+
+  const [updatedByUser] = await getDb()
+    .select({ username: users.username, displayName: users.displayName })
+    .from(users)
+    .where(eq(users.id, project.updatedByUserId))
+    .limit(1);
+
+  const lastEditedBy = updatedByUser
+    ? (updatedByUser.displayName ?? updatedByUser.username)
+    : "Someone";
 
   return (
     <div className="space-y-6">
@@ -32,33 +44,40 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           ← All projects
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-serif text-2xl text-text">{project.title}</h1>
           <ProjectStatusChip status={project.status} />
+          <ProjectPrioritySelector projectId={project.id} currentPriority={project.priority} />
         </div>
+        <ProjectTitleForm projectId={project.id} title={project.title} />
+        <p className="text-xs text-text-muted">
+          Last edited by {lastEditedBy} · {project.updatedAt.toLocaleString()}
+        </p>
       </header>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <ProjectStatusActions projectId={project.id} currentStatus={project.status} />
       </section>
 
+      <ProjectNotesEditor
+        projectId={project.id}
+        initialNotes={project.notes}
+        users={mentionUsers}
+      />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ProjectTagsForm project={project} />
+        <ProjectLinksPanel project={project} />
+      </div>
+
+      <ProjectComponentsTable project={project} />
+
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <h2 className="text-lg font-medium text-text">Details</h2>
-        <div className="mt-4">
-          <ProjectDetailForm
-            project={{
-              id: project.id,
-              title: project.title,
-              description: project.description,
-            }}
-            users={mentionUsers}
-          />
-        </div>
+        <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
+          <Attachments entityType="project" entityId={project.id} />
+        </Suspense>
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <Suspense fallback={<p className="text-sm text-text-muted">Loading photos…</p>}>
-          <Attachments entityType="project" entityId={project.id} />
-        </Suspense>
+        <ProjectDeleteButton projectId={project.id} />
       </section>
     </div>
   );

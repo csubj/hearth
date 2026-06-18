@@ -6,6 +6,7 @@ import { isNumericMetric } from "@/components/metrics/chart";
 import { MetricChart } from "@/components/metrics/MetricChart";
 import { UpdateMetricForm } from "@/components/metrics/UpdateMetricForm";
 import { getMetricWithEntries } from "@/lib/actions/metrics";
+import { formatReminderInterval, hasReminderInterval } from "@/lib/metrics/reminder-interval";
 import { loadMentionUsers } from "@/lib/users/mention-users";
 
 export default async function MetricDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,6 +32,16 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
           <h1 className="font-serif text-2xl text-text">{metric.name}</h1>
           {metric.unit ? (
             <p className="mt-1 text-sm text-text-muted">Unit: {metric.unit}</p>
+          ) : null}
+          {hasReminderInterval(metric) ? (
+            <p className="mt-1 text-sm text-text-muted">
+              Reminds{" "}
+              {formatReminderInterval(
+                metric.reminderIntervalCount!,
+                metric.reminderIntervalUnit!,
+                { prefixEvery: true },
+              )}
+            </p>
           ) : null}
         </div>
       </header>

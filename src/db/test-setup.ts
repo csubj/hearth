@@ -1,10 +1,8 @@
-import path from "node:path";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { getDb, resetDbForTests } from "@/db";
+import { resetDbForTests } from "@/db";
+import { runMigrations } from "@/db/migrate";
 
 export function migrateTestDb(): void {
-  const db = getDb();
-  migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+  runMigrations();
 }
 
 export function setupTestDb(): void {

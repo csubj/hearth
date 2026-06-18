@@ -4,11 +4,21 @@ import { NextRequest } from "next/server";
 import "@/lib/api/register-openapi";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import { apiTokens, streamEntries } from "@/db/schema";
+import { apiTokens, projectComponents, projects } from "@/db/schema";
 import { ensureMetricTablesForTests } from "@/lib/actions/metrics";
 import { ensureApiTokensTableForTests, requireApiToken } from "@/lib/api/auth";
 import { getOpenApiDocument } from "@/lib/api/openapi";
-import { listStreamEntries } from "@/lib/api/resources";
+import {
+  createProjectComponentApi,
+  deleteProjectComponentApi,
+  getProjectComponentApi,
+  getProjectWithRollupsApi,
+  listProjectComponentsApi,
+  listProjectsApi,
+  serializeProjectComponent,
+  serializeProjectDetail,
+  updateProjectComponentApi,
+} from "@/lib/api/resources";
 import { createApiTokenForUser } from "@/lib/auth/api-tokens";
 import { getOpenModeUsername, isOpenMode } from "@/lib/auth/config";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
@@ -114,7 +124,7 @@ describe("API bearer auth", () => {
   });
 
   it("returns 401 without bearer token", async () => {
-    const request = new NextRequest("http://localhost/api/v1/stream");
+    const request = new NextRequest("http://localhost/api/v1/projects");
     const result = await requireApiToken(request);
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -126,7 +136,7 @@ describe("API bearer auth", () => {
     const user = await createTestUser({ username: "api-owner" });
     const { token, id } = await createApiTokenForUser(user.id, "test");
 
-    const request = new NextRequest("http://localhost/api/v1/stream", {
+    const request = new NextRequest("http://localhost/api/v1/projects", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const result = await requireApiToken(request);
@@ -144,7 +154,7 @@ describe("API bearer auth", () => {
     const { token, id } = await createApiTokenForUser(user.id, "revoked");
     await getDb().update(apiTokens).set({ revokedAt: new Date() }).where(eq(apiTokens.id, id));
 
-    const request = new NextRequest("http://localhost/api/v1/stream", {
+    const request = new NextRequest("http://localhost/api/v1/projects", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const result = await requireApiToken(request);
@@ -154,25 +164,102 @@ describe("API bearer auth", () => {
     }
   });
 
-  it("lists stream entries after auth setup", async () => {
+  it("lists projects after auth setup", async () => {
     const user = await createTestUser();
     await createApiTokenForUser(user.id, "integration");
     const now = new Date();
 
-    await getDb().insert(streamEntries).values({
+    await getDb().insert(projects).values({
       id: crypto.randomUUID(),
-      body: "hello api",
-      isPinned: false,
-      doneAt: null,
-      roughWhen: null,
+      title: "hello api",
+      notes: "project notes",
+      status: "idea",
+      priority: null,
+      targetWhen: null,
+      budgetCents: null,
       createdByUserId: user.id,
       updatedByUserId: user.id,
       createdAt: now,
       updatedAt: now,
     });
 
-    const page = await listStreamEntries({ limit: 50 });
-    expect(page.data[0]?.body).toBe("hello api");
+    const page = await listProjectsApi({ limit: 50 });
+    expect(page.data[0]?.title).toBe("hello api");
+  });
+});
+
+describe("project components API", () => {
+  beforeEach(() => {
+    resetTestDb();
+  });
+
+  async function authHeader() {
+    const user = await createTestUser();
+    const { token } = await createApiTokenForUser(user.id, "components");
+    return { user, token };
+  }
+
+  it("lists, creates, updates, and deletes components with project rollups", async () => {
+    const { user } = await authHeader();
+    const now = new Date();
+    const projectId = crypto.randomUUID();
+
+    await getDb().insert(projects).values({
+      id: projectId,
+      title: "Deck",
+      notes: null,
+      status: "idea",
+      priority: null,
+      targetWhen: null,
+      budgetCents: 10000,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const created = await createProjectComponentApi(user, projectId, {
+      name: "Lumber",
+      kind: "item",
+      quantity: 2,
+      unitCostCents: 1500,
+      purchaseUrl: "https://example.com/lumber",
+      note: "Pressure treated",
+    });
+    expect(created?.kind).toBe("item");
+
+    const listPage = await listProjectComponentsApi(projectId, { limit: 50 });
+    expect(listPage.data).toHaveLength(1);
+    expect(listPage.data[0]?.name).toBe("Lumber");
+
+    const projectDetail = await getProjectWithRollupsApi(projectId);
+    expect(projectDetail).not.toBeNull();
+    const projectBody = serializeProjectDetail(
+      projectDetail!.project,
+      projectDetail!.rollups,
+    );
+    expect(projectBody.estimatedCostCents).toBe(3000);
+    expect(projectBody.acquiredCostCents).toBe(0);
+    expect(projectBody.remainingCostCents).toBe(3000);
+
+    const fetched = await getProjectComponentApi(projectId, created!.id);
+    expect(fetched).not.toBeNull();
+
+    const patched = await updateProjectComponentApi(user, projectId, created!.id, {
+      acquired: true,
+    });
+    expect(patched?.acquired).toBe(true);
+    expect(patched?.acquiredAt).toBeTruthy();
+    expect(serializeProjectComponent(patched!).acquired).toBe(true);
+
+    const deleted = await deleteProjectComponentApi(projectId, created!.id);
+    expect(deleted).toBe(true);
+
+    const remaining = await getDb()
+      .select()
+      .from(projectComponents)
+      .where(eq(projectComponents.projectId, projectId));
+    expect(remaining).toHaveLength(0);
   });
 });
 
@@ -184,7 +271,8 @@ describe("openapi.json", () => {
       components: { securitySchemes: Record<string, unknown> };
     };
     expect(doc.openapi).toMatch(/^3\./);
-    expect(doc.paths["/api/v1/stream"]).toBeDefined();
+    expect(doc.paths["/api/v1/projects"]).toBeDefined();
+    expect(doc.paths["/api/v1/projects/{projectId}/components"]).toBeDefined();
     expect(doc.paths["/api/v1/metrics/{metricId}/entries"]).toBeDefined();
     expect(doc.components.securitySchemes.bearerAuth).toBeDefined();
   });

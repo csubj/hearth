@@ -9,7 +9,10 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 
 export const ALLOWED_DOCUMENT_MIME_TYPES = ["application/pdf"] as const;
 
-export const DOCUMENT_ENTITY_TYPES: readonly AttachmentEntityType[] = ["inventory_item"];
+export const DOCUMENT_ENTITY_TYPES: readonly AttachmentEntityType[] = [
+  "inventory_item",
+  "project",
+];
 
 /** @deprecated Use ALLOWED_IMAGE_MIME_TYPES */
 export const ALLOWED_MIME_TYPES = ALLOWED_IMAGE_MIME_TYPES;

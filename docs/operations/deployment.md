@@ -24,7 +24,7 @@ The compose file:
 
 - Maps port `3000`
 - Mounts `hearth-data` volume at `/app/data`
-- Runs migrations on container start via entrypoint script
+- Runs migrations automatically when the Next.js server starts
 
 ## GHCR image (no local build)
 
@@ -59,8 +59,8 @@ docker login ghcr.io
 On start, the container:
 
 1. Ensures `data/` and `data/uploads/` exist
-2. Runs `pnpm db:migrate`
-3. Starts the Next.js server
+2. Runs legacy data purge scripts (events, stream) when applicable
+3. Starts the Next.js server (which applies pending migrations on startup)
 
 Migrations are idempotent and committed in `drizzle/`.
 
@@ -118,7 +118,7 @@ By default the web UI requires login (`AUTH_MODE=required`). To skip the login g
 
 - [ ] `SESSION_SECRET` set (production)
 - [ ] `data/` volume persisted
-- [ ] Migrations applied (automatic in Docker entrypoint)
+- [ ] Migrations applied (automatic on server start)
 - [ ] First admin bootstrapped
 - [ ] `AUTH_MODE` reviewed (`required` unless on a trusted network)
 - [ ] HTTPS configured

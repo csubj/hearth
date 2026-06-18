@@ -44,19 +44,15 @@ openssl rand -base64 32
 
 Add the generated value to `.env` as `SESSION_SECRET`. See [Configuration](../operations/configuration.md) for all environment variables.
 
-### 3. Initialize the database
+### 3. Start the dev server
+
+Migrations run automatically on startup. Start the app:
 
 ```bash
-pnpm db:migrate
+pnpm dev
 ```
 
-Or:
-
-```bash
-make db-migrate
-```
-
-This creates `data/hearth.db` (gitignored) and applies all Drizzle migrations from `drizzle/`.
+This creates `data/hearth.db` (gitignored) and applies all Drizzle migrations from `drizzle/` on first boot.
 
 ### 4. Create the first admin
 

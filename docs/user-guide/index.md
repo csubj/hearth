@@ -7,9 +7,8 @@ hearth is organized around a **home page** that summarizes what needs attention,
 | Nav item | Route | Purpose |
 | -------- | ----- | ------- |
 | Home | `/` | Glanceable summary across all features |
-| Stream | `/stream` | Full list + quick capture |
 | Restaurants | `/restaurants` | Wishlist and visit history |
-| Projects | `/projects` | House projects by status |
+| Projects | `/projects` | House projects — notes, costs, files |
 | Metrics | `/metrics` | Named metrics with dated entries and charts |
 | Inventory | `/inventory` | Searchable household items, manuals, and photos |
 | Notifications | `/notifications` | Activity feed and @-mentions |
@@ -23,9 +22,8 @@ The landing page aggregates recent activity from each area:
 
 | Section | What surfaces |
 | ------- | ------------- |
-| Stream | Pinned items and recent open notes |
+| Projects | Quick capture + high-priority / in-progress projects |
 | Restaurants | A few "want to try" suggestions |
-| Projects | Items in progress or recently touched |
 | Metrics | Latest entry per metric |
 | Inventory | Recently added or updated items |
 | Since last visit | Notifications since you last opened hearth |
@@ -48,22 +46,21 @@ Adding something should feel like writing on a sticky note:
 
 ## Feature guides
 
-- [Stream](stream.md) — notes, reminders, and thoughts
 - [Restaurants](restaurants.md) — places to try and visit reviews
 - [Projects](projects.md) — house projects from idea to done
 - [Metrics](metrics.md) — recurring measurements and charts
 - [Inventory](inventory.md) — searchable household items, manuals, and photos
 - [Notifications & @-mentions](notifications-and-mentions.md) — activity feed
-- [Attachments](attachments.md) — photos on notes and entries
+- [Attachments](attachments.md) — photos and documents
 - [Your account](account.md) — password and settings
 
 ## Tips for households
 
-!!! tip "Start with the stream"
-    If something doesn't fit a specialized list yet, put it in the stream. You can always organize later.
+!!! tip "Start with Projects quick capture"
+    If something doesn't fit a specialized list yet, add a project with a quick note. You can add tags, links, and costs later.
 
 !!! tip "Use @-mentions lightly"
     `@username` is a nudge, not an assignment system. Mention someone when you want them to notice something.
 
-!!! tip "Pin sparingly"
-    Pinned stream items surface on the home page. Reserve pins for things that genuinely need household attention now.
+!!! tip "Set priority sparingly"
+    High-priority projects surface on the home page. Reserve priority for things that genuinely need household attention now.

@@ -21,6 +21,6 @@ docker compose exec -T \
 echo "==> Running in-container verification"
 docker compose exec -T \
   -e HEARTH_BOOTSTRAP_USERNAME="$SMOKE_USERNAME" \
-  app tsx scripts/smoke-verify.ts
+  app ./node_modules/.bin/tsx scripts/smoke-verify.ts
 
 echo "==> Smoke test passed"

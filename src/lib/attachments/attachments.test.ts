@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import { attachments, restaurants } from "@/db/schema";
+import { attachments, projects, restaurants } from "@/db/schema";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser, loginAs } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
@@ -48,6 +48,25 @@ async function createRestaurant(userId: string): Promise<string> {
     id,
     name: "Test Restaurant",
     status: "want_to_try",
+    createdByUserId: userId,
+    updatedByUserId: userId,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return id;
+}
+
+async function createProject(userId: string): Promise<string> {
+  const id = crypto.randomUUID();
+  const now = new Date();
+  await getDb().insert(projects).values({
+    id,
+    title: "Test Project",
+    notes: null,
+    status: "idea",
+    priority: null,
+    targetWhen: null,
+    budgetCents: null,
     createdByUserId: userId,
     updatedByUserId: userId,
     createdAt: now,
@@ -503,5 +522,57 @@ describe("attachments API routes", () => {
 
     expect(response.status).toBe(403);
     expect(await getAttachmentById(upload.attachment.id)).toBeDefined();
+  });
+
+  it("POST /api/attachments allows PDF on project", async () => {
+    const user = await createTestUser();
+    const sessionId = await loginAs(user.id);
+    mockSession(sessionId);
+    const projectId = await createProject(user.id);
+
+    const formData = new FormData();
+    formData.set("entityType", "project");
+    formData.set("entityId", projectId);
+    formData.set(
+      "file",
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d])], "quote.pdf", {
+        type: "application/pdf",
+      }),
+    );
+
+    const response = await POST(
+      new Request("http://localhost/api/attachments", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    expect(response.status).toBe(200);
+  });
+
+  it("POST /api/attachments rejects PDF on restaurant", async () => {
+    const user = await createTestUser();
+    const sessionId = await loginAs(user.id);
+    mockSession(sessionId);
+    const restaurantId = await createRestaurant(user.id);
+
+    const formData = new FormData();
+    formData.set("entityType", "restaurant");
+    formData.set("entityId", restaurantId);
+    formData.set(
+      "file",
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d])], "menu.pdf", {
+        type: "application/pdf",
+      }),
+    );
+
+    const response = await POST(
+      new Request("http://localhost/api/attachments", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+
+    expect(response.status).toBe(415);
   });
 });

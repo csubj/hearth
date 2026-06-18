@@ -28,6 +28,9 @@ COPY src/db ./src/db
 COPY src/lib/auth ./src/lib/auth
 COPY scripts/smoke-verify.ts ./scripts/smoke-verify.ts
 COPY scripts/auth-bootstrap.ts ./scripts/auth-bootstrap.ts
+COPY scripts/purge-events.ts ./scripts/purge-events.ts
+COPY scripts/purge-stream.ts ./scripts/purge-stream.ts
+COPY src/lib/attachments ./src/lib/attachments
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/public ./public
 COPY --from=build /app/.next/standalone ./

@@ -1,4 +1,3 @@
-export * from "./stream";
 export * from "./restaurants";
 export * from "./projects";
 export * from "./metrics";

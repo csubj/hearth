@@ -1,22 +1,24 @@
 # Projects
 
-A list of things to fix, build, or improve around the home. Projects can linger — the goal is visibility, not velocity.
+The household notebook for house work: notes, tags, links, component costs, and files in one place. Quick capture on Home and `/projects` replaces the old Stream feature.
 
 ## Browsing projects
 
-Go to **Projects** (`/projects`). The page leads with your existing projects grouped by status, so you see what's underway at a glance. Adding a project is a compact **New** button in the header.
+Go to **Projects** (`/projects`). Projects are grouped by status (In progress, Ideas, Done). Use **search**, **tag filters**, and **sort** (Updated, Priority, Estimated cost) to find what you need.
 
-## Adding a project
+## Quick capture
 
-1. Use the **New project** button in the header
-2. Give it a **title**
-3. Optionally add a **description** — materials, links, steps, or context
+Use the **Quick capture** box on Home or `/projects`:
 
-**Examples:**
+1. Optionally enter a **title**
+2. Add **notes** — markdown supported; first line becomes the title if you skip one
+3. Click **Add project**
 
-- "fix the back gate latch"
-- "paint the guest room"
-- "organize the garage shelves"
+This is the fastest way to jot something down for the household.
+
+## Full create
+
+Use **New project** in the header for the same flow with redirect to the detail page after save.
 
 ## Statuses
 
@@ -26,25 +28,41 @@ Go to **Projects** (`/projects`). The page leads with your existing projects gro
 | In progress | Actively working on it |
 | Done | Finished |
 
-Update status from the project detail page (`/projects/[id]`). No formal project plan is required — notes and description are freeform.
+Update status from the project detail page (`/projects/[id]`).
 
 ## Detail page
 
-Each project has a detail view with:
+Each project includes:
 
-- Title and description
-- Current status
-- Edit and status controls
-- Attached photos (before/after, reference images)
+- **Title** and **priority** (1–5, optional)
+- **Notes** — auto-saving markdown with edit/preview tabs
+- **Tags** and **links** (comma-separated tags; labeled URLs)
+- **Budget** — unified list of items, labor, fees, and other costs with estimated, acquired, and remaining totals
+- **Photos & documents** — images and PDFs (manuals, quotes)
+
+## Budget & components
+
+Each project has a **Budget** section for everything the project needs to cost out:
+
+| Kind | Use for |
+| ---- | ------- |
+| Item | Materials, parts, supplies you buy |
+| Labor | Work or installation |
+| Fee | Permits, delivery, service charges |
+| Other | Anything else |
+
+For each line you can set **quantity**, **unit cost**, a **purchase link**, and **how to acquire / notes**. The header shows **Estimated**, **Acquired**, and **Remaining** totals (and compares to an optional project budget).
+
+Mark a line as acquired when it's done — the label adapts to the kind (**Owned** for items, **Paid** for fees, **Done** for labor/other). Click **Details** on a row to edit metadata or reorder items.
 
 ## Home page
 
-The home projects section shows items **in progress** or **recently updated**. Stalled projects in "idea" status won't clutter the summary unless recently touched.
-
-## Photos
-
-Attach progress photos — before/after shots, reference images, or material lists. See [Attachments](attachments.md).
+The home projects section shows high-priority and in-progress projects, plus quick capture.
 
 ## @-mentions
 
-@-mention someone in the project description to loop them in. See [Notifications & @-mentions](notifications-and-mentions.md).
+@-mention someone in project notes to loop them in. Mentions reconcile when you leave the notes field. See [Notifications & @-mentions](notifications-and-mentions.md).
+
+## Attachments
+
+Projects accept photos and PDF documents. See [Attachments](attachments.md).

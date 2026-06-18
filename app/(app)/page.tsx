@@ -3,7 +3,6 @@ import { InventorySection } from "@/components/home/InventorySection";
 import { MetricsSection } from "@/components/home/MetricsSection";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
 import { RestaurantsSection } from "@/components/home/RestaurantsSection";
-import { StreamSection } from "@/components/home/StreamSection";
 
 export default function HomePage() {
   return (
@@ -14,9 +13,8 @@ export default function HomePage() {
       </header>
       <SinceLastVisitSection />
       <div className="grid gap-6 md:grid-cols-2">
-        <StreamSection />
-        <RestaurantsSection />
         <ProjectsSection />
+        <RestaurantsSection />
         <MetricsSection />
         <InventorySection />
       </div>

@@ -44,9 +44,9 @@ data/
 
 | entity_type     | Images | Documents (PDF) | Notes                                |
 | --------------- | ------ | --------------- | ------------------------------------ |
-| `stream_entry`  | Yes    | No              | Photos only                          |
+| `stream_entry`  | _(removed)_ | — | Merged into Projects |
 | `restaurant`    | Yes    | No              | Menu pics, visit photos              |
-| `project`       | Yes    | No              | Before/after, progress photos        |
+| `project`       | Yes    | Yes             | Notes attachments, progress photos, PDFs |
 | `metric_entry`  | Yes    | No              | Scale reading, condition photo       |
 | `inventory_item`| Yes    | Yes             | Photos + manuals, receipts, warranties |
 
@@ -200,7 +200,7 @@ attachments:
   max_per_entity: 10
   mime_allowlist_images: [image/jpeg, image/png, image/webp, image/gif]
   mime_allowlist_documents: [application/pdf]
-  documents_allowed_for: [inventory_item]
+  documents_allowed_for: [inventory_item, project]
 ```
 
 ---

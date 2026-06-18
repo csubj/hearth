@@ -18,7 +18,7 @@ Every `/api/v1/*` request requires a **bearer token**, regardless of the instanc
 Send the token in the `Authorization` header:
 
 ```bash
-curl https://your-hearth.example.com/api/v1/stream \
+curl https://your-hearth.example.com/api/v1/projects \
   -H "Authorization: Bearer hearth_pat_xxxxxxxxxxxxxxxxxxxx"
 ```
 
@@ -35,11 +35,12 @@ The API exposes the same entities as the web app. Each resource supports standar
 
 | Resource | Base path | Notes |
 | -------- | --------- | ----- |
-| Stream | `/api/v1/stream` | Notes with pin / done / rough-when |
 | Restaurants | `/api/v1/restaurants` | Wishlist + visit status, ratings |
-| Projects | `/api/v1/projects` | Idea / in progress / done |
+| Projects | `/api/v1/projects` | Notes, priority, status, tags (via UI), budget rollups on GET |
+| Project components | `/api/v1/projects/{id}/components` | Budget line items (items, labor, fees) |
 | Metrics | `/api/v1/metrics` | Named metrics (see entries below) |
 | Metric entries | `/api/v1/metrics/{id}/entries` | Dated values for a metric |
+| Project components | `/api/v1/projects/{id}/components` | Budget line items for a project |
 | Inventory | `/api/v1/inventory` | Household objects/appliances/electronics |
 
 ### Managed types
@@ -65,10 +66,10 @@ Export returns a structured file (items, links, tags) suitable for backup or mig
 
 ## Example requests
 
-List the stream:
+List projects:
 
 ```bash
-curl https://your-hearth.example.com/api/v1/stream \
+curl https://your-hearth.example.com/api/v1/projects \
   -H "Authorization: Bearer $HEARTH_TOKEN"
 ```
 
@@ -88,6 +89,29 @@ curl -X POST https://your-hearth.example.com/api/v1/inventory \
   -H "Authorization: Bearer $HEARTH_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{ "name": "Washer", "model": "WF45", "serial": "ABC123", "location": "basement" }'
+```
+
+Get a project with budget rollups (`estimatedCostCents`, `acquiredCostCents`, `remainingCostCents`):
+
+```bash
+curl https://your-hearth.example.com/api/v1/projects/$PROJECT_ID \
+  -H "Authorization: Bearer $HEARTH_TOKEN"
+```
+
+Add a budget component:
+
+```bash
+curl -X POST https://your-hearth.example.com/api/v1/projects/$PROJECT_ID/components \
+  -H "Authorization: Bearer $HEARTH_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Gate latch",
+    "kind": "item",
+    "quantity": 1,
+    "unitCostCents": 2499,
+    "purchaseUrl": "https://example.com/latch",
+    "note": "Pick up at hardware store"
+  }'
 ```
 
 ## Pagination
@@ -163,7 +187,7 @@ Upload a photo or document attached to an existing entity.
 | Field | Type | Required | Description |
 | ----- | ---- | -------- | ----------- |
 | `file` | File | Yes | Image (all entities) or document (inventory only) — see [Attachments](../user-guide/attachments.md) |
-| `entityType` | string | Yes | `stream_entry`, `restaurant`, `project`, `metric_entry`, or `inventory_item` |
+| `entityType` | string | Yes | `restaurant`, `project`, `metric_entry`, or `inventory_item` |
 | `entityId` | string | Yes | UUID of the parent entity |
 
 ```json

@@ -2,11 +2,28 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import {
+  ALLOWED_DOCUMENT_MIME_TYPES,
+  ALLOWED_IMAGE_MIME_TYPES,
+  allowsDocuments,
+} from "@/lib/attachments/config";
 import type { AttachmentEntityType } from "@/lib/attachments/entity";
 import type { AttachmentSummary } from "@/lib/attachments/queries";
 
 const MAX_ATTACHMENTS_PER_ENTITY = 10;
+
+function isPdf(mimeType: string): boolean {
+  return mimeType === "application/pdf";
+}
+
+function acceptAttribute(entityType: AttachmentEntityType): string {
+  const imageAccept = ALLOWED_IMAGE_MIME_TYPES.join(",");
+  if (!allowsDocuments(entityType)) {
+    return imageAccept;
+  }
+  return [...ALLOWED_IMAGE_MIME_TYPES, ...ALLOWED_DOCUMENT_MIME_TYPES, ".pdf"].join(",");
+}
 
 export function AttachmentsPanel({
   entityType,
@@ -24,6 +41,8 @@ export function AttachmentsPanel({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
 
+  const documentsAllowed = allowsDocuments(entityType);
+  const accept = useMemo(() => acceptAttribute(entityType), [entityType]);
   const lightboxItem = items.find((item) => item.id === lightboxId) ?? null;
   const atLimit = items.length >= MAX_ATTACHMENTS_PER_ENTITY;
 
@@ -103,20 +122,30 @@ export function AttachmentsPanel({
     }
   }
 
+  const heading = documentsAllowed ? "Photos & documents" : "Photos";
+  const emptyLabel = documentsAllowed ? "No files yet." : "No photos yet.";
+  const addLabel = uploading
+    ? "Uploading…"
+    : atLimit
+      ? "File limit reached"
+      : documentsAllowed
+        ? "Add file"
+        : "Add photo";
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-text">Photos</h3>
+        <h3 className="text-sm font-medium text-text">{heading}</h3>
         <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-accent hover:text-accent/90">
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept={accept}
             className="sr-only"
             disabled={uploading || atLimit}
             onChange={handleUpload}
           />
           <span className="rounded-md border border-border px-2 py-1 transition-colors hover:bg-accent-soft disabled:opacity-50">
-            {uploading ? "Uploading…" : atLimit ? "Photo limit reached" : "Add photo"}
+            {addLabel}
           </span>
         </label>
       </div>
@@ -128,7 +157,7 @@ export function AttachmentsPanel({
       ) : null}
 
       {items.length === 0 ? (
-        <p className="text-sm text-text-muted">No photos yet.</p>
+        <p className="text-sm text-text-muted">{emptyLabel}</p>
       ) : (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
           {items.map((item) => (
@@ -136,20 +165,34 @@ export function AttachmentsPanel({
               key={item.id}
               className="group relative aspect-square overflow-hidden rounded-md border border-border bg-accent-soft/30"
             >
-              <button
-                type="button"
-                className="h-full w-full focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-                onClick={() => setLightboxId(item.id)}
-                aria-label={`View ${item.filename}`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.url}
-                  alt={item.filename}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              </button>
+              {isPdf(item.mimeType) ? (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 text-center text-xs text-text-muted"
+                >
+                  <span aria-hidden className="text-2xl">
+                    PDF
+                  </span>
+                  <span className="line-clamp-2">{item.filename}</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  className="h-full w-full focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                  onClick={() => setLightboxId(item.id)}
+                  aria-label={`View ${item.filename}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.url}
+                    alt={item.filename}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => handleDelete(item.id)}
@@ -176,7 +219,7 @@ export function AttachmentsPanel({
                 Close
               </Dialog.Close>
             </div>
-            {lightboxItem ? (
+            {lightboxItem && !isPdf(lightboxItem.mimeType) ? (
               <div className="relative flex max-h-[calc(90vh-3rem)] items-center justify-center bg-black/5 p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img

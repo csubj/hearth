@@ -28,13 +28,12 @@ export function ProjectCreateForm({ users = [] }: { users?: MentionUser[] }) {
         <input
           id="project-title"
           name="title"
-          required
-          placeholder="What are we working on?"
+          placeholder="What are we working on? (optional if notes provided)"
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
         />
       </div>
       <MentionTextarea
-        name="description"
+        name="notes"
         users={users}
         rows={2}
         placeholder="Notes, materials, links… (optional)"

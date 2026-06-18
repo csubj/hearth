@@ -116,6 +116,6 @@ All authenticated users share the same data. There are no private notes or per-u
 | Bootstrap says users already exist | An admin was already created; log in or reset via CLI/DB |
 | Can't reach `/admin/users` | You need the admin role; ask the instance admin |
 | Login fails | Check username/password; account may be disabled |
-| Blank page after login | Check browser console; verify `pnpm db:migrate` ran |
+| Blank page after login | Check browser console; restart the app (migrations run on startup) |
 
 More help: [Troubleshooting](../operations/troubleshooting.md)

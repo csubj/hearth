@@ -17,7 +17,7 @@ Defined in `package.json`:
 | `pnpm format` | Prettier write |
 | `pnpm run format:check` | Prettier check (CI) |
 | `pnpm typecheck` | TypeScript (`tsc --noEmit`) |
-| `pnpm db:migrate` | Apply Drizzle migrations |
+| `pnpm db:migrate` | Apply Drizzle migrations manually (optional; app migrates on startup) |
 | `pnpm db:generate` | Generate migration from schema changes |
 | `pnpm run auth:bootstrap` | Create first admin (once per instance) |
 | `pnpm smoke:docker` | Docker smoke test |
@@ -84,11 +84,22 @@ End-to-end Docker verification:
 1. Builds and starts compose stack
 2. Bootstraps smoke-test admin
 3. Checks `/api/health`
-4. Verifies authenticated stream access
+4. Verifies authenticated `/projects` access and a seeded project appears
 
 ```bash
 pnpm smoke:docker
 ```
+
+## Data purge scripts (upgrades)
+
+Run before migrations when removing legacy features:
+
+| Script | Purpose |
+| ------ | ------- |
+| `tsx scripts/purge-events.ts` | Remove events table data, attachments, mentions, notifications |
+| `tsx scripts/purge-stream.ts` | Remove stream entries, attachments, mentions, notifications |
+
+Docker entrypoint runs both automatically before the server starts (migrations run when the app boots).
 
 ## Git hooks (lefthook)
 

@@ -50,6 +50,27 @@
       "when": 1781804407491,
       "tag": "0006_fat_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1781890800000,
+      "tag": "0007_projects_v2_drop_stream",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1781977200000,
+      "tag": "0008_project_component_budgeting",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1782063600000,
+      "tag": "0009_metric_reminder_interval",
+      "breakpoints": true
     }
   ]
 }

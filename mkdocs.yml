@@ -1,5 +1,5 @@
 site_name: hearth
-site_description: Household coordination — a shared landing page for stream notes, restaurants, projects, metrics, inventory, and events.
+site_description: Household coordination — projects, restaurants, metrics, inventory, and more.
 site_url: https://csubj.github.io/hearth/
 repo_url: https://github.com/csubj/hearth
 repo_name: csubj/hearth
@@ -81,11 +81,9 @@ nav:
       - getting-started/first-use.md
   - User Guide:
       - user-guide/index.md
-      - Stream: user-guide/stream.md
       - Restaurants: user-guide/restaurants.md
       - Projects: user-guide/projects.md
       - Metrics: user-guide/metrics.md
-      - Events: user-guide/events.md
       - Inventory: user-guide/inventory.md
       - Notifications & Mentions: user-guide/notifications-and-mentions.md
       - Attachments: user-guide/attachments.md

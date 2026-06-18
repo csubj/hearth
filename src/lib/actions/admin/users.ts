@@ -68,7 +68,7 @@ export async function createUser(
   await emitHouseholdActivity({
     type: "user.admin_action",
     actorId: admin.id,
-    entityType: "stream_entry",
+    entityType: "project",
     entityId: userId,
     summary: `${displayName(admin)} created user @${username}`,
   });
@@ -113,7 +113,7 @@ export async function resetUserPassword(
   await emitHouseholdActivity({
     type: "user.admin_action",
     actorId: admin.id,
-    entityType: "stream_entry",
+    entityType: "project",
     entityId: userId,
     summary: `${displayName(admin)} reset password for @${updated[0]!.username}`,
   });
@@ -164,7 +164,7 @@ export async function disableUser(
   await emitHouseholdActivity({
     type: "user.admin_action",
     actorId: admin.id,
-    entityType: "stream_entry",
+    entityType: "project",
     entityId: userId,
     summary: `${displayName(admin)} disabled user @${targetUsername}`,
   });
@@ -227,7 +227,7 @@ export async function promoteToAdmin(
   await emitHouseholdActivity({
     type: "user.admin_action",
     actorId: admin.id,
-    entityType: "stream_entry",
+    entityType: "project",
     entityId: userId,
     summary: `${displayName(admin)} promoted @${target.username} to admin`,
   });
@@ -273,7 +273,7 @@ export async function demoteFromAdmin(
   await emitHouseholdActivity({
     type: "user.admin_action",
     actorId: admin.id,
-    entityType: "stream_entry",
+    entityType: "project",
     entityId: userId,
     summary: `${displayName(admin)} demoted @${targetUsername} to member`,
   });

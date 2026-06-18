@@ -2,11 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { displayName, touchLastSeen, validateRequest } from "@/lib/auth/session";
+import { processMetricReminders } from "@/lib/metrics/reminders";
 import { getPreviousLastSeenAt, getUnreadNotificationCount } from "@/lib/notifications/queries";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/stream", label: "Stream" },
   { href: "/restaurants", label: "Restaurants" },
   { href: "/projects", label: "Projects" },
   { href: "/metrics", label: "Metrics" },
@@ -21,6 +21,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   await getPreviousLastSeenAt(user.id);
   await touchLastSeen(user.id);
+
+  try {
+    await processMetricReminders();
+  } catch {
+    // Reminder processing should not block page render.
+  }
 
   let unreadCount = 0;
   try {

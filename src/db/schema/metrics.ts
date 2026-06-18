@@ -1,10 +1,18 @@
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { users } from "./users";
 
+export const metricReminderUnits = ["day", "week", "month", "year"] as const;
+export type MetricReminderUnit = (typeof metricReminderUnits)[number];
+
 export const metrics = sqliteTable("metrics", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   unit: text("unit"),
+  reminderIntervalCount: integer("reminder_interval_count"),
+  reminderIntervalUnit: text("reminder_interval_unit", {
+    enum: metricReminderUnits,
+  }),
+  lastReminderAt: integer("last_reminder_at", { mode: "timestamp_ms" }),
   createdByUserId: text("created_by_user_id")
     .notNull()
     .references(() => users.id),

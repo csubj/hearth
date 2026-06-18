@@ -3,20 +3,82 @@ import { z } from "zod";
 import { getDb } from "@/db";
 import { metricEntries, metrics, users, type Metric, type MetricEntry } from "@/db/schema";
 import { requireUser } from "@/lib/auth/session";
+import {
+  DEFAULT_REMINDER_INTERVAL_COUNT,
+  DEFAULT_REMINDER_INTERVAL_UNIT,
+  isMetricStale,
+  metricReminderUnitSchema,
+} from "@/lib/metrics/reminder-interval";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
-export const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
+const reminderIntervalCountSchema = z.coerce
+  .number()
+  .int()
+  .min(1, "Reminder interval must be at least 1")
+  .max(999, "Reminder interval is too large")
+  .optional()
+  .nullable();
 
-export const createMetricSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(200),
-  unit: z.string().trim().max(50).optional(),
-});
+export const createMetricSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name is required").max(200),
+    unit: z.string().trim().max(50).optional(),
+    reminderIntervalCount: reminderIntervalCountSchema,
+    reminderIntervalUnit: metricReminderUnitSchema.optional().nullable(),
+    remindersEnabled: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const enabled = data.remindersEnabled ?? true;
+    if (!enabled) {
+      return;
+    }
+    if (data.reminderIntervalCount == null || data.reminderIntervalCount < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Reminder interval is required when reminders are enabled",
+        path: ["reminderIntervalCount"],
+      });
+    }
+    if (!data.reminderIntervalUnit) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Reminder unit is required when reminders are enabled",
+        path: ["reminderIntervalUnit"],
+      });
+    }
+  });
 
-export const updateMetricSchema = z.object({
-  metricId: z.string().uuid(),
-  name: z.string().trim().min(1, "Name is required").max(200),
-  unit: z.string().trim().max(50).optional(),
-});
+export const updateMetricSchema = z
+  .object({
+    metricId: z.string().uuid(),
+    name: z.string().trim().min(1, "Name is required").max(200),
+    unit: z.string().trim().max(50).optional(),
+    reminderIntervalCount: reminderIntervalCountSchema,
+    reminderIntervalUnit: metricReminderUnitSchema.optional().nullable(),
+    remindersEnabled: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const enabled = data.remindersEnabled;
+    if (enabled === false) {
+      return;
+    }
+    if (enabled === true) {
+      if (data.reminderIntervalCount == null || data.reminderIntervalCount < 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Reminder interval is required when reminders are enabled",
+          path: ["reminderIntervalCount"],
+        });
+      }
+      if (!data.reminderIntervalUnit) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Reminder unit is required when reminders are enabled",
+          path: ["reminderIntervalUnit"],
+        });
+      }
+    }
+  });
 
 export const addEntrySchema = z.object({
   metricId: z.string().uuid(),
@@ -37,15 +99,7 @@ export type MetricListItem = Metric & {
 
 export type MetricHomeItem = MetricListItem;
 
-export function isMetricStale(
-  latestRecordedAt: Date | null | undefined,
-  now = Date.now(),
-): boolean {
-  if (!latestRecordedAt) {
-    return true;
-  }
-  return now - latestRecordedAt.getTime() > STALE_THRESHOLD_MS;
-}
+export { isMetricStale } from "@/lib/metrics/reminder-interval";
 
 export function parseRecordedAt(raw: string | null): Date | undefined {
   if (!raw?.trim()) {
@@ -56,6 +110,70 @@ export function parseRecordedAt(raw: string | null): Date | undefined {
     return undefined;
   }
   return parsed;
+}
+
+export function parseRemindersEnabled(raw: FormDataEntryValue | null): boolean {
+  return raw === "on" || raw === "true" || raw === "1";
+}
+
+export function parseReminderIntervalFromForm(formData: FormData): {
+  reminderIntervalCount: number | null;
+  reminderIntervalUnit: z.infer<typeof metricReminderUnitSchema> | null;
+  remindersEnabled: boolean;
+} {
+  const remindersEnabled = parseRemindersEnabled(formData.get("remindersEnabled"));
+  if (!remindersEnabled) {
+    return {
+      remindersEnabled: false,
+      reminderIntervalCount: null,
+      reminderIntervalUnit: null,
+    };
+  }
+
+  const countRaw = String(formData.get("reminderIntervalCount") ?? "").trim();
+  const unitRaw = String(formData.get("reminderIntervalUnit") ?? "").trim();
+
+  return {
+    remindersEnabled: true,
+    reminderIntervalCount: countRaw ? Number(countRaw) : DEFAULT_REMINDER_INTERVAL_COUNT,
+    reminderIntervalUnit: unitRaw
+      ? metricReminderUnitSchema.parse(unitRaw)
+      : DEFAULT_REMINDER_INTERVAL_UNIT,
+  };
+}
+
+function resolveReminderFields(input: {
+  remindersEnabled?: boolean;
+  reminderIntervalCount?: number | null;
+  reminderIntervalUnit?: z.infer<typeof metricReminderUnitSchema> | null;
+}): Pick<Metric, "reminderIntervalCount" | "reminderIntervalUnit"> {
+  if (input.remindersEnabled === false) {
+    return { reminderIntervalCount: null, reminderIntervalUnit: null };
+  }
+
+  if (
+    input.remindersEnabled !== true &&
+    input.reminderIntervalCount === null &&
+    input.reminderIntervalUnit === null
+  ) {
+    return { reminderIntervalCount: null, reminderIntervalUnit: null };
+  }
+
+  if (
+    input.remindersEnabled === true ||
+    input.reminderIntervalCount != null ||
+    input.reminderIntervalUnit != null
+  ) {
+    return {
+      reminderIntervalCount: input.reminderIntervalCount ?? DEFAULT_REMINDER_INTERVAL_COUNT,
+      reminderIntervalUnit: input.reminderIntervalUnit ?? DEFAULT_REMINDER_INTERVAL_UNIT,
+    };
+  }
+
+  return {
+    reminderIntervalCount: DEFAULT_REMINDER_INTERVAL_COUNT,
+    reminderIntervalUnit: DEFAULT_REMINDER_INTERVAL_UNIT,
+  };
 }
 
 function formatMetricValue(value: string, unit: string | null): string {
@@ -90,7 +208,7 @@ function toMetricListItem(metric: Metric, latestEntry: MetricEntry | null): Metr
   return {
     ...metric,
     latestEntry,
-    stale: isMetricStale(latestEntry?.recordedAt ?? null),
+    stale: isMetricStale(metric, latestEntry),
   };
 }
 
@@ -144,10 +262,13 @@ export async function createMetricRecord(
   input: z.infer<typeof createMetricSchema>,
 ): Promise<Metric> {
   const now = new Date();
+  const reminderFields = resolveReminderFields(input);
   const row: Metric = {
     id: crypto.randomUUID(),
     name: input.name,
     unit: input.unit?.length ? input.unit : null,
+    ...reminderFields,
+    lastReminderAt: null,
     createdByUserId: userId,
     createdAt: now,
     updatedAt: now,
@@ -172,11 +293,20 @@ export async function updateMetricRecord(
   }
 
   const now = new Date();
+  const reminderFields =
+    input.remindersEnabled === undefined
+      ? {
+          reminderIntervalCount: existing.reminderIntervalCount,
+          reminderIntervalUnit: existing.reminderIntervalUnit,
+        }
+      : resolveReminderFields(input);
+
   const [updated] = await db
     .update(metrics)
     .set({
       name: input.name,
       unit: input.unit?.length ? input.unit : null,
+      ...reminderFields,
       updatedAt: now,
     })
     .where(eq(metrics.id, input.metricId))
@@ -219,7 +349,10 @@ export async function addEntryRecord(
   };
 
   await db.insert(metricEntries).values(entry);
-  await db.update(metrics).set({ updatedAt: now }).where(eq(metrics.id, input.metricId));
+  await db
+    .update(metrics)
+    .set({ updatedAt: now, lastReminderAt: null })
+    .where(eq(metrics.id, input.metricId));
 
   await emitHouseholdActivity({
     type: "metric.entry_added",
@@ -249,6 +382,9 @@ export function ensureMetricTablesForTests(): void {
       id text PRIMARY KEY NOT NULL,
       name text NOT NULL,
       unit text,
+      reminder_interval_count integer,
+      reminder_interval_unit text,
+      last_reminder_at integer,
       created_by_user_id text NOT NULL,
       created_at integer NOT NULL,
       updated_at integer NOT NULL,

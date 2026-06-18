@@ -41,8 +41,6 @@ class AttachmentLimitError extends Error {
 
 function notificationTypeForEntity(entityType: AttachmentEntityType): string {
   switch (entityType) {
-    case "stream_entry":
-      return "stream.updated";
     case "restaurant":
       return "restaurant.updated";
     case "project":

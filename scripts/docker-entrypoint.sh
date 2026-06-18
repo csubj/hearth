@@ -4,7 +4,7 @@ set -e
 mkdir -p /app/data/uploads
 
 cd /app
-tsx scripts/purge-events.ts
-pnpm db:migrate
+./node_modules/.bin/tsx scripts/purge-events.ts
+./node_modules/.bin/tsx scripts/purge-stream.ts
 
 exec node server.js

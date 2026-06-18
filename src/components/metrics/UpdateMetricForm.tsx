@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { updateMetric, type MetricActionState } from "@/lib/actions/metrics-mutations";
+import { ReminderIntervalFields } from "@/components/metrics/ReminderIntervalFields";
 import type { Metric } from "@/db/schema";
 
 export function UpdateMetricForm({ metric }: { metric: Metric }) {
@@ -38,6 +39,7 @@ export function UpdateMetricForm({ metric }: { metric: Metric }) {
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
         />
       </div>
+      <ReminderIntervalFields metric={metric} idPrefix="update-metric" />
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">
           {state.error}

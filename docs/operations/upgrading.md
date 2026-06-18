@@ -9,7 +9,7 @@ Upgrade a running hearth instance to a newer version.
 3. **Restart** the container or process
 4. **Verify** migrations ran and the app is healthy
 
-Migrations run automatically on Docker container start. For manual Node deploys, run `pnpm db:migrate` before starting.
+Migrations run automatically when the app starts (dev, `pnpm start`, and Docker). No manual migration step is required for normal upgrades.
 
 ## Docker upgrade
 
@@ -47,7 +47,6 @@ image: ghcr.io/<owner>/hearth:sha-abc1234
 ```bash
 git pull origin main
 pnpm install
-pnpm db:migrate
 pnpm build
 pnpm start
 ```
@@ -61,8 +60,18 @@ curl https://your-hearth.example.com/api/health
 Log in and spot-check:
 
 - Home page loads
-- Stream note can be added
-- Photos still display (upload path unchanged)
+- Project quick capture works on `/projects`
+- Photos and PDFs still display on project/inventory detail pages
+
+### Upgrading past Stream removal
+
+If your instance still has Stream data, run **before** starting the upgraded app:
+
+```bash
+tsx scripts/purge-stream.ts
+```
+
+Docker runs both purge scripts automatically on container start (before the server applies migrations).
 
 ## Rollback
 

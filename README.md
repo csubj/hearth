@@ -1,6 +1,6 @@
 # hearth
 
-Household coordination — a shared landing page for stream notes, restaurants, projects, metrics, and inventory. One deployment serves one household.
+Household coordination — projects, restaurants, metrics, and inventory. One deployment serves one household.
 
 ## Design docs
 
@@ -28,10 +28,9 @@ Generate a session secret and add it to `.env`:
 openssl rand -base64 32
 ```
 
-Apply migrations and create the first admin (once per instance):
+Create the first admin (once per instance). Migrations run automatically when the dev or production server starts.
 
 ```bash
-pnpm db:migrate
 pnpm run auth:bootstrap
 ```
 
@@ -57,7 +56,7 @@ Database and uploads live in `./data/` (gitignored).
 | `pnpm format`             | Prettier write                         |
 | `pnpm format:check`       | Prettier check                         |
 | `pnpm typecheck`          | TypeScript                             |
-| `pnpm db:migrate`         | Apply Drizzle migrations               |
+| `pnpm db:migrate`         | Apply Drizzle migrations manually (optional; app migrates on startup) |
 | `pnpm db:generate`        | Generate migration from schema changes |
 | `pnpm run auth:bootstrap` | Create first admin user                |
 | `pnpm smoke:docker`       | Docker smoke test (see below)          |
@@ -94,13 +93,13 @@ This script:
 
 1. Builds and starts the stack (`docker compose up --build --wait`)
 2. Bootstraps a smoke-test admin (skipped if users already exist)
-3. Verifies `/api/health`, authenticated access to `/stream`, and that a stream note is visible
+3. Verifies `/api/health`, authenticated access to `/projects`, and that a project is visible
 
 For a manual end-to-end check in the browser:
 
 1. `docker compose up -d --build`
 2. `docker compose exec app pnpm run auth:bootstrap`
-3. Open http://localhost:3000 → sign in → add a stream note on `/stream`
+3. Open http://localhost:3000 → sign in → add a project from Home or `/projects`
 
 See [docs/design/09_deploy.md](docs/design/09_deploy.md) for backup, HTTPS, and hosting notes.
 

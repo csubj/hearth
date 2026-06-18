@@ -4,7 +4,6 @@ import { mentions, notifications, users } from "@/db/schema";
 import { parseMentions, type MentionCandidate } from "@/lib/mentions/parse";
 
 export type EntityType =
-  | "stream_entry"
   | "restaurant"
   | "project"
   | "metric"
@@ -28,7 +27,6 @@ export interface EmitMentionsInput {
 }
 
 const ENTITY_MENTION_LABEL: Record<EntityType, string> = {
-  stream_entry: "a stream note",
   restaurant: "a restaurant",
   project: "a project",
   metric: "a metric",
@@ -74,7 +72,7 @@ async function getActorDisplayName(actorId: string): Promise<string> {
 
 async function insertNotificationRow(input: {
   recipientUserId: string;
-  actorUserId: string;
+  actorUserId: string | null;
   type: string;
   entityType: EntityType;
   entityId: string;
@@ -179,5 +177,33 @@ export async function emitMentions(input: EmitMentionsInput): Promise<void> {
     );
   } catch (error) {
     console.error("[notifications] emitMentions failed", error);
+  }
+}
+
+export interface EmitMetricReminderInput {
+  metricId: string;
+  metricName: string;
+  intervalLabel: string;
+}
+
+export async function emitMetricReminder(input: EmitMetricReminderInput): Promise<void> {
+  try {
+    const recipients = await loadActiveUsers();
+    const summary = `${input.metricName} hasn't been logged in ${input.intervalLabel}`;
+
+    await Promise.all(
+      recipients.map((user) =>
+        insertNotificationRow({
+          recipientUserId: user.id,
+          actorUserId: null,
+          type: "metric.reminder",
+          entityType: "metric",
+          entityId: input.metricId,
+          summary,
+        }),
+      ),
+    );
+  } catch (error) {
+    console.error("[notifications] emitMetricReminder failed", error);
   }
 }

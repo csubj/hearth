@@ -149,6 +149,7 @@ All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 | Stream              | `/api/v1/stream`                  | list, CRUD        |
 | Restaurants         | `/api/v1/restaurants`             | list, CRUD        |
 | Projects            | `/api/v1/projects`                | list, CRUD        |
+| Project components  | `/api/v1/projects/{id}/components` | list, create, update, delete |
 | Metrics             | `/api/v1/metrics`                 | list, CRUD        |
 | Metric entries      | `/api/v1/metrics/{id}/entries`    | list, create, update, delete |
 | Inventory           | `/api/v1/inventory`               | list, CRUD, search |

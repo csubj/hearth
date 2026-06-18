@@ -8,6 +8,7 @@ import {
   createMetricRecord,
   createMetricSchema,
   parseRecordedAt,
+  parseReminderIntervalFromForm,
   updateMetricRecord,
   updateMetricSchema,
   type MetricActionState,
@@ -26,9 +27,11 @@ export async function createMetric(
   formData: FormData,
 ): Promise<MetricActionState> {
   const { user } = await requireUser();
+  const reminderFields = parseReminderIntervalFromForm(formData);
   const parsed = createMetricSchema.safeParse({
     name: formData.get("name"),
     unit: formData.get("unit") || undefined,
+    ...reminderFields,
   });
 
   if (!parsed.success) {
@@ -45,10 +48,12 @@ export async function updateMetric(
   formData: FormData,
 ): Promise<MetricActionState> {
   const { user } = await requireUser();
+  const reminderFields = parseReminderIntervalFromForm(formData);
   const parsed = updateMetricSchema.safeParse({
     metricId: formData.get("metricId"),
     name: formData.get("name"),
     unit: formData.get("unit") || undefined,
+    ...reminderFields,
   });
 
   if (!parsed.success) {

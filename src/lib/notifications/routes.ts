@@ -12,8 +12,6 @@ export async function getNotificationHref(
   }
 
   switch (entityType) {
-    case "stream_entry":
-      return `/stream#entry-${entityId}`;
     case "restaurant":
       return `/restaurants/${entityId}`;
     case "project":

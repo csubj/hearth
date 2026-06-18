@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { createMetric, type MetricActionState } from "@/lib/actions/metrics-mutations";
+import { ReminderIntervalFields } from "@/components/metrics/ReminderIntervalFields";
 
 export function CreateMetricForm() {
   const [state, formAction, pending] = useActionState<MetricActionState, FormData>(
@@ -36,6 +37,7 @@ export function CreateMetricForm() {
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
         />
       </div>
+      <ReminderIntervalFields idPrefix="create-metric" />
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">
           {state.error}

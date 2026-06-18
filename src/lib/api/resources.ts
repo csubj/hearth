@@ -3,16 +3,17 @@ import { getDb } from "@/db";
 import {
   metricEntries,
   metrics,
+  projectComponents,
   projects,
   restaurants,
-  streamEntries,
   type Metric,
   type MetricEntry,
   type Project,
+  type ProjectComponent,
   type Restaurant,
-  type StreamEntry,
 } from "@/db/schema";
 import type { AuthUser } from "@/lib/auth/lucia";
+import { componentRollups } from "@/lib/projects/rollups";
 import {
   addEntryRecord,
   createMetricRecord,
@@ -27,29 +28,15 @@ import type {
   createMetricEntrySchema,
   createMetricSchema,
   createProjectSchema,
+  createProjectComponentSchema,
   createRestaurantSchema,
-  createStreamEntrySchema,
   updateMetricEntrySchema,
   updateMetricSchema,
   updateProjectSchema,
+  updateProjectComponentSchema,
   updateRestaurantSchema,
-  updateStreamEntrySchema,
 } from "@/lib/api/schemas";
 import type { z } from "zod";
-
-export function serializeStreamEntry(row: StreamEntry) {
-  return {
-    id: row.id,
-    body: row.body,
-    isPinned: row.isPinned,
-    doneAt: toIso(row.doneAt),
-    roughWhen: row.roughWhen,
-    createdByUserId: row.createdByUserId,
-    updatedByUserId: row.updatedByUserId,
-    createdAt: toIso(row.createdAt)!,
-    updatedAt: toIso(row.updatedAt)!,
-  };
-}
 
 export function serializeRestaurant(row: Restaurant) {
   return {
@@ -73,10 +60,47 @@ export function serializeProject(row: Project) {
   return {
     id: row.id,
     title: row.title,
-    description: row.description,
+    notes: row.notes,
     status: row.status,
+    priority: row.priority,
+    targetWhen: row.targetWhen,
+    budgetCents: row.budgetCents,
     createdByUserId: row.createdByUserId,
     updatedByUserId: row.updatedByUserId,
+    createdAt: toIso(row.createdAt)!,
+    updatedAt: toIso(row.updatedAt)!,
+  };
+}
+
+export function serializeProjectDetail(
+  row: Project,
+  rollups: {
+    estimatedCostCents: number;
+    acquiredCostCents: number;
+    remainingCostCents: number;
+    acquiredCount: number;
+    componentCount: number;
+  },
+) {
+  return {
+    ...serializeProject(row),
+    ...rollups,
+  };
+}
+
+export function serializeProjectComponent(row: ProjectComponent) {
+  return {
+    id: row.id,
+    projectId: row.projectId,
+    name: row.name,
+    kind: row.kind,
+    quantity: row.quantity,
+    unitCostCents: row.unitCostCents,
+    acquired: row.acquired,
+    acquiredAt: toIso(row.acquiredAt),
+    purchaseUrl: row.purchaseUrl,
+    sortOrder: row.sortOrder,
+    note: row.note,
     createdAt: toIso(row.createdAt)!,
     updatedAt: toIso(row.updatedAt)!,
   };
@@ -87,6 +111,9 @@ export function serializeMetric(row: Metric) {
     id: row.id,
     name: row.name,
     unit: row.unit,
+    reminderIntervalCount: row.reminderIntervalCount,
+    reminderIntervalUnit: row.reminderIntervalUnit,
+    lastReminderAt: toIso(row.lastReminderAt),
     createdByUserId: row.createdByUserId,
     createdAt: toIso(row.createdAt)!,
     updatedAt: toIso(row.updatedAt)!,
@@ -119,132 +146,6 @@ function cursorCondition(
     lt(createdAt, cursorDate),
     and(eq(createdAt, cursorDate), lt(id, decoded.id)),
   );
-}
-
-export async function listStreamEntries(query: PaginationQuery) {
-  const db = getDb();
-  const conditions = [];
-  const cursorFilter = query.cursor
-    ? cursorCondition(streamEntries.createdAt, streamEntries.id, query.cursor)
-    : undefined;
-  if (cursorFilter) {
-    conditions.push(cursorFilter);
-  }
-
-  const rows = await db
-    .select()
-    .from(streamEntries)
-    .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(streamEntries.createdAt), desc(streamEntries.id))
-    .limit(query.limit + 1);
-
-  return paginateRows(rows, query.limit);
-}
-
-export async function getStreamEntry(id: string) {
-  const [row] = await getDb()
-    .select()
-    .from(streamEntries)
-    .where(eq(streamEntries.id, id))
-    .limit(1);
-  return row ?? null;
-}
-
-export async function createStreamEntry(
-  user: AuthUser,
-  input: z.infer<typeof createStreamEntrySchema>,
-) {
-  const now = new Date();
-  const id = crypto.randomUUID();
-  const row: StreamEntry = {
-    id,
-    body: input.body,
-    roughWhen: input.roughWhen ?? null,
-    isPinned: input.isPinned ?? false,
-    doneAt: null,
-    createdByUserId: user.id,
-    updatedByUserId: user.id,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await getDb().insert(streamEntries).values(row);
-
-  const name = displayName(user);
-  await emitHouseholdActivity({
-    type: "stream.created",
-    actorId: user.id,
-    entityType: "stream_entry",
-    entityId: id,
-    summary: `${name} added a stream note`,
-  });
-  await emitMentions({
-    body: input.body,
-    entityType: "stream_entry",
-    entityId: id,
-    actorId: user.id,
-  });
-
-  return row;
-}
-
-export async function updateStreamEntry(
-  user: AuthUser,
-  id: string,
-  input: z.infer<typeof updateStreamEntrySchema>,
-) {
-  const db = getDb();
-  const [existing] = await db.select().from(streamEntries).where(eq(streamEntries.id, id)).limit(1);
-  if (!existing) {
-    return null;
-  }
-
-  const now = new Date();
-  const [updated] = await db
-    .update(streamEntries)
-    .set({
-      body: input.body ?? existing.body,
-      roughWhen: input.roughWhen !== undefined ? input.roughWhen : existing.roughWhen,
-      isPinned: input.isPinned ?? existing.isPinned,
-      doneAt: input.done === true ? now : input.done === false ? null : existing.doneAt,
-      updatedByUserId: user.id,
-      updatedAt: now,
-    })
-    .where(eq(streamEntries.id, id))
-    .returning();
-
-  if (!updated) {
-    return null;
-  }
-
-  const name = displayName(user);
-  await emitHouseholdActivity({
-    type: "stream.updated",
-    actorId: user.id,
-    entityType: "stream_entry",
-    entityId: id,
-    summary: `${name} updated a stream note`,
-  });
-  if (input.body) {
-    await emitMentions({
-      body: input.body,
-      entityType: "stream_entry",
-      entityId: id,
-      actorId: user.id,
-    });
-  }
-
-  return updated;
-}
-
-export async function deleteStreamEntry(id: string) {
-  const db = getDb();
-  const [existing] = await db.select().from(streamEntries).where(eq(streamEntries.id, id)).limit(1);
-  if (!existing) {
-    return false;
-  }
-  await db.delete(streamEntries).where(eq(streamEntries.id, id));
-  return true;
 }
 
 export async function listRestaurantsApi(query: PaginationQuery) {
@@ -408,14 +309,174 @@ export async function getProjectApi(id: string) {
   return row ?? null;
 }
 
+export async function getProjectWithRollupsApi(id: string) {
+  const project = await getProjectApi(id);
+  if (!project) {
+    return null;
+  }
+
+  const components = await getDb()
+    .select()
+    .from(projectComponents)
+    .where(eq(projectComponents.projectId, id))
+    .orderBy(projectComponents.sortOrder, projectComponents.createdAt);
+
+  return {
+    project,
+    components,
+    rollups: componentRollups(components),
+  };
+}
+
+export async function listProjectComponentsApi(projectId: string, query: PaginationQuery) {
+  const db = getDb();
+  const conditions = [eq(projectComponents.projectId, projectId)];
+  const cursorFilter = query.cursor
+    ? cursorCondition(projectComponents.createdAt, projectComponents.id, query.cursor)
+    : undefined;
+  if (cursorFilter) {
+    conditions.push(cursorFilter);
+  }
+
+  const rows = await db
+    .select()
+    .from(projectComponents)
+    .where(and(...conditions))
+    .orderBy(projectComponents.sortOrder, projectComponents.createdAt, projectComponents.id)
+    .limit(query.limit + 1);
+
+  return paginateRows(rows, query.limit);
+}
+
+export async function getProjectComponentApi(projectId: string, componentId: string) {
+  const [row] = await getDb()
+    .select()
+    .from(projectComponents)
+    .where(and(eq(projectComponents.projectId, projectId), eq(projectComponents.id, componentId)))
+    .limit(1);
+  return row ?? null;
+}
+
+export async function createProjectComponentApi(
+  user: AuthUser,
+  projectId: string,
+  input: z.infer<typeof createProjectComponentSchema>,
+) {
+  const project = await getProjectApi(projectId);
+  if (!project) {
+    return null;
+  }
+
+  const db = getDb();
+  const existing = await db
+    .select()
+    .from(projectComponents)
+    .where(eq(projectComponents.projectId, projectId))
+    .orderBy(projectComponents.sortOrder);
+
+  const now = new Date();
+  const maxSort = existing.length > 0 ? Math.max(...existing.map((row) => row.sortOrder)) : -1;
+  const acquired = input.acquired ?? false;
+  const id = crypto.randomUUID();
+
+  const [row] = await db
+    .insert(projectComponents)
+    .values({
+      id,
+      projectId,
+      name: input.name,
+      kind: input.kind ?? "item",
+      quantity: input.quantity ?? 1,
+      unitCostCents: input.unitCostCents ?? 0,
+      acquired,
+      acquiredAt: acquired ? now : null,
+      purchaseUrl: input.purchaseUrl ?? null,
+      sortOrder: maxSort + 1,
+      note: input.note ?? null,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning();
+
+  await db
+    .update(projects)
+    .set({ updatedByUserId: user.id, updatedAt: now })
+    .where(eq(projects.id, projectId));
+
+  return row ?? null;
+}
+
+export async function updateProjectComponentApi(
+  user: AuthUser,
+  projectId: string,
+  componentId: string,
+  input: z.infer<typeof updateProjectComponentSchema>,
+) {
+  const db = getDb();
+  const existing = await getProjectComponentApi(projectId, componentId);
+  if (!existing) {
+    return null;
+  }
+
+  const now = new Date();
+  const acquired =
+    input.acquired !== undefined ? input.acquired : existing.acquired;
+  const acquiredAt =
+    input.acquired === undefined
+      ? existing.acquiredAt
+      : input.acquired
+        ? now
+        : null;
+
+  const [updated] = await db
+    .update(projectComponents)
+    .set({
+      name: input.name ?? existing.name,
+      kind: input.kind ?? existing.kind,
+      quantity: input.quantity ?? existing.quantity,
+      unitCostCents: input.unitCostCents ?? existing.unitCostCents,
+      acquired,
+      acquiredAt,
+      purchaseUrl: input.purchaseUrl !== undefined ? input.purchaseUrl : existing.purchaseUrl,
+      note: input.note !== undefined ? input.note : existing.note,
+      sortOrder: input.sortOrder ?? existing.sortOrder,
+      updatedAt: now,
+    })
+    .where(eq(projectComponents.id, componentId))
+    .returning();
+
+  await db
+    .update(projects)
+    .set({ updatedByUserId: user.id, updatedAt: now })
+    .where(eq(projects.id, projectId));
+
+  return updated ?? null;
+}
+
+export async function deleteProjectComponentApi(projectId: string, componentId: string) {
+  const db = getDb();
+  const existing = await getProjectComponentApi(projectId, componentId);
+  if (!existing) {
+    return false;
+  }
+
+  await db
+    .delete(projectComponents)
+    .where(and(eq(projectComponents.projectId, projectId), eq(projectComponents.id, componentId)));
+  return true;
+}
+
 export async function createProjectApi(user: AuthUser, input: z.infer<typeof createProjectSchema>) {
   const now = new Date();
   const id = crypto.randomUUID();
   const row: Project = {
     id,
     title: input.title,
-    description: input.description ?? null,
+    notes: input.notes ?? null,
     status: input.status ?? "idea",
+    priority: input.priority ?? null,
+    targetWhen: input.targetWhen ?? null,
+    budgetCents: input.budgetCents ?? null,
     createdByUserId: user.id,
     updatedByUserId: user.id,
     createdAt: now,
@@ -432,9 +493,9 @@ export async function createProjectApi(user: AuthUser, input: z.infer<typeof cre
     entityId: id,
     summary: `${actor} added "${input.title}"`,
   });
-  if (input.description) {
+  if (input.notes) {
     await emitMentions({
-      body: input.description,
+      body: input.notes,
       entityType: "project",
       entityId: id,
       actorId: user.id,
@@ -460,8 +521,11 @@ export async function updateProjectApi(
     .update(projects)
     .set({
       title: input.title ?? existing.title,
-      description: input.description !== undefined ? input.description : existing.description,
+      notes: input.notes !== undefined ? input.notes : existing.notes,
       status: input.status ?? existing.status,
+      priority: input.priority !== undefined ? input.priority : existing.priority,
+      targetWhen: input.targetWhen !== undefined ? input.targetWhen : existing.targetWhen,
+      budgetCents: input.budgetCents !== undefined ? input.budgetCents : existing.budgetCents,
       updatedByUserId: user.id,
       updatedAt: now,
     })
@@ -537,6 +601,18 @@ export async function updateMetricApi(
     metricId: id,
     name: input.name ?? existing.name,
     unit: input.unit !== undefined ? (input.unit ?? undefined) : (existing.unit ?? undefined),
+    remindersEnabled:
+      input.reminderIntervalCount !== undefined || input.reminderIntervalUnit !== undefined
+        ? input.reminderIntervalCount != null && input.reminderIntervalUnit != null
+        : undefined,
+    reminderIntervalCount:
+      input.reminderIntervalCount !== undefined
+        ? input.reminderIntervalCount
+        : existing.reminderIntervalCount,
+    reminderIntervalUnit:
+      input.reminderIntervalUnit !== undefined
+        ? input.reminderIntervalUnit
+        : existing.reminderIntervalUnit,
   });
 }
 

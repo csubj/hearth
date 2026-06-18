@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { InventoryDetail } from "@/lib/actions/inventory";
 import type { MentionUser } from "@/components/MentionTextarea";
 import { listAttachmentsForEntity } from "@/lib/attachments/queries";
-import { InventoryAttachmentsPanel } from "@/components/inventory/InventoryAttachmentsPanel";
+import { AttachmentsPanel } from "@/lib/attachments/AttachmentsPanel";
 import { InventoryLinksPanel, InventoryTagsForm } from "@/components/inventory/InventoryLinksTags";
 import { UpdateInventoryForm } from "@/components/inventory/UpdateInventoryForm";
 
@@ -61,7 +61,11 @@ export async function InventoryDetailView({
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
-          <InventoryAttachmentsPanel entityId={item.id} initialAttachments={attachments} />
+          <AttachmentsPanel
+            entityType="inventory_item"
+            entityId={item.id}
+            initialAttachments={attachments}
+          />
         </Suspense>
       </section>
     </div>

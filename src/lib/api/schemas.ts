@@ -1,33 +1,8 @@
 import { z } from "zod";
 import { restaurantStatuses } from "@/db/schema/restaurants";
-import { PROJECT_STATUSES } from "@/db/schema/projects";
+import { PROJECT_COMPONENT_KINDS, PROJECT_STATUSES } from "@/db/schema/projects";
 
 const isoDateTime = z.string().datetime();
-
-export const streamEntrySchema = z.object({
-  id: z.string().uuid(),
-  body: z.string(),
-  isPinned: z.boolean(),
-  doneAt: isoDateTime.nullable(),
-  roughWhen: z.string().nullable(),
-  createdByUserId: z.string().uuid(),
-  updatedByUserId: z.string().uuid(),
-  createdAt: isoDateTime,
-  updatedAt: isoDateTime,
-});
-
-export const createStreamEntrySchema = z.object({
-  body: z.string().min(1).max(10_000),
-  roughWhen: z.string().max(200).optional(),
-  isPinned: z.boolean().optional(),
-});
-
-export const updateStreamEntrySchema = z.object({
-  body: z.string().min(1).max(10_000).optional(),
-  roughWhen: z.string().max(200).nullable().optional(),
-  isPinned: z.boolean().optional(),
-  done: z.boolean().optional(),
-});
 
 export const restaurantSchema = z.object({
   id: z.string().uuid(),
@@ -67,8 +42,11 @@ export const updateRestaurantSchema = z.object({
 export const projectSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
-  description: z.string().nullable(),
+  notes: z.string().nullable(),
   status: z.enum(PROJECT_STATUSES),
+  priority: z.number().int().min(1).max(5).nullable(),
+  targetWhen: z.string().nullable(),
+  budgetCents: z.number().int().nullable(),
   createdByUserId: z.string().uuid(),
   updatedByUserId: z.string().uuid(),
   createdAt: isoDateTime,
@@ -77,20 +55,68 @@ export const projectSchema = z.object({
 
 export const createProjectSchema = z.object({
   title: z.string().min(1).max(200),
-  description: z.string().max(5000).optional(),
+  notes: z.string().max(10_000).optional(),
   status: z.enum(PROJECT_STATUSES).optional(),
+  priority: z.number().int().min(1).max(5).nullable().optional(),
+  targetWhen: z.string().max(200).nullable().optional(),
+  budgetCents: z.number().int().min(0).nullable().optional(),
 });
 
 export const updateProjectSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  description: z.string().max(5000).nullable().optional(),
+  notes: z.string().max(10_000).nullable().optional(),
   status: z.enum(PROJECT_STATUSES).optional(),
+  priority: z.number().int().min(1).max(5).nullable().optional(),
+  targetWhen: z.string().max(200).nullable().optional(),
+  budgetCents: z.number().int().min(0).nullable().optional(),
 });
+
+export const projectComponentSchema = z.object({
+  id: z.string().uuid(),
+  projectId: z.string().uuid(),
+  name: z.string(),
+  kind: z.enum(PROJECT_COMPONENT_KINDS),
+  quantity: z.number().int().min(1),
+  unitCostCents: z.number().int().min(0),
+  acquired: z.boolean(),
+  acquiredAt: isoDateTime.nullable(),
+  purchaseUrl: z.string().nullable(),
+  sortOrder: z.number().int(),
+  note: z.string().nullable(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+});
+
+export const createProjectComponentSchema = z.object({
+  name: z.string().min(1).max(200),
+  kind: z.enum(PROJECT_COMPONENT_KINDS).optional(),
+  quantity: z.number().int().min(1).max(9999).optional(),
+  unitCostCents: z.number().int().min(0).optional(),
+  purchaseUrl: z.string().url().max(2000).optional(),
+  note: z.string().max(500).optional(),
+  acquired: z.boolean().optional(),
+});
+
+export const updateProjectComponentSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  kind: z.enum(PROJECT_COMPONENT_KINDS).optional(),
+  quantity: z.number().int().min(1).max(9999).optional(),
+  unitCostCents: z.number().int().min(0).optional(),
+  purchaseUrl: z.string().url().max(2000).nullable().optional(),
+  note: z.string().max(500).nullable().optional(),
+  acquired: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
+});
+
+export const metricReminderUnitApiSchema = z.enum(["day", "week", "month", "year"]);
 
 export const metricSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   unit: z.string().nullable(),
+  reminderIntervalCount: z.number().int().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.nullable(),
+  lastReminderAt: isoDateTime.nullable(),
   createdByUserId: z.string().uuid(),
   createdAt: isoDateTime,
   updatedAt: isoDateTime,
@@ -99,11 +125,15 @@ export const metricSchema = z.object({
 export const createMetricSchema = z.object({
   name: z.string().min(1).max(200),
   unit: z.string().max(50).optional(),
+  reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
 });
 
 export const updateMetricSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   unit: z.string().max(50).nullable().optional(),
+  reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
 });
 
 export const metricEntrySchema = z.object({

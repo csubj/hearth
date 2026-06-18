@@ -1,10 +1,4 @@
-import { registerMetricEntriesResource, registerResource } from "@/lib/api/openapi";
-
-registerResource({
-  tag: "Stream",
-  basePath: "/api/v1/stream",
-  entityName: "StreamEntry",
-});
+import { registerMetricEntriesResource, registerProjectComponentsResource, registerResource } from "@/lib/api/openapi";
 
 registerResource({
   tag: "Restaurants",
@@ -43,3 +37,4 @@ registerResource({
 });
 
 registerMetricEntriesResource();
+registerProjectComponentsResource();

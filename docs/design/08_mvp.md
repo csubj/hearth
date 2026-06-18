@@ -68,25 +68,22 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ---
 
-## Phase 2 — Home + Stream
+## Phase 2 — Home + Projects capture
 
-**Goal:** core product loop — capture and glance.
+**Goal:** core product loop — capture and glance (Stream was later merged into Projects).
 
 | Deliverable                | Notes                                    |
 | -------------------------- | ---------------------------------------- |
-| `stream_entries` migration |                                          |
-| `/stream` page             | list + quick capture form                |
-| `/` home                   | stream section summary                   |
-| Server actions             | create, update, pin, mark done           |
+| `/projects` quick capture  | title-optional notes capture             |
+| `/` home                   | projects section + quick capture         |
 | Basic UI components        | `Button`, list cards per `05_styling.md` |
 | Notification emitter stub  | log-only OK; full fan-out in Phase 6     |
 
 **Done when:**
 
-- [ ] Authenticated user adds stream note from `/stream`
-- [ ] Pin and mark-done persist
-- [ ] Home shows recent/pinned stream items
-- [ ] Integration test: create entry visible on home
+- [ ] Authenticated user adds a project from Home or `/projects`
+- [ ] Home shows in-progress / high-priority projects
+- [ ] Integration test: create project visible on list
 
 ---
 
@@ -189,7 +186,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 - [ ] `pnpm build` succeeds
 - [ ] CI passes on clean clone
-- [ ] Fresh deploy: bootstrap → login → add stream note works in Docker
+- [ ] Fresh deploy: bootstrap → login → add project works in Docker
 
 ---
 
@@ -212,7 +209,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 - [ ] `AUTH_MODE=open` skips login gate; writes attributed to `OPEN_MODE_USERNAME`
 - [ ] Admin routes still require logged-in admin in open mode
-- [ ] Create token → curl `/api/v1/stream` with bearer header succeeds
+- [ ] Create token → curl `/api/v1/projects` with bearer header succeeds
 - [ ] Revoked token returns 401
 - [ ] `/api/openapi.json` validates; `/api/docs` renders
 
@@ -273,7 +270,7 @@ mvp:
       name: auth
       depends_on: [0]
     - id: 2
-      name: home_stream
+      name: home_projects
       depends_on: [1]
     - id: 3
       name: restaurants
