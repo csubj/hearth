@@ -113,6 +113,7 @@ export function serializeMetric(row: Metric) {
     unit: row.unit,
     reminderIntervalCount: row.reminderIntervalCount,
     reminderIntervalUnit: row.reminderIntervalUnit,
+    reminderRecipientUserId: row.reminderRecipientUserId,
     lastReminderAt: toIso(row.lastReminderAt),
     createdByUserId: row.createdByUserId,
     createdAt: toIso(row.createdAt)!,
@@ -613,6 +614,10 @@ export async function updateMetricApi(
       input.reminderIntervalUnit !== undefined
         ? input.reminderIntervalUnit
         : existing.reminderIntervalUnit,
+    reminderRecipientUserId:
+      input.reminderRecipientUserId !== undefined
+        ? input.reminderRecipientUserId
+        : existing.reminderRecipientUserId,
   });
 }
 

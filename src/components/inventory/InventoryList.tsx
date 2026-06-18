@@ -26,7 +26,16 @@ export function InventoryList({ items }: { items: InventoryListItem[] }) {
                   {item.location ? ` · ${item.location}` : ""}
                 </p>
               </div>
-              <span className="text-xs text-text-muted">Updated {formatUpdatedAt(item.updatedAt)}</span>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {item.hasOverdueReminder ? (
+                  <span className="rounded-full bg-accent-soft px-2 py-1 text-xs font-medium text-accent">
+                    Needs maintenance
+                  </span>
+                ) : null}
+                <span className="text-xs text-text-muted">
+                  Updated {formatUpdatedAt(item.updatedAt)}
+                </span>
+              </div>
             </div>
             {item.tags.length > 0 ? (
               <ul className="mt-2 flex flex-wrap gap-1.5">

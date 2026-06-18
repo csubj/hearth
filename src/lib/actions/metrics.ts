@@ -4,11 +4,15 @@ import { getDb } from "@/db";
 import { metricEntries, metrics, users, type Metric, type MetricEntry } from "@/db/schema";
 import { requireUser } from "@/lib/auth/session";
 import {
-  DEFAULT_REMINDER_INTERVAL_COUNT,
-  DEFAULT_REMINDER_INTERVAL_UNIT,
   isMetricStale,
   metricReminderUnitSchema,
 } from "@/lib/metrics/reminder-interval";
+import {
+  parseReminderIntervalFromForm as parseReminderIntervalFromFormShared,
+  parseReminderRecipientFromForm,
+  reminderRecipientUserIdSchema,
+  resolveReminderFields,
+} from "@/lib/reminders/form";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 const reminderIntervalCountSchema = z.coerce
@@ -25,6 +29,7 @@ export const createMetricSchema = z
     unit: z.string().trim().max(50).optional(),
     reminderIntervalCount: reminderIntervalCountSchema,
     reminderIntervalUnit: metricReminderUnitSchema.optional().nullable(),
+    reminderRecipientUserId: reminderRecipientUserIdSchema,
     remindersEnabled: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -55,6 +60,7 @@ export const updateMetricSchema = z
     unit: z.string().trim().max(50).optional(),
     reminderIntervalCount: reminderIntervalCountSchema,
     reminderIntervalUnit: metricReminderUnitSchema.optional().nullable(),
+    reminderRecipientUserId: reminderRecipientUserIdSchema,
     remindersEnabled: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
@@ -112,67 +118,10 @@ export function parseRecordedAt(raw: string | null): Date | undefined {
   return parsed;
 }
 
-export function parseRemindersEnabled(raw: FormDataEntryValue | null): boolean {
-  return raw === "on" || raw === "true" || raw === "1";
-}
-
-export function parseReminderIntervalFromForm(formData: FormData): {
-  reminderIntervalCount: number | null;
-  reminderIntervalUnit: z.infer<typeof metricReminderUnitSchema> | null;
-  remindersEnabled: boolean;
-} {
-  const remindersEnabled = parseRemindersEnabled(formData.get("remindersEnabled"));
-  if (!remindersEnabled) {
-    return {
-      remindersEnabled: false,
-      reminderIntervalCount: null,
-      reminderIntervalUnit: null,
-    };
-  }
-
-  const countRaw = String(formData.get("reminderIntervalCount") ?? "").trim();
-  const unitRaw = String(formData.get("reminderIntervalUnit") ?? "").trim();
-
+export function parseReminderIntervalFromForm(formData: FormData) {
   return {
-    remindersEnabled: true,
-    reminderIntervalCount: countRaw ? Number(countRaw) : DEFAULT_REMINDER_INTERVAL_COUNT,
-    reminderIntervalUnit: unitRaw
-      ? metricReminderUnitSchema.parse(unitRaw)
-      : DEFAULT_REMINDER_INTERVAL_UNIT,
-  };
-}
-
-function resolveReminderFields(input: {
-  remindersEnabled?: boolean;
-  reminderIntervalCount?: number | null;
-  reminderIntervalUnit?: z.infer<typeof metricReminderUnitSchema> | null;
-}): Pick<Metric, "reminderIntervalCount" | "reminderIntervalUnit"> {
-  if (input.remindersEnabled === false) {
-    return { reminderIntervalCount: null, reminderIntervalUnit: null };
-  }
-
-  if (
-    input.remindersEnabled !== true &&
-    input.reminderIntervalCount === null &&
-    input.reminderIntervalUnit === null
-  ) {
-    return { reminderIntervalCount: null, reminderIntervalUnit: null };
-  }
-
-  if (
-    input.remindersEnabled === true ||
-    input.reminderIntervalCount != null ||
-    input.reminderIntervalUnit != null
-  ) {
-    return {
-      reminderIntervalCount: input.reminderIntervalCount ?? DEFAULT_REMINDER_INTERVAL_COUNT,
-      reminderIntervalUnit: input.reminderIntervalUnit ?? DEFAULT_REMINDER_INTERVAL_UNIT,
-    };
-  }
-
-  return {
-    reminderIntervalCount: DEFAULT_REMINDER_INTERVAL_COUNT,
-    reminderIntervalUnit: DEFAULT_REMINDER_INTERVAL_UNIT,
+    ...parseReminderIntervalFromFormShared(formData),
+    reminderRecipientUserId: parseReminderRecipientFromForm(formData),
   };
 }
 
@@ -204,22 +153,26 @@ async function getLatestEntriesByMetric(metricIds: string[]): Promise<Map<string
   return latest;
 }
 
-function toMetricListItem(metric: Metric, latestEntry: MetricEntry | null): MetricListItem {
+function toMetricListItem(
+  metric: Metric,
+  latestEntry: MetricEntry | null,
+  viewerUserId: string,
+): MetricListItem {
   return {
     ...metric,
     latestEntry,
-    stale: isMetricStale(metric, latestEntry),
+    stale: isMetricStale(metric, latestEntry, new Date(), viewerUserId),
   };
 }
 
 export async function listMetricsWithLatest(): Promise<MetricListItem[]> {
-  await requireUser();
+  const { user } = await requireUser();
   const db = getDb();
   const allMetrics = await db.select().from(metrics).orderBy(desc(metrics.updatedAt));
   const latestByMetric = await getLatestEntriesByMetric(allMetrics.map((metric) => metric.id));
 
   return allMetrics.map((metric) =>
-    toMetricListItem(metric, latestByMetric.get(metric.id) ?? null),
+    toMetricListItem(metric, latestByMetric.get(metric.id) ?? null, user.id),
   );
 }
 
@@ -294,10 +247,14 @@ export async function updateMetricRecord(
 
   const now = new Date();
   const reminderFields =
-    input.remindersEnabled === undefined
+    input.remindersEnabled === undefined &&
+    input.reminderIntervalCount === undefined &&
+    input.reminderIntervalUnit === undefined &&
+    input.reminderRecipientUserId === undefined
       ? {
           reminderIntervalCount: existing.reminderIntervalCount,
           reminderIntervalUnit: existing.reminderIntervalUnit,
+          reminderRecipientUserId: existing.reminderRecipientUserId,
         }
       : resolveReminderFields(input);
 
@@ -385,6 +342,7 @@ export function ensureMetricTablesForTests(): void {
       reminder_interval_count integer,
       reminder_interval_unit text,
       last_reminder_at integer,
+      reminder_recipient_user_id text,
       created_by_user_id text NOT NULL,
       created_at integer NOT NULL,
       updated_at integer NOT NULL,

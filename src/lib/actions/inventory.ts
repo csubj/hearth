@@ -9,6 +9,8 @@ import {
   inventoryItemTags,
   inventoryItems,
   inventoryLinks,
+  inventoryMaintenanceReminderLinks,
+  inventoryMaintenanceReminders,
   inventoryTags,
   type InventoryItem,
   type InventoryLink,
@@ -17,6 +19,11 @@ import {
 import { attachments } from "@/db/schema";
 import { displayName, requireUser } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
+import {
+  loadMaintenanceRemindersForItem,
+  type MaintenanceReminderWithLinks,
+} from "@/lib/actions/inventory-maintenance";
+import { isMaintenanceReminderStale } from "@/lib/inventory/reminder-interval";
 
 const INVENTORY_ENTITY_TYPE = "inventory_item" as const;
 
@@ -27,11 +34,13 @@ export type InventoryActionState = {
 
 export type InventoryListItem = InventoryItem & {
   tags: InventoryTag[];
+  hasOverdueReminder: boolean;
 };
 
 export type InventoryDetail = InventoryItem & {
   tags: InventoryTag[];
   links: InventoryLink[];
+  maintenanceReminders: MaintenanceReminderWithLinks[];
 };
 
 export type InventoryListFilters = {
@@ -65,6 +74,15 @@ export type InventoryExportItem = {
   updatedAt: string;
   tags: string[];
   links: Array<{ label: string; url: string }>;
+  maintenanceReminders: Array<{
+    title: string;
+    notes: string | null;
+    reminderIntervalCount: number | null;
+    reminderIntervalUnit: string | null;
+    reminderRecipientUserId: string | null;
+    lastCompletedAt: string | null;
+    links: Array<{ label: string; url: string }>;
+  }>;
   attachments: InventoryExportAttachment[];
 };
 
@@ -212,10 +230,26 @@ export async function listInventoryItemTypes(): Promise<string[]> {
     .filter((value): value is string => Boolean(value?.trim()));
 }
 
+async function loadOverdueReminderItemIds(viewerUserId: string): Promise<Set<string>> {
+  const rows = await getDb()
+    .select()
+    .from(inventoryMaintenanceReminders)
+    .where(sql`${inventoryMaintenanceReminders.reminderIntervalCount} IS NOT NULL`);
+
+  const overdue = new Set<string>();
+  const now = new Date();
+  for (const reminder of rows) {
+    if (isMaintenanceReminderStale(reminder, now, viewerUserId)) {
+      overdue.add(reminder.inventoryItemId);
+    }
+  }
+  return overdue;
+}
+
 export async function listInventoryItems(
   searchParams: Record<string, string | string[] | undefined> = {},
 ): Promise<InventoryListItem[]> {
-  await requireUser();
+  const { user } = await requireUser();
   const { q, tag, itemType } = parseListFilters(searchParams);
   const db = getDb();
 
@@ -265,15 +299,17 @@ export async function listInventoryItems(
     .orderBy(desc(inventoryItems.updatedAt));
 
   const tagsByItem = await loadTagsForItems(items.map((item) => item.id));
+  const overdueItemIds = await loadOverdueReminderItemIds(user.id);
 
   return items.map((item) => ({
     ...item,
     tags: tagsByItem.get(item.id) ?? [],
+    hasOverdueReminder: overdueItemIds.has(item.id),
   }));
 }
 
 export async function getInventoryItemById(id: string): Promise<InventoryDetail | null> {
-  await requireUser();
+  const { user } = await requireUser();
   const db = getDb();
 
   const [item] = await db.select().from(inventoryItems).where(eq(inventoryItems.id, id)).limit(1);
@@ -295,12 +331,21 @@ export async function getInventoryItemById(id: string): Promise<InventoryDetail 
       .orderBy(inventoryLinks.createdAt),
   ]);
 
-  return { ...item, tags, links };
+  const maintenanceReminders = await loadMaintenanceRemindersForItem(id, user.id);
+
+  return { ...item, tags, links, maintenanceReminders };
 }
 
 export async function getInventoryHomeSummary(limit = 5): Promise<InventoryListItem[]> {
   const items = await listInventoryItems({});
-  return items.slice(0, limit);
+  return items
+    .sort((a, b) => {
+      if (a.hasOverdueReminder !== b.hasOverdueReminder) {
+        return a.hasOverdueReminder ? -1 : 1;
+      }
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    })
+    .slice(0, limit);
 }
 
 export async function create(
@@ -636,7 +681,7 @@ export async function buildInventoryExport(): Promise<InventoryExportPayload> {
   ]);
 
   const itemIds = allItems.map((item) => item.id);
-  const [tagsByItem, allLinks, allAttachments] = await Promise.all([
+  const [tagsByItem, allLinks, allAttachments, allReminders] = await Promise.all([
     loadTagsForItems(itemIds),
     itemIds.length
       ? db.select().from(inventoryLinks).where(inArray(inventoryLinks.inventoryItemId, itemIds))
@@ -652,7 +697,36 @@ export async function buildInventoryExport(): Promise<InventoryExportPayload> {
             ),
           )
       : Promise.resolve([]),
+    itemIds.length
+      ? db
+          .select()
+          .from(inventoryMaintenanceReminders)
+          .where(inArray(inventoryMaintenanceReminders.inventoryItemId, itemIds))
+      : Promise.resolve([]),
   ]);
+
+  const reminderIds = allReminders.map((reminder) => reminder.id);
+  const allReminderLinks =
+    reminderIds.length > 0
+      ? await db
+          .select()
+          .from(inventoryMaintenanceReminderLinks)
+          .where(inArray(inventoryMaintenanceReminderLinks.reminderId, reminderIds))
+      : [];
+
+  const reminderLinksByReminder = new Map<string, typeof allReminderLinks>();
+  for (const link of allReminderLinks) {
+    const current = reminderLinksByReminder.get(link.reminderId) ?? [];
+    current.push(link);
+    reminderLinksByReminder.set(link.reminderId, current);
+  }
+
+  const remindersByItem = new Map<string, typeof allReminders>();
+  for (const reminder of allReminders) {
+    const current = remindersByItem.get(reminder.inventoryItemId) ?? [];
+    current.push(reminder);
+    remindersByItem.set(reminder.inventoryItemId, current);
+  }
 
   const linksByItem = new Map<string, InventoryLink[]>();
   for (const link of allLinks) {
@@ -698,6 +772,18 @@ export async function buildInventoryExport(): Promise<InventoryExportPayload> {
         label: link.label,
         url: link.url,
       })),
+      maintenanceReminders: (remindersByItem.get(item.id) ?? []).map((reminder) => ({
+        title: reminder.title,
+        notes: reminder.notes,
+        reminderIntervalCount: reminder.reminderIntervalCount,
+        reminderIntervalUnit: reminder.reminderIntervalUnit,
+        reminderRecipientUserId: reminder.reminderRecipientUserId,
+        lastCompletedAt: toIsoDate(reminder.lastCompletedAt),
+        links: (reminderLinksByReminder.get(reminder.id) ?? []).map((link) => ({
+          label: link.label,
+          url: link.url,
+        })),
+      })),
       attachments: attachmentsByItem.get(item.id) ?? [],
     })),
   };
@@ -722,6 +808,26 @@ const importItemSchema = z.object({
       z.object({
         label: z.string().min(1),
         url: urlSchema,
+      }),
+    )
+    .optional(),
+  maintenanceReminders: z
+    .array(
+      z.object({
+        title: z.string().min(1).max(200),
+        notes: z.string().nullable().optional(),
+        reminderIntervalCount: z.number().int().min(1).max(999).nullable().optional(),
+        reminderIntervalUnit: z.enum(["day", "week", "month", "year"]).nullable().optional(),
+        reminderRecipientUserId: z.string().uuid().nullable().optional(),
+        lastCompletedAt: z.string().nullable().optional(),
+        links: z
+          .array(
+            z.object({
+              label: z.string().min(1),
+              url: urlSchema,
+            }),
+          )
+          .optional(),
       }),
     )
     .optional(),
@@ -777,6 +883,9 @@ export async function importInventoryData(
         .where(eq(inventoryItems.id, id));
 
       await db.delete(inventoryLinks).where(eq(inventoryLinks.inventoryItemId, id));
+      await db
+        .delete(inventoryMaintenanceReminders)
+        .where(eq(inventoryMaintenanceReminders.inventoryItemId, id));
     } else {
       await db.insert(inventoryItems).values({
         id,
@@ -809,6 +918,43 @@ export async function importInventoryData(
           createdAt: now,
         })),
       );
+    }
+
+    if (item.maintenanceReminders?.length) {
+      for (const reminder of item.maintenanceReminders) {
+        const reminderId = crypto.randomUUID();
+        const lastCompletedAt = reminder.lastCompletedAt
+          ? new Date(reminder.lastCompletedAt)
+          : null;
+
+        await db.insert(inventoryMaintenanceReminders).values({
+          id: reminderId,
+          inventoryItemId: id,
+          title: reminder.title,
+          notes: reminder.notes ?? null,
+          reminderIntervalCount: reminder.reminderIntervalCount ?? null,
+          reminderIntervalUnit: reminder.reminderIntervalUnit ?? null,
+          reminderRecipientUserId: reminder.reminderRecipientUserId ?? null,
+          lastCompletedAt:
+            lastCompletedAt && !Number.isNaN(lastCompletedAt.getTime()) ? lastCompletedAt : null,
+          lastReminderAt: null,
+          createdByUserId: userId,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        if (reminder.links?.length) {
+          await db.insert(inventoryMaintenanceReminderLinks).values(
+            reminder.links.map((link) => ({
+              id: crypto.randomUUID(),
+              reminderId,
+              label: link.label,
+              url: link.url,
+              createdAt: now,
+            })),
+          );
+        }
+      }
     }
 
     await replaceItemTags(id, item.tags ?? []);

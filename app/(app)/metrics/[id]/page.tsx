@@ -9,6 +9,17 @@ import { getMetricWithEntries } from "@/lib/actions/metrics";
 import { formatReminderInterval, hasReminderInterval } from "@/lib/metrics/reminder-interval";
 import { loadMentionUsers } from "@/lib/users/mention-users";
 
+function formatRecipientLabel(
+  recipientUserId: string | null,
+  users: Awaited<ReturnType<typeof loadMentionUsers>>,
+): string {
+  if (!recipientUserId) {
+    return "whole household";
+  }
+  const user = users.find((entry) => entry.id === recipientUserId);
+  return user ? (user.displayName ?? user.username) : "assigned member";
+}
+
 export default async function MetricDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [data, mentionUsers] = await Promise.all([getMetricWithEntries(id), loadMentionUsers()]);
@@ -40,7 +51,8 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
                 metric.reminderIntervalCount!,
                 metric.reminderIntervalUnit!,
                 { prefixEvery: true },
-              )}
+              )}{" "}
+              ({formatRecipientLabel(metric.reminderRecipientUserId, mentionUsers)})
             </p>
           ) : null}
         </div>
@@ -57,7 +69,7 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
         <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
           <h2 className="text-lg font-medium text-text">Metric settings</h2>
           <div className="mt-4">
-            <UpdateMetricForm metric={metric} />
+            <UpdateMetricForm metric={metric} users={mentionUsers} />
           </div>
         </section>
 

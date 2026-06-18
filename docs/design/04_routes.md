@@ -153,6 +153,7 @@ All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 | Metrics             | `/api/v1/metrics`                 | list, CRUD        |
 | Metric entries      | `/api/v1/metrics/{id}/entries`    | list, create, update, delete |
 | Inventory           | `/api/v1/inventory`               | list, CRUD, search |
+| Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | list, CRUD, complete |
 | Inventory types     | `/api/v1/inventory/types`         | list, CRUD        |
 | Inventory tags      | `/api/v1/inventory/tags`          | list, CRUD        |
 
@@ -216,6 +217,7 @@ Colocate in `src/lib/actions/` by domain. Each action:
 | `projects.ts`      | `create`, `update`, `setStatus`                                            |
 | `metrics.ts`       | `createMetric`, `addEntry`, `updateMetric`                                 |
 | `inventory.ts`     | `create`, `update`, `addLink`, `removeLink`, `setTags`                     |
+| `inventory-maintenance.ts` | `createMaintenanceReminder`, `updateMaintenanceReminder`, `deleteMaintenanceReminder`, `completeMaintenanceReminder`, link CRUD |
 | `notifications.ts` | `markRead`, `markAllRead`                                                  |
 | `admin/users.ts`   | `createUser`, `resetPassword`, `disableUser`, `enableUser`, `promoteAdmin` |
 | `admin/api-tokens.ts` | `createToken`, `revokeToken`                                            |

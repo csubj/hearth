@@ -2,10 +2,17 @@
 
 import { useActionState } from "react";
 import { updateMetric, type MetricActionState } from "@/lib/actions/metrics-mutations";
-import { ReminderIntervalFields } from "@/components/metrics/ReminderIntervalFields";
+import { ReminderIntervalFields } from "@/components/reminders/ReminderIntervalFields";
 import type { Metric } from "@/db/schema";
+import type { MentionUser } from "@/components/MentionTextarea";
 
-export function UpdateMetricForm({ metric }: { metric: Metric }) {
+export function UpdateMetricForm({
+  metric,
+  users = [],
+}: {
+  metric: Metric;
+  users?: MentionUser[];
+}) {
   const [state, formAction, pending] = useActionState<MetricActionState, FormData>(
     updateMetric,
     {},
@@ -39,7 +46,14 @@ export function UpdateMetricForm({ metric }: { metric: Metric }) {
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
         />
       </div>
-      <ReminderIntervalFields metric={metric} idPrefix="update-metric" />
+      <ReminderIntervalFields
+        idPrefix="update-metric"
+        intervalCount={metric.reminderIntervalCount}
+        intervalUnit={metric.reminderIntervalUnit}
+        recipientUserId={metric.reminderRecipientUserId}
+        users={users}
+        description="Stale metrics are flagged in the list and trigger in-app reminders on this schedule."
+      />
       {state.error ? (
         <p className="text-sm text-red-600" role="alert">
           {state.error}

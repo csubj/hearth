@@ -116,6 +116,7 @@ export const metricSchema = z.object({
   unit: z.string().nullable(),
   reminderIntervalCount: z.number().int().nullable(),
   reminderIntervalUnit: metricReminderUnitApiSchema.nullable(),
+  reminderRecipientUserId: z.string().uuid().nullable(),
   lastReminderAt: isoDateTime.nullable(),
   createdByUserId: z.string().uuid(),
   createdAt: isoDateTime,
@@ -127,6 +128,7 @@ export const createMetricSchema = z.object({
   unit: z.string().max(50).optional(),
   reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
   reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
+  reminderRecipientUserId: z.string().uuid().optional().nullable(),
 });
 
 export const updateMetricSchema = z.object({
@@ -134,6 +136,7 @@ export const updateMetricSchema = z.object({
   unit: z.string().max(50).nullable().optional(),
   reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
   reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
+  reminderRecipientUserId: z.string().uuid().optional().nullable(),
 });
 
 export const metricEntrySchema = z.object({
@@ -228,4 +231,47 @@ export const updateInventoryItemSchema = z.object({
   warrantyNote: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   tags: z.array(z.string().min(1).max(100)).optional(),
+});
+
+const maintenanceReminderLinkSchema = z.object({
+  label: z.string().min(1).max(200),
+  url: z.string().url().max(2000),
+});
+
+export const inventoryMaintenanceReminderLinkSchema = maintenanceReminderLinkSchema.extend({
+  id: z.string().uuid(),
+  createdAt: isoDateTime,
+});
+
+export const inventoryMaintenanceReminderSchema = z.object({
+  id: z.string().uuid(),
+  inventoryItemId: z.string().uuid(),
+  title: z.string(),
+  notes: z.string().nullable(),
+  reminderIntervalCount: z.number().int().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.nullable(),
+  reminderRecipientUserId: z.string().uuid().nullable(),
+  lastCompletedAt: isoDateTime.nullable(),
+  lastReminderAt: isoDateTime.nullable(),
+  createdByUserId: z.string().uuid(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+  links: z.array(inventoryMaintenanceReminderLinkSchema),
+});
+
+export const createInventoryMaintenanceReminderSchema = z.object({
+  title: z.string().min(1).max(200),
+  notes: z.string().max(5000).nullable().optional(),
+  reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
+  reminderRecipientUserId: z.string().uuid().optional().nullable(),
+  links: z.array(maintenanceReminderLinkSchema).optional(),
+});
+
+export const updateInventoryMaintenanceReminderSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  notes: z.string().max(5000).nullable().optional(),
+  reminderIntervalCount: z.number().int().min(1).max(999).optional().nullable(),
+  reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
+  reminderRecipientUserId: z.string().uuid().optional().nullable(),
 });

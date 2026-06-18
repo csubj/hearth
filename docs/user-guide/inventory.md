@@ -62,6 +62,22 @@ Inventory accepts both **photos** and **PDF documents** — manuals, receipts, w
 
 Limits: 10 MB per image, 25 MB per PDF, up to 10 files per item. See [Attachments](attachments.md).
 
+## Maintenance reminders
+
+Schedule recurring upkeep on any item — filter changes, annual inspections, battery swaps.
+
+On the item detail page, use **Maintenance reminders**:
+
+| Field | Required | Notes |
+| ----- | -------- | ----- |
+| Title | Yes | e.g. "Replace HVAC filter" |
+| Notes | No | Size, part number, instructions |
+| Interval | Yes when enabled | Every N days/weeks/months/years |
+| Notify | Yes when enabled | Whole household or one member |
+| Links | No | Manuals, parts pages |
+
+When maintenance is done, click **Mark done** to reset the interval from today. Due reminders show a badge on the item in the list and home page.
+
 ## Home page
 
 The home inventory section shows a few recently added or edited items and a quick search link to the full catalog.

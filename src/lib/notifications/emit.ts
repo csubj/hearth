@@ -180,30 +180,70 @@ export async function emitMentions(input: EmitMentionsInput): Promise<void> {
   }
 }
 
-export interface EmitMetricReminderInput {
-  metricId: string;
-  metricName: string;
-  intervalLabel: string;
+import { resolveReminderRecipientIds } from "@/lib/reminders/scope";
+
+export interface EmitIntervalReminderInput {
+  type: string;
+  entityType: EntityType;
+  entityId: string;
+  summary: string;
+  recipientUserId: string | null;
 }
 
-export async function emitMetricReminder(input: EmitMetricReminderInput): Promise<void> {
+export async function emitIntervalReminder(input: EmitIntervalReminderInput): Promise<void> {
   try {
-    const recipients = await loadActiveUsers();
-    const summary = `${input.metricName} hasn't been logged in ${input.intervalLabel}`;
+    const recipientIds = await resolveReminderRecipientIds(input.recipientUserId);
 
     await Promise.all(
-      recipients.map((user) =>
+      recipientIds.map((recipientUserId) =>
         insertNotificationRow({
-          recipientUserId: user.id,
+          recipientUserId,
           actorUserId: null,
-          type: "metric.reminder",
-          entityType: "metric",
-          entityId: input.metricId,
-          summary,
+          type: input.type,
+          entityType: input.entityType,
+          entityId: input.entityId,
+          summary: input.summary,
         }),
       ),
     );
   } catch (error) {
-    console.error("[notifications] emitMetricReminder failed", error);
+    console.error("[notifications] emitIntervalReminder failed", error);
   }
+}
+
+export interface EmitMetricReminderInput {
+  metricId: string;
+  metricName: string;
+  intervalLabel: string;
+  recipientUserId: string | null;
+}
+
+export async function emitMetricReminder(input: EmitMetricReminderInput): Promise<void> {
+  await emitIntervalReminder({
+    type: "metric.reminder",
+    entityType: "metric",
+    entityId: input.metricId,
+    summary: `${input.metricName} hasn't been logged in ${input.intervalLabel}`,
+    recipientUserId: input.recipientUserId,
+  });
+}
+
+export interface EmitInventoryMaintenanceReminderInput {
+  inventoryItemId: string;
+  reminderTitle: string;
+  itemName: string;
+  intervalLabel: string;
+  recipientUserId: string | null;
+}
+
+export async function emitInventoryMaintenanceReminder(
+  input: EmitInventoryMaintenanceReminderInput,
+): Promise<void> {
+  await emitIntervalReminder({
+    type: "inventory.maintenance_reminder",
+    entityType: "inventory_item",
+    entityId: input.inventoryItemId,
+    summary: `${input.reminderTitle} (${input.itemName}) is due for maintenance`,
+    recipientUserId: input.recipientUserId,
+  });
 }

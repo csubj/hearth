@@ -177,6 +177,10 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 | `id`                 | text PK          |                                 |
 | `name`               | text NOT NULL    | e.g. "Flora's weight"           |
 | `unit`               | text NULL        | e.g. "lbs", "°F" — display only |
+| `reminder_interval_count` | integer NULL | days/weeks/months/years between reminders |
+| `reminder_interval_unit` | text NULL | `day`, `week`, `month`, `year` |
+| `reminder_recipient_user_id` | text NULL FK → users | `NULL` = whole household |
+| `last_reminder_at`   | integer NULL     | ms — throttle for in-app reminders |
 | `created_by_user_id` | text FK → users  |                                 |
 | `created_at`         | integer NOT NULL |                                 |
 | `updated_at`         | integer NOT NULL |                                 |
@@ -248,6 +252,39 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 | `tag_id`            | text FK → inventory_tags  | ON DELETE CASCADE |
 
 **Indexes:** `(inventory_item_id)`, `(tag_id)`.
+
+### `inventory_maintenance_reminders`
+
+Per-item recurring upkeep schedules (filter changes, inspections, etc.).
+
+| Column                       | Type                     | Notes                              |
+| ---------------------------- | ------------------------ | ---------------------------------- |
+| `id`                         | text PK                  |                                    |
+| `inventory_item_id`          | text FK → inventory_items | ON DELETE CASCADE               |
+| `title`                      | text NOT NULL            | subject line                       |
+| `notes`                      | text NULL                | optional context                   |
+| `reminder_interval_count`    | integer NULL             | `NULL` = reminders off             |
+| `reminder_interval_unit`     | text NULL                | `day`, `week`, `month`, `year`     |
+| `reminder_recipient_user_id` | text NULL FK → users     | `NULL` = whole household           |
+| `last_completed_at`          | integer NULL             | ms — anchor after "mark done"      |
+| `last_reminder_at`           | integer NULL             | ms — notification throttle         |
+| `created_by_user_id`         | text FK → users          |                                    |
+| `created_at`                 | integer NOT NULL         |                                    |
+| `updated_at`                 | integer NOT NULL         |                                    |
+
+**Indexes:** `(inventory_item_id)`.
+
+### `inventory_maintenance_reminder_links`
+
+| Column        | Type                              | Notes             |
+| ------------- | --------------------------------- | ----------------- |
+| `id`          | text PK                           |                   |
+| `reminder_id` | text FK → inventory_maintenance_reminders | ON DELETE CASCADE |
+| `label`       | text NOT NULL                     |                   |
+| `url`         | text NOT NULL                     |                   |
+| `created_at`  | integer NOT NULL                  |                   |
+
+**Indexes:** `(reminder_id)`.
 
 ---
 
@@ -333,6 +370,8 @@ erDiagram
   users ||--o{ mentions : mentioned_in
   metrics ||--o{ metric_entries : has
   inventory_items ||--o{ inventory_links : has
+  inventory_items ||--o{ inventory_maintenance_reminders : has
+  inventory_maintenance_reminders ||--o{ inventory_maintenance_reminder_links : has
   inventory_items ||--o{ inventory_item_tags : tagged
   inventory_tags ||--o{ inventory_item_tags : applied
   stream_entries ||--o{ attachments : has
@@ -384,7 +423,7 @@ schema:
       restaurants: [restaurants]
       projects: [projects]
       metrics: [metrics, metric_entries]
-      inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags]
+      inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags, inventory_maintenance_reminders, inventory_maintenance_reminder_links]
     cross_cutting:
       - mentions
       - notifications

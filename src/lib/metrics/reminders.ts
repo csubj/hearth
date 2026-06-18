@@ -47,6 +47,7 @@ export async function processMetricReminders(): Promise<void> {
       metricId: metric.id,
       metricName: metric.name,
       intervalLabel,
+      recipientUserId: metric.reminderRecipientUserId,
     });
 
     await db

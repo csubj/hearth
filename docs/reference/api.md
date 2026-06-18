@@ -38,10 +38,10 @@ The API exposes the same entities as the web app. Each resource supports standar
 | Restaurants | `/api/v1/restaurants` | Wishlist + visit status, ratings |
 | Projects | `/api/v1/projects` | Notes, priority, status, tags (via UI), budget rollups on GET |
 | Project components | `/api/v1/projects/{id}/components` | Budget line items (items, labor, fees) |
-| Metrics | `/api/v1/metrics` | Named metrics (see entries below) |
+| Metrics | `/api/v1/metrics` | Named metrics; optional `reminderIntervalCount`, `reminderIntervalUnit`, `reminderRecipientUserId` |
 | Metric entries | `/api/v1/metrics/{id}/entries` | Dated values for a metric |
-| Project components | `/api/v1/projects/{id}/components` | Budget line items for a project |
 | Inventory | `/api/v1/inventory` | Household objects/appliances/electronics |
+| Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | Per-item upkeep schedules; `POST …/{reminderId}/complete` marks done |
 
 ### Managed types
 
@@ -62,7 +62,7 @@ Bulk operations for the [Inventory](../user-guide/inventory.md) feature:
 | Export all inventory | `GET /api/inventory/export` |
 | Import inventory | `POST /api/inventory/import` |
 
-Export returns a structured file (items, links, tags) suitable for backup or migration; import accepts the same shape. Allowed import/upload file types are documented in [Configuration](../operations/configuration.md).
+Export returns a structured file (items, links, tags, maintenance reminders) suitable for backup or migration; import accepts the same shape. Allowed import/upload file types are documented in [Configuration](../operations/configuration.md).
 
 ## Example requests
 

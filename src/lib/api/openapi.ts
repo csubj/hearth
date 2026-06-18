@@ -259,6 +259,105 @@ export function registerMetricEntriesResource(): void {
   });
 }
 
+export function registerInventoryMaintenanceRemindersResource(): void {
+  const basePath = "/api/v1/inventory/{inventoryItemId}/maintenance-reminders";
+
+  openApiRegistry.registerPath({
+    method: "get",
+    path: basePath,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "List inventory maintenance reminders",
+        content: { "application/json": { schema: paginatedList } },
+      },
+      401: { description: "Unauthorized" },
+      404: { description: "Inventory item not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "post",
+    path: basePath,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    requestBody: {
+      content: { "application/json": { schema: jsonObject } },
+    },
+    responses: {
+      201: {
+        description: "Created maintenance reminder",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      400: { description: "Validation error" },
+      401: { description: "Unauthorized" },
+      404: { description: "Inventory item not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "get",
+    path: `${basePath}/{reminderId}`,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "Get maintenance reminder",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "patch",
+    path: `${basePath}/{reminderId}`,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    requestBody: {
+      content: { "application/json": { schema: jsonObject } },
+    },
+    responses: {
+      200: {
+        description: "Updated maintenance reminder",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      400: { description: "Validation error" },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "delete",
+    path: `${basePath}/{reminderId}`,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      204: { description: "Deleted" },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+
+  openApiRegistry.registerPath({
+    method: "post",
+    path: `${basePath}/{reminderId}/complete`,
+    tags: ["Inventory"],
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "Marked maintenance reminder complete",
+        content: { "application/json": { schema: jsonObject } },
+      },
+      401: { description: "Unauthorized" },
+      404: { description: "Not found" },
+    },
+  });
+}
+
 export function getOpenApiDocument() {
   const generator = new OpenApiGeneratorV3(openApiRegistry.definitions);
   return generator.generateDocument({

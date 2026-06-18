@@ -32,9 +32,16 @@ export async function InventorySection() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-sm font-medium text-text">{item.name}</span>
-                  <span className="shrink-0 text-xs text-text-muted">
-                    {formatUpdatedAt(item.updatedAt)}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    {item.hasOverdueReminder ? (
+                      <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">
+                        Due
+                      </span>
+                    ) : null}
+                    <span className="text-xs text-text-muted">
+                      {formatUpdatedAt(item.updatedAt)}
+                    </span>
+                  </div>
                 </div>
                 <p className="mt-0.5 text-sm text-text-muted">
                   {[item.brand, item.model, item.location].filter(Boolean).join(" · ") ||

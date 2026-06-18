@@ -32,6 +32,8 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 | `metric.entry_added`     | New metric entry                  | All except actor                                         |
 | `inventory.created`      | New inventory item                 | All except actor                                         |
 | `inventory.updated`      | Inventory item edit                | All except actor                                         |
+| `metric.reminder`        | Metric overdue for logging         | Whole household or assigned user (see `reminder_recipient_user_id`) |
+| `inventory.maintenance_reminder` | Maintenance reminder due   | Whole household or assigned user                         |
 | `mention`                | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional |
 | `user.admin_action`      | Admin create/disable/reset user    | All admins except actor (audit)                          |
 

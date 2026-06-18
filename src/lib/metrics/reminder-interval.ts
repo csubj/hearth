@@ -1,47 +1,37 @@
-import { z } from "zod";
 import {
   type Metric,
   type MetricEntry,
   type MetricReminderUnit,
-  metricReminderUnits,
 } from "@/db/schema";
+import {
+  hasReminderInterval as hasReminderIntervalState,
+  isDueForReminder,
+  isStale,
+  type ReminderIntervalState,
+} from "@/lib/reminders/interval";
+import { isReminderVisibleToUser } from "@/lib/reminders/scope";
 
-export const METRIC_REMINDER_UNITS = metricReminderUnits;
+export {
+  addReminderInterval,
+  DEFAULT_REMINDER_INTERVAL_COUNT,
+  DEFAULT_REMINDER_INTERVAL_UNIT,
+  formatReminderInterval,
+  formatReminderIntervalPhrase,
+  reminderUnits as METRIC_REMINDER_UNITS,
+} from "@/lib/reminders/interval";
 
-export const metricReminderUnitSchema = z.enum(metricReminderUnits);
+export { reminderUnitSchema as metricReminderUnitSchema } from "@/lib/reminders/interval";
 
-export const DEFAULT_REMINDER_INTERVAL_COUNT = 7;
-export const DEFAULT_REMINDER_INTERVAL_UNIT: MetricReminderUnit = "day";
-
-export function addReminderInterval(
-  date: Date,
-  count: number,
-  unit: MetricReminderUnit,
-): Date {
-  const result = new Date(date);
-  switch (unit) {
-    case "day":
-      result.setDate(result.getDate() + count);
-      break;
-    case "week":
-      result.setDate(result.getDate() + count * 7);
-      break;
-    case "month":
-      result.setMonth(result.getMonth() + count);
-      break;
-    case "year":
-      result.setFullYear(result.getFullYear() + count);
-      break;
-  }
-  return result;
+function metricIntervalState(metric: Metric): ReminderIntervalState {
+  return {
+    reminderIntervalCount: metric.reminderIntervalCount,
+    reminderIntervalUnit: metric.reminderIntervalUnit as MetricReminderUnit | null,
+    lastReminderAt: metric.lastReminderAt,
+  };
 }
 
 export function hasReminderInterval(metric: Metric): boolean {
-  return (
-    metric.reminderIntervalCount != null &&
-    metric.reminderIntervalCount > 0 &&
-    metric.reminderIntervalUnit != null
-  );
+  return hasReminderIntervalState(metricIntervalState(metric));
 }
 
 export function getMetricReminderAnchor(metric: Metric, latestEntry: MetricEntry | null): Date {
@@ -52,18 +42,13 @@ export function isMetricStale(
   metric: Metric,
   latestEntry: MetricEntry | null,
   now: Date = new Date(),
+  viewerUserId?: string,
 ): boolean {
-  if (!hasReminderInterval(metric)) {
+  if (viewerUserId && !isReminderVisibleToUser(metric.reminderRecipientUserId, viewerUserId)) {
     return false;
   }
 
-  const anchor = getMetricReminderAnchor(metric, latestEntry);
-  const dueAt = addReminderInterval(
-    anchor,
-    metric.reminderIntervalCount!,
-    metric.reminderIntervalUnit!,
-  );
-  return now.getTime() > dueAt.getTime();
+  return isStale(metricIntervalState(metric), getMetricReminderAnchor(metric, latestEntry), now);
 }
 
 export function isMetricDueForReminder(
@@ -71,43 +56,10 @@ export function isMetricDueForReminder(
   latestEntry: MetricEntry | null,
   now: Date = new Date(),
 ): boolean {
-  if (!isMetricStale(metric, latestEntry, now)) {
-    return false;
-  }
-
-  if (!metric.lastReminderAt) {
-    return true;
-  }
-
-  const retryAt = addReminderInterval(
-    metric.lastReminderAt,
-    metric.reminderIntervalCount!,
-    metric.reminderIntervalUnit!,
+  return isDueForReminder(
+    metricIntervalState(metric),
+    getMetricReminderAnchor(metric, latestEntry),
+    now,
   );
-  return now.getTime() > retryAt.getTime();
 }
 
-const UNIT_LABELS: Record<MetricReminderUnit, { one: string; other: string }> = {
-  day: { one: "day", other: "days" },
-  week: { one: "week", other: "weeks" },
-  month: { one: "month", other: "months" },
-  year: { one: "year", other: "years" },
-};
-
-export function formatReminderInterval(
-  count: number,
-  unit: MetricReminderUnit,
-  { prefixEvery = false }: { prefixEvery?: boolean } = {},
-): string {
-  const labels = UNIT_LABELS[unit];
-  const label = count === 1 ? labels.one : labels.other;
-  const interval = `${count} ${label}`;
-  return prefixEvery ? `every ${interval}` : interval;
-}
-
-export function formatReminderIntervalPhrase(
-  count: number,
-  unit: MetricReminderUnit,
-): string {
-  return formatReminderInterval(count, unit);
-}

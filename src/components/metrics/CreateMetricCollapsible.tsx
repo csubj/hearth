@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CreateMetricForm } from "@/components/metrics/CreateMetricForm";
+import type { MentionUser } from "@/components/MentionTextarea";
 import { Button } from "@/components/ui/Button";
 import {
   Collapsible,
@@ -9,7 +10,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/Collapsible";
 
-export function CreateMetricCollapsible() {
+export function CreateMetricCollapsible({ users = [] }: { users?: MentionUser[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -25,7 +26,7 @@ export function CreateMetricCollapsible() {
           Name a metric and optionally set a display unit.
         </p>
         <div className="mt-4 max-w-md">
-          <CreateMetricForm />
+          <CreateMetricForm users={users} />
         </div>
       </CollapsibleContent>
     </Collapsible>

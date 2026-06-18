@@ -36,6 +36,7 @@ function makeMetric(overrides: Partial<Metric> = {}): Metric {
     reminderIntervalCount: 7,
     reminderIntervalUnit: "day",
     lastReminderAt: null,
+    reminderRecipientUserId: null,
     createdByUserId: crypto.randomUUID(),
     createdAt: now,
     updatedAt: now,
@@ -168,6 +169,7 @@ describe("processMetricReminders", () => {
       metricId,
       metricName: "Flora's weight",
       intervalLabel: "7 days",
+      recipientUserId: null,
     });
 
     const [updated] = await getDb().select().from(metrics).where(eq(metrics.id, metricId));

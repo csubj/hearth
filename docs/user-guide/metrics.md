@@ -38,6 +38,17 @@ Numeric metrics render as a **line chart** over time, so trends are visible at a
 
 Charts are powered by Recharts. See the [Styling design](../design/05_styling.md) for the chart component pattern.
 
+## Reminders
+
+Each metric can remind the household (or one member) when it hasn't been logged on schedule.
+
+1. When creating or editing a metric, enable **recurring reminders**
+2. Set the interval — e.g. every **7 days**
+3. Choose **Whole household** or **Specific member** for who gets in-app notifications
+4. Stale metrics show a **Needs update** badge on the list and home page (scoped to the assigned user when set)
+
+Logging a new entry resets the reminder clock. While still stale, reminders repeat on the same interval.
+
 ## Home page
 
 The home metrics section shows the **latest entry** per metric. Metrics without recent entries may be flagged if something hasn't been logged in a while.

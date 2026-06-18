@@ -144,6 +144,47 @@ describe("inventory records", () => {
     expect(detail?.tags[0]?.name).toBe("network");
   });
 
+  it("export and import round-trip preserves maintenance reminders", async () => {
+    const user = await createTestUser({ username: "alex", password: "password123" });
+    mockRequireUser.mockResolvedValue({ user });
+
+    await importInventoryData(
+      {
+        items: [
+          {
+            name: "HVAC",
+            maintenanceReminders: [
+              {
+                title: "Replace filter",
+                notes: "16x25x1",
+                reminderIntervalCount: 3,
+                reminderIntervalUnit: "month",
+                reminderRecipientUserId: null,
+                links: [{ label: "Filter", url: "https://example.com/filter" }],
+              },
+            ],
+          },
+        ],
+      },
+      user.id,
+    );
+
+    const exported = await buildInventoryExport();
+    expect(exported.items[0]?.maintenanceReminders).toHaveLength(1);
+    expect(exported.items[0]?.maintenanceReminders[0]?.title).toBe("Replace filter");
+
+    const db = getDb();
+    await db.delete(inventoryItems);
+
+    await importInventoryData(exported, user.id);
+    const detail = await getInventoryItemById(
+      (await listInventoryItems({}))[0]!.id,
+    );
+    expect(detail?.maintenanceReminders).toHaveLength(1);
+    expect(detail?.maintenanceReminders[0]?.title).toBe("Replace filter");
+    expect(detail?.maintenanceReminders[0]?.links[0]?.label).toBe("Filter");
+  });
+
   it("filters by tag name", async () => {
     const user = await createTestUser({ username: "alex", password: "password123" });
     mockRequireUser.mockResolvedValue({ user });

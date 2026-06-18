@@ -5,6 +5,7 @@ import type { MentionUser } from "@/components/MentionTextarea";
 import { listAttachmentsForEntity } from "@/lib/attachments/queries";
 import { AttachmentsPanel } from "@/lib/attachments/AttachmentsPanel";
 import { InventoryLinksPanel, InventoryTagsForm } from "@/components/inventory/InventoryLinksTags";
+import { MaintenanceRemindersPanel } from "@/components/inventory/MaintenanceRemindersPanel";
 import { UpdateInventoryForm } from "@/components/inventory/UpdateInventoryForm";
 
 function formatDate(date: Date | null): string | null {
@@ -58,6 +59,12 @@ export async function InventoryDetailView({
           <InventoryLinksPanel item={item} />
         </div>
       </div>
+
+      <MaintenanceRemindersPanel
+        inventoryItemId={item.id}
+        reminders={item.maintenanceReminders}
+        users={users}
+      />
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

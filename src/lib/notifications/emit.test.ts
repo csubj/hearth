@@ -145,6 +145,7 @@ describe("notification emit", () => {
       metricId,
       metricName: "Flora's weight",
       intervalLabel: "2 weeks",
+      recipientUserId: null,
     });
 
     const rows = await getDb().select().from(notifications);
@@ -153,5 +154,22 @@ describe("notification emit", () => {
     expect(rows.every((row) => row.type === "metric.reminder")).toBe(true);
     expect(rows.every((row) => row.actorUserId == null)).toBe(true);
     expect(rows[0]!.summary).toBe("Flora's weight hasn't been logged in 2 weeks");
+  });
+
+  it("sends metric reminders to a single assigned user", async () => {
+    const first = await createTestUser({ username: "first" });
+    await createTestUser({ username: "second" });
+    const metricId = crypto.randomUUID();
+
+    await emitMetricReminder({
+      metricId,
+      metricName: "Plant watering",
+      intervalLabel: "3 days",
+      recipientUserId: first.id,
+    });
+
+    const rows = await getDb().select().from(notifications);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.recipientUserId).toBe(first.id);
   });
 });

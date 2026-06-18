@@ -54,7 +54,7 @@ No native app. The responsive web UI works on phones and tablets.
 
 ### Can I sync with Google Calendar?
 
-Not supported. Use stream notes for date-specific reminders.
+Use **inventory maintenance reminders** for recurring appliance upkeep (filter changes, inspections). Metrics support interval reminders when something hasn't been logged.
 
 ### Is there a map for restaurants?
 

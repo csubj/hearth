@@ -13,6 +13,7 @@ export const metrics = sqliteTable("metrics", {
     enum: metricReminderUnits,
   }),
   lastReminderAt: integer("last_reminder_at", { mode: "timestamp_ms" }),
+  reminderRecipientUserId: text("reminder_recipient_user_id").references(() => users.id),
   createdByUserId: text("created_by_user_id")
     .notNull()
     .references(() => users.id),

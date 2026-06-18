@@ -18,6 +18,8 @@ Documentation and design updates for upcoming features (implementation in progre
 
 ### Added (documented)
 
+- **Inventory maintenance reminders** — per-item recurring upkeep with title, notes, links, interval, and household or per-user notification scope
+- **Metric reminder scope** — optional `reminderRecipientUserId` to notify one member instead of the whole household
 - **REST API** — `/api/v1/*` programmatic access with bearer token auth
 - **OpenAPI** — self-describing spec at `/api/openapi.json` and interactive docs at `/api/docs`
 - **API tokens** — admin-managed bearer tokens (`api_tokens` table)

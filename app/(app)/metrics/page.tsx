@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CreateMetricCollapsible } from "@/components/metrics/CreateMetricCollapsible";
 import { listMetricsWithLatest } from "@/lib/actions/metrics";
+import { loadMentionUsers } from "@/lib/users/mention-users";
 
 function formatRecordedAt(date: Date): string {
   return date.toLocaleDateString(undefined, { dateStyle: "medium" });
@@ -11,7 +12,7 @@ function formatValue(value: string, unit: string | null): string {
 }
 
 export default async function MetricsPage() {
-  const items = await listMetricsWithLatest();
+  const [items, mentionUsers] = await Promise.all([listMetricsWithLatest(), loadMentionUsers()]);
 
   return (
     <div className="space-y-6">
@@ -22,7 +23,7 @@ export default async function MetricsPage() {
             Ongoing measurements and observations for the household.
           </p>
         </div>
-        <CreateMetricCollapsible />
+        <CreateMetricCollapsible users={mentionUsers} />
       </header>
 
       <section className="space-y-3">
