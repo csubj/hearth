@@ -209,7 +209,7 @@ stack:
     handlers: nextjs_route_handlers
     validation: zod
     openapi: "@asteasolutions/zod-to-openapi"
-    docs_ui: scalar # or redoc — pick one at implementation
+    docs_ui: scalar # implemented via @scalar/nextjs-api-reference
     spec_route: /api/openapi.json
     docs_route: /api/docs
     rest_prefix: /api/v1
@@ -237,7 +237,7 @@ stack:
 
 | Field           | Value                                                                                                                                                                                                 |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Choice**      | Next.js Route Handlers + Zod + `@asteasolutions/zod-to-openapi` + Scalar (or Redoc)                                                                                                                   |
+| **Choice**      | Next.js Route Handlers + Zod + `@asteasolutions/zod-to-openapi` + Scalar (`@scalar/nextjs-api-reference`)                                                                                                                   |
 | **Role**        | Versioned REST API under `/api/v1/*` with a self-describing OpenAPI spec                                                                                                                              |
 | **Rationale**   | Route Handlers fit the App Router stack. Zod schemas validate request/response bodies and double as OpenAPI source via `zod-to-openapi`, keeping the spec in sync with runtime validation. Scalar or Redoc provides interactive docs without maintaining a separate spec by hand. |
 | **Conventions** | Handlers live under `app/api/v1/`. Shared Zod schemas in `src/lib/api/schemas/`. Register paths with the OpenAPI registry; emit spec at `GET /api/openapi.json`. Interactive UI at `/api/docs`. Bearer token auth on all `/api/v1/*` routes. Web UI continues using server actions — REST is an additional surface. |
@@ -253,7 +253,7 @@ api:
   openapi_generator: "@asteasolutions/zod-to-openapi"
   spec_route: GET /api/openapi.json
   docs_route: /api/docs
-  docs_ui: scalar # or redoc
+  docs_ui: scalar # @scalar/nextjs-api-reference
   auth: bearer_token # api_tokens table
 ```
 
@@ -266,7 +266,7 @@ api:
 | **Choice**      | Recharts                                                                                                                                       |
 | **Role**        | Line/point charts for numeric metric history on `/metrics/[id]`                                                                              |
 | **Rationale**   | React-native charting library; composable with Server + Client Components. Fits the existing React/Tailwind stack without a separate charting framework. |
-| **Conventions** | Chart component in `src/components/MetricChart.tsx` (client component). Numeric values only — text metrics fall back to table/list. Axis labels use the metric's `unit` field. See `05_styling.md` for layout. |
+| **Conventions** | Chart component in `src/components/metrics/MetricChart.tsx` (client component). Numeric values only — text metrics fall back to table/list. Axis labels use the metric's `unit` field. See `05_styling.md` for layout. |
 | **References**  | https://recharts.org · `docs/design/05_styling.md`                                                                                             |
 
 ---

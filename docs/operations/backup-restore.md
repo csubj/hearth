@@ -73,7 +73,7 @@ curl http://localhost:3000/api/health
 
 ## What backups do not include
 
-- Environment variables (`.env`) — store `SESSION_SECRET` separately and securely
+- Environment variables (`.env`) — store separately and securely
 - Application code — recoverable from git/Docker image
 - Git history
 
@@ -81,7 +81,6 @@ curl http://localhost:3000/api/health
 
 1. Deploy a fresh hearth instance (same version if possible)
 2. Restore `data/` from backup
-3. Ensure `SESSION_SECRET` matches the original (or all users must re-login)
-4. Verify health endpoint and log in
+3. Verify health endpoint and log in
 
-If `SESSION_SECRET` changes, existing session cookies are invalidated — users log in again but data is intact.
+Sessions are stored in the database (`hearth.db`), so restoring `data/` keeps existing logins valid. There is no separate session-signing secret to preserve.

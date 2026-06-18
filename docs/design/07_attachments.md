@@ -44,7 +44,6 @@ data/
 
 | entity_type     | Images | Documents (PDF) | Notes                                |
 | --------------- | ------ | --------------- | ------------------------------------ |
-| `stream_entry`  | _(removed)_ | — | Merged into Projects |
 | `restaurant`    | Yes    | No              | Menu pics, visit photos              |
 | `project`       | Yes    | Yes             | Notes attachments, progress photos, PDFs |
 | `metric_entry`  | Yes    | No              | Scale reading, condition photo       |
@@ -124,7 +123,6 @@ Attachments link polymorphically via `entity_type` + `entity_id`:
 
 | entity_type      | When attached                        |
 | ---------------- | ------------------------------------ |
-| `stream_entry`   | On create/edit stream note           |
 | `restaurant`     | Notes, visit review                  |
 | `project`        | Description updates, progress photos |
 | `metric_entry`   | Entry note (e.g. scale photo)        |
@@ -219,7 +217,7 @@ attachments:
   max_per_entity: 10
   mime_images: [image/jpeg, image/png, image/webp, image/gif]
   mime_documents: [application/pdf]
-  documents_entity_types: [inventory_item]
+  documents_entity_types: [inventory_item, project]
   thumbnails: false # v1
   import_export: metadata_only # files backed up via data/ volume
 ```

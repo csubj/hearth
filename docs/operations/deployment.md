@@ -15,7 +15,6 @@ Supported platforms: any single-container host — Hetzner, Fly.io, Railway, a h
 ## Docker Compose (local build)
 
 ```bash
-# .env with SESSION_SECRET set
 docker compose up -d --build
 docker compose exec app pnpm run auth:bootstrap
 ```
@@ -108,7 +107,7 @@ Verify a full deploy from a dev checkout:
 pnpm smoke:docker
 ```
 
-Builds, starts, bootstraps, and checks health + authenticated stream access.
+Builds, starts, bootstraps, and checks health + authenticated `/projects` access.
 
 ## Authentication mode
 
@@ -116,7 +115,6 @@ By default the web UI requires login (`AUTH_MODE=required`). To skip the login g
 
 ## Manual deploy checklist
 
-- [ ] `SESSION_SECRET` set (production)
 - [ ] `data/` volume persisted
 - [ ] Migrations applied (automatic on server start)
 - [ ] First admin bootstrapped

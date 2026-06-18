@@ -32,7 +32,7 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 | `user_role`         | `member`, `admin`                                                                                   | `users.role`                         |
 | `restaurant_status` | `want_to_try`, `visited`                                                                            | `restaurants.status`                 |
 | `project_status`    | `idea`, `in_progress`, `done`                                                                       | `projects.status`                    |
-| `entity_type`       | `stream_entry`, `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`        | attachments, mentions, notifications |
+| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`        | attachments, mentions, notifications |
 | `notification_type` | see `06_notifications.md`                                                                           | `notifications.type`                 |
 
 ---
@@ -50,6 +50,7 @@ Defined in detail in `02_auth.md`. Included here for ERD completeness.
 | `display_name`  | text NULL            | @-mention label; falls back to username |
 | `password_hash` | text NOT NULL        | Argon2id                                |
 | `role`          | text NOT NULL        | `member` \| `admin`                     |
+| `theme`         | text NOT NULL        | `default` \| `warm` \| `dark` \| `gamer`; default `default` |
 | `disabled_at`   | integer NULL         | ms; NULL = active                       |
 | `last_seen_at`  | integer NULL         | ms; updated on authenticated page load  |
 | `created_at`    | integer NOT NULL     |                                         |
@@ -74,25 +75,7 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 
 **Indexes:** `(user_id)`, `(prefix)`.
 
----
-
-## Stream
-
-### `stream_entries`
-
-| Column               | Type             | Notes                                         |
-| -------------------- | ---------------- | --------------------------------------------- |
-| `id`                 | text PK          |                                               |
-| `body`               | text NOT NULL    | markdown-lite plain text; @-mentions embedded |
-| `is_pinned`          | integer NOT NULL | 0/1 boolean                                   |
-| `done_at`            | integer NULL     | ms; NULL = open                               |
-| `rough_when`         | text NULL        | freeform ("this week", "before trip")         |
-| `created_by_user_id` | text FK → users  |                                               |
-| `updated_by_user_id` | text FK → users  |                                               |
-| `created_at`         | integer NOT NULL |                                               |
-| `updated_at`         | integer NOT NULL |                                               |
-
-**Indexes:** `(created_at DESC)`, `(is_pinned, created_at DESC)`, `(done_at)` where open items matter.
+> **Note:** the original `stream_entries` table was removed (migration `0007_projects_v2_drop_stream.sql`); the stream feature was merged into Projects.
 
 ---
 
@@ -141,6 +124,33 @@ Managed by Lucia + `@lucia-auth/adapter-drizzle`. Follow upstream adapter schema
 | `updated_at`         | integer NOT NULL |                                   |
 
 **Indexes:** `(status, updated_at DESC)`, `(priority)`.
+
+### `project_links`
+
+| Column       | Type             | Notes             |
+| ------------ | ---------------- | ----------------- |
+| `id`         | text PK          |                   |
+| `project_id` | text FK → projects | ON DELETE CASCADE |
+| `label`      | text NOT NULL    | e.g. "Manual"     |
+| `url`        | text NOT NULL    |                   |
+| `created_at` | integer NOT NULL |                   |
+
+### `project_tags`
+
+| Column       | Type                 | Notes  |
+| ------------ | -------------------- | ------ |
+| `id`         | text PK              |        |
+| `name`       | text UNIQUE NOT NULL |        |
+| `created_at` | integer NOT NULL     |        |
+
+### `project_item_tags`
+
+| Column       | Type                    | Notes             |
+| ------------ | ----------------------- | ----------------- |
+| `project_id` | text FK → projects      | ON DELETE CASCADE |
+| `tag_id`     | text FK → project_tags  | ON DELETE CASCADE |
+
+**Indexes:** `(project_id)`, `(tag_id)`. Composite primary key `(project_id, tag_id)`.
 
 ### `project_components`
 
@@ -359,7 +369,6 @@ Metadata in SQLite; bytes on disk. Detail in `07_attachments.md`.
 
 ```mermaid
 erDiagram
-  users ||--o{ stream_entries : creates
   users ||--o{ restaurants : creates
   users ||--o{ projects : creates
   users ||--o{ metrics : creates
@@ -369,12 +378,15 @@ erDiagram
   users ||--o{ notifications : receives
   users ||--o{ mentions : mentioned_in
   metrics ||--o{ metric_entries : has
+  projects ||--o{ project_links : has
+  projects ||--o{ project_components : has
+  projects ||--o{ project_item_tags : tagged
+  project_tags ||--o{ project_item_tags : applied
   inventory_items ||--o{ inventory_links : has
   inventory_items ||--o{ inventory_maintenance_reminders : has
   inventory_maintenance_reminders ||--o{ inventory_maintenance_reminder_links : has
   inventory_items ||--o{ inventory_item_tags : tagged
   inventory_tags ||--o{ inventory_item_tags : applied
-  stream_entries ||--o{ attachments : has
   restaurants ||--o{ attachments : has
   projects ||--o{ attachments : has
   metric_entries ||--o{ attachments : has
@@ -391,8 +403,7 @@ src/db/
   schema/
     users.ts
     sessions.ts      # Lucia adapter tables
-    api_tokens.ts
-    stream.ts
+    api-tokens.ts
     restaurants.ts
     projects.ts
     metrics.ts
@@ -419,9 +430,8 @@ schema:
   tables:
     auth: [users, sessions, api_tokens]
     features:
-      stream: [stream_entries]
       restaurants: [restaurants]
-      projects: [projects]
+      projects: [projects, project_links, project_tags, project_item_tags, project_components]
       metrics: [metrics, metric_entries]
       inventory: [inventory_items, inventory_links, inventory_tags, inventory_item_tags, inventory_maintenance_reminders, inventory_maintenance_reminder_links]
     cross_cutting:
@@ -430,7 +440,9 @@ schema:
       - attachments
   enums:
     user_role: [member, admin]
+    user_theme: [default, warm, dark, gamer]
     restaurant_status: [want_to_try, visited]
     project_status: [idea, in_progress, done]
-    entity_type: [stream_entry, restaurant, project, metric, metric_entry, inventory_item]
+    project_component_kind: [item, labor, fee, other]
+    entity_type: [restaurant, project, metric, metric_entry, inventory_item]
 ```

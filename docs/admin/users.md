@@ -22,7 +22,6 @@ The admin panel shows all users with:
 - Display name
 - Role (member / admin)
 - Active or disabled status
-- Last login (if tracked)
 
 ## Create a user
 

@@ -18,6 +18,22 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ---
 
+## Implementation status
+
+All phases below (0–10) are **implemented** in the codebase. Beyond the originally scoped phases, the following features also now exist and are not yet broken out into their own phase descriptions:
+
+- **User themes** — per-user theme selection (`default`, `warm`, `dark`, `gamer`) stored in `users.theme`, set via `/settings` (`ThemePicker`). See `05_styling.md`.
+- **Inventory maintenance reminders** — per-item recurring upkeep schedules (`inventory_maintenance_reminders` + links) with a "mark done"/complete flow and `inventory.maintenance_reminder` notifications.
+- **Metric reminders** — interval-based logging reminders on metrics (`reminder_interval_*`, `reminder_recipient_user_id`) emitting `metric.reminder` notifications.
+- **Project budgeting** — `project_components` budget line items, plus project `links` and `tags`.
+- **Navigation additions** — `/browse` hub and `/reminders` feed pages (see `04_routes.md`).
+
+The original "Stream" feature was built and then removed (merged into Projects, migration `0007_projects_v2_drop_stream.sql`). References to a standalone stream in earlier phase notes are historical.
+
+> Note: the per-phase `Done when` checklists below are left unchecked as originally authored; treat the status note above as the source of truth for what is implemented.
+
+---
+
 ## Phase 0 — Scaffold & toolchain
 
 **Goal:** empty app boots, DB migrates, hooks run.
@@ -135,7 +151,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 | --------------------------- | ------------------------------------------------- |
 | `attachments` migration     |                                                   |
 | `POST/GET /api/attachments` | per `07_attachments.md`                           |
-| Upload UI on detail forms   | stream, restaurant, project, metric entry  |
+| Upload UI on detail forms   | restaurant, project, metric entry  |
 | Thumbnail grid + lightbox   | Radix Dialog                                      |
 
 **Done when:**
@@ -163,7 +179,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 **Done when:**
 
-- [ ] User A creates stream note → User B sees notification
+- [ ] User A creates a project → User B sees notification
 - [ ] `@username` in note → mentioned user gets `mention` notification
 - [ ] Mark all read clears badge
 - [ ] Parser tests pass

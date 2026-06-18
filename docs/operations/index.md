@@ -35,7 +35,6 @@ SQLite handles this workload easily. Scale vertically if needed — do not run m
 - Do not mount SQLite over NFS or a network filesystem
 - Do not run multiple containers/replicas writing one DB file
 - Do not store uploads outside the persisted volume
-- Do not skip `SESSION_SECRET` in production
 - Do not commit `.env` or `data/` to version control
 
 ## Health monitoring

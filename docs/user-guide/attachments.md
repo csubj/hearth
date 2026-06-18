@@ -1,6 +1,6 @@
 # Attachments
 
-Attach photos to notes and entries across hearth — stream notes, restaurant reviews, project updates, metric entries, and inventory items. Inventory additionally accepts **PDF documents** (manuals, receipts, warranties).
+Attach photos to records across hearth — restaurant reviews, projects, metric entries, and inventory items. Inventory items and projects additionally accept **PDF documents** (manuals, receipts, warranties, quotes).
 
 ## Supported formats
 
@@ -15,7 +15,7 @@ Attach photos to notes and entries across hearth — stream notes, restaurant re
 
 **Limits:** 10 MB per image, up to 10 files per item.
 
-### Documents (inventory only)
+### Documents (inventory & projects)
 
 | Type | Extensions |
 | ---- | ---------- |
@@ -27,7 +27,7 @@ Attach photos to notes and entries across hearth — stream notes, restaurant re
 
 1. Open the detail page or edit form for an item
 2. Use the upload control
-3. Select images (or PDFs on inventory items)
+3. Select images (or PDFs on inventory items and projects)
 
 The item must exist before you can attach files — create the entry first, then add files on edit.
 
@@ -48,4 +48,4 @@ On the server, files live in `data/uploads/` alongside the SQLite database. Oper
 Delete individual attachments from the detail page. Removing a file deletes it from storage.
 
 !!! note
-    Deleting a parent item (e.g. a stream entry) does not automatically delete attached files in v1. Orphan cleanup may be added later.
+    Deleting a parent item (e.g. a restaurant) does not automatically delete attached files in v1. Orphan cleanup may be added later.

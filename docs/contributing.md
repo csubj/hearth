@@ -4,12 +4,12 @@ Thank you for contributing to hearth! This guide covers development setup, conve
 
 ## What this is
 
-**hearth** is a household coordination web app — shared stream, restaurants, projects, metrics, and inventory. One instance = one household.
+**hearth** is a household coordination web app — projects, restaurants, metrics, and inventory. One instance = one household.
 
 ## Before you code
 
 1. Read the [Architecture overview](architecture/index.md) and [Product Vision](design/00_init.md)
-2. Check [MVP Phases](design/08_mvp.md) for build status — v1 (phases 0–7) is complete
+2. Check [MVP Phases](design/08_mvp.md) for build status — phases 0–10 are complete
 3. Follow stack decisions in [Tech Choices](design/01_tech.md) — do not swap libraries without discussion
 
 ## Development setup
@@ -20,7 +20,6 @@ cd hearth
 pnpm install
 lefthook install
 cp .env.example .env
-# add SESSION_SECRET to .env
 pnpm db:migrate
 pnpm run auth:bootstrap
 pnpm dev

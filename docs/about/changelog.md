@@ -9,14 +9,7 @@ All notable changes to hearth. Versioning follows [Semantic Versioning](https://
 - **Stream** — quick-capture notes removed; use Projects quick capture and notes instead. Run `tsx scripts/purge-stream.ts` before migrating if upgrading from a version with Stream data.
 - **Events** — calendar-dated items feature removed
 
-### Changed
-
-- **Projects v2** — auto-saving markdown notes (field renamed from `description` to `notes` in REST API), priority, tags, links, component cost rollup, PDF attachments
-- **REST breaking:** `POST/PATCH /api/v1/projects` use `notes` instead of `description`; `/api/v1/stream` removed
-
-Documentation and design updates for upcoming features (implementation in progress):
-
-### Added (documented)
+### Added
 
 - **Home dashboard** — stats strip, upcoming reminders preview, and denser feature section cards
 - **Browse hub** — `/browse` groups Projects, Restaurants, Metrics, and Inventory; desktop nav uses a Browse dropdown
@@ -25,16 +18,19 @@ Documentation and design updates for upcoming features (implementation in progre
 - **Metric reminder scope** — optional `reminderRecipientUserId` to notify one member instead of the whole household
 - **REST API** — `/api/v1/*` programmatic access with bearer token auth
 - **OpenAPI** — self-describing spec at `/api/openapi.json` and interactive docs at `/api/docs`
-- **API tokens** — admin-managed bearer tokens (`api_tokens` table)
+- **API tokens** — admin-managed bearer tokens (`api_tokens` table), created in `/admin/api-tokens` or via `pnpm run auth:create-token`
 - **Configurable auth** — `AUTH_MODE=required|open` with `OPEN_MODE_USERNAME` for trusted networks
-- **Metrics** — renamed from Trackers; line charts for numeric values (Recharts)
+- **Metrics** — line charts for numeric values (Recharts)
 - **Inventory** — searchable household catalog with tags, links, photos, PDF documents, import/export
+- **Appearance themes** — per-user color themes (Default, Warm Earth, Dark, Gamer) in **Settings → Appearance**
 - **Existing-data-first layout** — list pages lead with content; compact create in header
 
-### Changed (documented)
+### Changed
 
+- **Projects v2** — auto-saving markdown notes (field renamed from `description` to `notes` in REST API), priority, tags, links, component/budget cost rollup, PDF attachments
+- **REST breaking:** `POST/PATCH /api/v1/projects` use `notes` instead of `description`; `/api/v1/stream` removed
 - Trackers renamed to **Metrics** across schema, routes, and UI (`/metrics`)
-- Attachments generalized — inventory accepts PDF documents; other entities remain images-only
+- Attachments generalized — inventory items and projects accept PDF documents; other entities remain images-only
 - MVP phases extended to 0–10 (auth modes, API, graphing, inventory)
 
 ## v1.0.0 — 2026-06

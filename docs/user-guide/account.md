@@ -1,6 +1,19 @@
 # Your account
 
-Manage your login credentials and personal settings.
+Manage your login credentials and personal settings under **Settings** (`/settings`).
+
+## Appearance theme
+
+Under **Settings → Appearance**, pick a color theme for your hearth:
+
+| Theme | Notes |
+| ----- | ----- |
+| Default | Light, warm neutral |
+| Warm Earth | Softer earth tones |
+| Dark | Dark background |
+| Gamer | High-contrast dark with neon accent |
+
+The choice is saved to your account and applies wherever you're logged in.
 
 ## Change your password
 

@@ -10,7 +10,7 @@ hearth is organized around a **home page** that summarizes what needs attention,
 | Browse | `/browse` | Hub for Projects, Restaurants, Metrics, and Inventory |
 | Reminders | `/reminders` | Upcoming maintenance and metric logging reminders |
 | Notifications | `/notifications` | Activity feed and @-mentions |
-| Settings | `/settings` | Change your password |
+| Settings | `/settings` | Change your password and pick an appearance theme |
 
 From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), or **Inventory** (`/inventory`).
 

@@ -46,7 +46,7 @@ flowchart TB
 | Language | TypeScript |
 | UI | React 19, Tailwind CSS v4, Radix UI |
 | Charting | Recharts (metrics) |
-| API | Route Handlers, Zod, zod-to-openapi, Scalar/Redoc |
+| API | Route Handlers, Zod, zod-to-openapi, Scalar |
 | Database | SQLite via `better-sqlite3` |
 | ORM | Drizzle |
 | Auth | Lucia v3 + Argon2id; optional open web mode; API bearer tokens |
@@ -66,10 +66,10 @@ sequenceDiagram
   participant Action
   participant DB
 
-  Browser->>Middleware: GET /stream
+  Browser->>Middleware: GET /projects
   Middleware->>Middleware: validate session or open mode
   Middleware->>Page: authorized request
-  Page->>DB: query stream entries
+  Page->>DB: query projects
   Page->>Browser: rendered HTML
 
   Browser->>Action: POST createEntry
@@ -87,7 +87,7 @@ sequenceDiagram
   participant Handler as /api/v1 handler
   participant DB
 
-  Client->>Handler: GET /api/v1/stream + Bearer token
+  Client->>Handler: GET /api/v1/projects + Bearer token
   Handler->>Handler: validate token against api_tokens
   Handler->>DB: query
   Handler->>Client: JSON response
@@ -97,7 +97,6 @@ sequenceDiagram
 
 ```mermaid
 erDiagram
-  users ||--o{ stream_entries : creates
   users ||--o{ restaurants : creates
   users ||--o{ projects : creates
   users ||--o{ metrics : creates
@@ -106,12 +105,13 @@ erDiagram
   users ||--o{ notifications : receives
   metrics ||--o{ metric_entries : has
   inventory_items ||--o{ inventory_links : has
-  stream_entries ||--o{ attachments : has
+  projects ||--o{ attachments : has
   restaurants ||--o{ attachments : has
+  metric_entries ||--o{ attachments : has
   inventory_items ||--o{ attachments : has
 ```
 
-Core entities: **users**, **stream entries**, **restaurants**, **projects**, **metrics** (+ entries), **inventory** (+ links, tags), **api tokens**, **notifications**, **mentions**, **attachments**.
+Core entities: **users**, **restaurants**, **projects** (+ components), **metrics** (+ entries), **inventory** (+ links, tags, maintenance reminders), **api tokens**, **notifications**, **mentions**, **attachments**.
 
 Full schema: [Data Model](../design/03_schema.md)
 

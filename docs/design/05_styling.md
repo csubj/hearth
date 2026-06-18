@@ -89,7 +89,7 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 ## Component patterns
 
-### Lists (stream, restaurants, projects, metrics, inventory)
+### Lists (restaurants, projects, metrics, inventory)
 
 - **Lead with existing content** — the list, history, or searchable catalog is the first element on the page
 - Full-width rows or cards with clear primary line + muted secondary line
@@ -99,7 +99,6 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 ### Quick capture / create
 
 - **Secondary affordance** — a compact "Add" / "New …" button in the page header, or a collapsed/expandable form (Radix `Collapsible`), not a large form at the top of the page
-- Stream is the exception for quick capture — it may keep an inline textarea, but still below any pinned/recent items on the home summary
 - Submit button labeled simply: "Add", not "Create task"
 - No modal for simple adds unless the form is large (inventory item with many fields)
 
@@ -131,8 +130,6 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 | Feature                | Chip styles                    |
 | ---------------------- | ------------------------------ |
-| Stream open            | default text                   |
-| Stream done            | muted + strikethrough optional |
 | Restaurant want_to_try | accent outline                 |
 | Restaurant visited     | muted + stars                  |
 | Project idea           | neutral                        |
@@ -197,9 +194,20 @@ Do not use `ghost` for primary create or card actions — it reads as plain text
 
 ---
 
-## Dark mode
+## Theming (incl. dark mode)
 
-Out of scope for v1. Structure tokens as CSS variables so dark mode can be added later without refactors.
+User-selectable themes are implemented. Each user picks a theme on `/settings` via the `ThemePicker` (`src/components/settings/ThemePicker.tsx`); the choice persists in `users.theme` (see `03_schema.md`) and is applied via a `data-theme` attribute that overrides the CSS variables in `app/globals.css`.
+
+Available themes:
+
+| Theme     | `users.theme` value | Notes                          |
+| --------- | ------------------- | ------------------------------ |
+| Default   | `default`           | Warm off-white (base `@theme`) |
+| Warm Earth| `warm`              | Earthy neutrals                |
+| Dark      | `dark`              | Dark (`color-scheme: dark`)    |
+| Gamer     | `gamer`             | Dark, neon-purple accent       |
+
+Tokens are CSS variables, so additional themes can be added by defining a new `[data-theme="…"]` block without component refactors.
 
 ---
 
@@ -217,6 +225,10 @@ styling:
   component_dir: src/components
   charting: recharts
   layout_principle: show_what_exists_first
-  dark_mode: false
+  theming:
+    enabled: true
+    store: users.theme
+    apply_via: data-theme attribute
+    themes: [default, warm, dark, gamer]
   design_tone: warm, calm, notebook-like
 ```

@@ -35,14 +35,13 @@ make setup
 
 ### 2. Configure environment
 
-Copy the example env file and generate a session secret:
+Copy the example env file:
 
 ```bash
 cp .env.example .env
-openssl rand -base64 32
 ```
 
-Add the generated value to `.env` as `SESSION_SECRET`. See [Configuration](../operations/configuration.md) for all environment variables.
+The defaults work for local development — no secret key is required (sessions use opaque, database-backed IDs). See [Configuration](../operations/configuration.md) for all environment variables.
 
 ### 3. Start the dev server
 

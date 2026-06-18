@@ -14,11 +14,11 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
 <div class="grid cards" markdown>
 
-- :material-note-text-outline: **Stream**
+- :material-bell-ring-outline: **Reminders**
 
     ---
 
-    Quick-capture notes, reminders, and half-formed thoughts. Pin what matters; mark things done when they're handled.
+    Recurring maintenance and metric check-ins surface when they're due — on the home page and a dedicated reminders feed.
 
 - :material-silverware-fork-knife: **Restaurants**
 

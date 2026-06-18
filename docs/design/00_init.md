@@ -34,6 +34,8 @@ There is no audience beyond the household. No public profiles, no social feed, n
 
 ### Shared stream of consciousness
 
+> **Implementation note:** the standalone stream was built and later merged into **House projects** (migration `0007_projects_v2_drop_stream.sql`); there is no separate `/stream` feature in the current code. The vision below is retained for context.
+
 A running list of tasks, reminders, and half-formed thoughts anyone can add to.
 
 - Quick capture: type and save; no required fields beyond the note itself
@@ -157,7 +159,7 @@ Photos can be attached to notes and other user inputs across features.
 
 hearth exposes a small REST API so the household can manage its data outside the web UI — scripts, home-automation glue, bulk edits, or a future companion app.
 
-- Every resource the UI manages is reachable over REST under `/api/v1/` — stream, restaurants, projects, metrics (and their definitions), and inventory (with its tags and types)
+- Every resource the UI manages is reachable over REST under `/api/v1/` — restaurants, projects, metrics (and their definitions), and inventory (with its tags and types)
 - Requests authenticate with a **bearer API token**, separate from web login; tokens are created and revoked by an admin
 - The API is **self-describing**: an OpenAPI spec is served at `/api/openapi.json` with interactive docs at `/api/docs`
 - The web UI keeps using its own server actions; REST is an additional surface, not a replacement

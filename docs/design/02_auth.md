@@ -245,7 +245,7 @@ api_tokens:
 
 Lucia's Drizzle adapter defines exact session table shape — follow upstream schema when implementing. Full `api_tokens` columns and indexes live in `03_schema.md`.
 
-**Attribution:** content tables (stream entries, restaurants, etc.) store `created_by_user_id` / `updated_by_user_id` for notifications and @-mentions. Use display name at render time, not denormalized strings.
+**Attribution:** content tables (projects, restaurants, etc.) store `created_by_user_id` / `updated_by_user_id` for notifications and @-mentions. Use display name at render time, not denormalized strings.
 
 ---
 

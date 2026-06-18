@@ -60,21 +60,21 @@ Each new member logs in with the credentials you set. They can change their own 
 
 See [User management](../admin/users.md) for disable, reset, and promote actions.
 
-## Step 4: Capture your first stream note
+## Step 4: Capture your first project
 
-The **stream** is the catch-all layer — errands, reminders, half-formed thoughts.
+**Projects** is the catch-all for house work and notes — errands, repairs, half-formed ideas.
 
-1. Go to **Stream** in the nav (or `/stream`)
-2. Type a note in the capture box at the top — e.g. "pick up more dog food"
-3. Click **Add**
+1. Go to **Projects** (from **Browse** in the nav, or `/projects`)
+2. Use the **Quick capture** box — type notes, e.g. "pick up more dog food"; the first line becomes the title if you skip one
+3. Click **Add project**
 
-Your note appears in the chronological list. Other household members will see it on their home page and in their notification feed.
+Your project appears in the list. Other household members will see it on their home page and in their notification feed.
 
-### Optional: pin or add timing
+### Optional: prioritize or add detail
 
-- **Pin** — surface an item on the home page for attention
-- **Rough when** — freeform timing like "this week" or "before the trip" (no strict due dates)
-- **@-mention** — type `@username` to nudge a specific person
+- **Priority** — set 1–5 on the detail page; high-priority projects surface on the home page
+- **Tags and links** — group projects and attach labeled URLs
+- **@-mention** — type `@username` in notes to nudge a specific person
 
 ## Step 5: Explore other features
 
@@ -104,8 +104,8 @@ All authenticated users share the same data. There are no private notes or per-u
 
 - [ ] Admin account bootstrapped
 - [ ] All household members have accounts
-- [ ] At least one stream note captured
-- [ ] One restaurant or project added (optional)
+- [ ] At least one project captured
+- [ ] One restaurant added (optional)
 - [ ] Everyone has logged in once and seen the home page
 - [ ] Backup plan in place if running on a server — see [Backup & restore](../operations/backup-restore.md)
 

@@ -21,7 +21,7 @@ Open a metric (`/metrics/[id]`) and add a dated entry:
 | Field | Required | Notes |
 | ----- | -------- | ----- |
 | Value | Yes | Number or text |
-| Recorded at | Yes | When the measurement applies |
+| Recorded at | No | Defaults to now; set when the measurement applies |
 | Note | No | Context — "after morning walk" |
 
 Entries appear in history, newest first. The detail page shows the chart, then a table or card list of past entries below it.

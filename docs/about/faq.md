@@ -6,7 +6,7 @@ Frequently asked questions about hearth.
 
 ### What is hearth?
 
-A self-hosted web app for household coordination — shared notes, restaurants, projects, metrics, and inventory. Think kitchen whiteboard, not corporate task manager.
+A self-hosted web app for household coordination — projects, restaurants, metrics, and inventory. Think kitchen whiteboard, not corporate task manager.
 
 ### Who is it for?
 
@@ -62,7 +62,7 @@ Not yet. Restaurants are a list in v1. Map view is on the [roadmap](roadmap.md).
 
 ### Does hearth support dark mode?
 
-Not in v1. CSS variables are structured to add it later.
+Yes. Each user can pick a color theme under **Settings → Appearance** — Default, Warm Earth, Dark, or Gamer. The choice is saved per user.
 
 ## Technical
 

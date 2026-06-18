@@ -2,6 +2,22 @@
 
 Household coordination — projects, restaurants, metrics, and inventory. One deployment serves one household.
 
+## Features
+
+- **Home dashboard** — stats strip, "since last visit" activity, and upcoming reminders at a glance
+- **Projects** — status and priority tracking, components table, markdown notes, links, and tags
+- **Restaurants** — status, star ratings, and visited tracking
+- **Metrics** — log entries, view history, and visualize trends with charts (Recharts)
+- **Inventory** — types, tags, filters, links, CSV import/export, and per-item maintenance reminders
+- **Maintenance reminders & reminders feed** — recurring upkeep tasks with a consolidated feed
+- **Notifications & @mentions** — in-app notifications with mention support
+- **Attachments** — photo and document uploads
+- **Browse menu** — quick global navigation across sections
+- **Themes** — selectable UI theme in settings
+- **Admin** — user management and API token administration
+- **REST API** — `/api/v1/*` with OpenAPI spec and Scalar-powered docs (`/api/docs`)
+- **Auth modes** — gated login (`required`) or shared household access (`open`) via `AUTH_MODE`
+
 ## Design docs
 
 - **[Documentation site](https://csubj.github.io/hearth/)** — user guide, operating guide, architecture (MkDocs)
@@ -22,11 +38,7 @@ lefthook install
 cp .env.example .env
 ```
 
-Generate a session secret and add it to `.env`:
-
-```bash
-openssl rand -base64 32
-```
+The defaults in `.env.example` work out of the box for local development. Optionally set `AUTH_MODE` (`required` or `open`) and the `HEARTH_BOOTSTRAP_*` credentials before bootstrapping.
 
 Create the first admin (once per instance). Migrations run automatically when the dev or production server starts.
 
@@ -59,6 +71,7 @@ Database and uploads live in `./data/` (gitignored).
 | `pnpm db:migrate`         | Apply Drizzle migrations manually (optional; app migrates on startup) |
 | `pnpm db:generate`        | Generate migration from schema changes |
 | `pnpm run auth:bootstrap` | Create first admin user                |
+| `pnpm run auth:create-token` | Create a REST API bearer token      |
 | `pnpm smoke:docker`       | Docker smoke test (see below)          |
 
 ## Docker
@@ -66,7 +79,6 @@ Database and uploads live in `./data/` (gitignored).
 Build and run with Docker Compose:
 
 ```bash
-# Set SESSION_SECRET in .env or export it
 docker compose up -d --build
 docker compose exec app pnpm run auth:bootstrap
 ```
@@ -120,7 +132,7 @@ docker run -d \
   --name hearth \
   -p 3000:3000 \
   -e DATABASE_URL=file:/app/data/hearth.db \
-  -e SESSION_SECRET="$(openssl rand -base64 32)" \
+  -e HOSTNAME=0.0.0.0 \
   -v hearth-data:/app/data \
   ghcr.io/<owner>/hearth:latest
 ```
@@ -132,7 +144,7 @@ Or use the compose override:
 docker compose -f docker-compose.yml -f docker-compose.ghcr.yml up -d
 ```
 
-Required env vars: `DATABASE_URL`, `SESSION_SECRET` (see [.env.example](.env.example)). Mount `/app/data` for SQLite (`hearth.db`) and photo uploads.
+Required env var: `DATABASE_URL` (see [.env.example](.env.example)). `SESSION_SECRET` is reserved and currently unused — Lucia uses opaque database session IDs rather than signed cookies. Mount `/app/data` for SQLite (`hearth.db`) and uploads.
 
 Bootstrap the first admin after the container is healthy:
 

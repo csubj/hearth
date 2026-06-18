@@ -11,14 +11,9 @@ git clone https://github.com/csubj/hearth.git
 cd hearth
 ```
 
-### 2. Set environment variables
+### 2. Set environment variables (optional)
 
-Create a `.env` file in the project root:
-
-```bash
-SESSION_SECRET=$(openssl rand -base64 32)
-echo "SESSION_SECRET=$SESSION_SECRET" >> .env
-```
+No secrets are required to start — the Compose file sets sensible defaults (`DATABASE_URL`, `NODE_ENV=production`). To run on a trusted network without a login gate, set `AUTH_MODE=open` and `OPEN_MODE_USERNAME` — see [Configuration](../operations/configuration.md).
 
 ### 3. Start the stack
 
@@ -65,7 +60,6 @@ docker run -d \
   --name hearth \
   -p 3000:3000 \
   -e DATABASE_URL=file:/app/data/hearth.db \
-  -e SESSION_SECRET="$(openssl rand -base64 32)" \
   -v hearth-data:/app/data \
   ghcr.io/<owner>/hearth:latest
 ```
@@ -109,7 +103,7 @@ From a dev checkout with Docker running:
 pnpm smoke:docker
 ```
 
-This builds, starts, bootstraps a test admin, and verifies health + authenticated stream access.
+This builds, starts, bootstraps a test admin, and verifies health + authenticated `/projects` access.
 
 ## Next steps
 

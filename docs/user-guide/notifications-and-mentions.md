@@ -10,8 +10,8 @@ hearth keeps a per-user **notification stream** — a chronological log of house
 **Examples:**
 
 - "Alex added a restaurant"
-- "Jordan marked a stream note done"
-- "Sam mentioned you in a stream note"
+- "Jordan moved a project to In progress"
+- "Sam mentioned you in a project"
 
 ### Read state
 
@@ -27,12 +27,11 @@ An optional **Since you last visited** block on the home page summarizes recent 
 
 | Activity | Who gets notified |
 | -------- | ----------------- |
-| New or updated stream note | Everyone except the person who did it |
-| Restaurant added or visited | Everyone except the actor |
-| Project created or status changed | Everyone except the actor |
+| Restaurant added, visited, or rated | Everyone except the actor |
+| Project created, status changed, or deleted | Everyone except the actor |
 | Metric entry added | Everyone except the actor |
-| Event created or updated | Everyone except the actor |
 | Inventory item created or updated | Everyone except the actor |
+| Metric or maintenance reminder due | The household or the assigned member |
 | @-mention | The mentioned user (always) |
 | Admin user management | All other admins |
 
@@ -52,11 +51,9 @@ Usernames are case-insensitive. Use the autocomplete popover that appears when y
 
 ### Where mentions work
 
-- Stream entry body
 - Restaurant notes and visit reviews
-- Project descriptions
+- Project notes
 - Metric entry notes
-- Event notes
 - Inventory item notes
 
 ### What happens

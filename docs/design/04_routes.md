@@ -36,8 +36,10 @@ hearth/
 │   ├── (app)/                  # authenticated route group
 │   │   ├── layout.tsx          # app shell: nav, user menu
 │   │   ├── page.tsx            # home / glanceable summary
-│   │   ├── stream/
-│   │   │   └── page.tsx
+│   │   ├── browse/
+│   │   │   └── page.tsx        # hub for feature areas
+│   │   ├── reminders/
+│   │   │   └── page.tsx        # upcoming maintenance + metric reminders
 │   │   ├── restaurants/
 │   │   │   ├── page.tsx
 │   │   │   └── [id]/page.tsx
@@ -62,7 +64,6 @@ hearth/
 │   │           └── page.tsx
 │   └── api/
 │       ├── v1/                 # REST API (bearer token)
-│       │   ├── stream/
 │       │   ├── restaurants/
 │       │   ├── projects/
 │       │   ├── metrics/
@@ -112,7 +113,6 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 | `/`                         | auth\* | Home dashboard — stats, reminders, feature previews |
 | `/browse`                   | auth\* | Hub for Projects, Restaurants, Metrics, Inventory |
 | `/reminders`                | auth\* | Upcoming maintenance and metric reminders         |
-| `/stream`                   | auth\* | Full stream list + compact capture           |
 | `/restaurants`              | auth\* | Restaurant list (v1: no map)                 |
 | `/restaurants/[id]`         | auth\* | Detail, mark visited, rating, notes          |
 | `/projects`                 | auth\* | Project list                                 |
@@ -122,7 +122,7 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 | `/inventory`                | auth\* | Searchable inventory list                    |
 | `/inventory/[id]`           | auth\* | Item detail — tags, links, files, notes      |
 | `/notifications`            | auth\* | Per-user activity stream                     |
-| `/settings`                 | auth\* | Change own password                          |
+| `/settings`                 | auth\* | Change own password; choose theme            |
 | `/admin/users`              | admin  | User CRUD                                    |
 | `/admin/api-tokens`         | admin  | API token create/revoke                      |
 
@@ -148,7 +148,6 @@ All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 
 | Resource            | Base path                         | Operations        |
 | ------------------- | --------------------------------- | ----------------- |
-| Stream              | `/api/v1/stream`                  | list, CRUD        |
 | Restaurants         | `/api/v1/restaurants`             | list, CRUD        |
 | Projects            | `/api/v1/projects`                | list, CRUD        |
 | Project components  | `/api/v1/projects/{id}/components` | list, create, update, delete |
@@ -216,9 +215,9 @@ Colocate in `src/lib/actions/` by domain. Each action:
 | File               | Actions                                                                    |
 | ------------------ | -------------------------------------------------------------------------- |
 | `auth.ts`          | `login`, `logout`, `changePassword`                                        |
-| `stream.ts`        | `createEntry`, `updateEntry`, `togglePin`, `markDone`                      |
+| `settings.ts`      | `updateTheme`                                                              |
 | `restaurants.ts`   | `create`, `update`, `markVisited`, `setRating`                             |
-| `projects.ts`      | `create`, `update`, `setStatus`                                            |
+| `projects.ts`      | `create`, `updateTitle`, `updateNotes`, `setStatus`, `setPriority`, `setTags`, link/component CRUD, `deleteProject` |
 | `metrics.ts`       | `createMetric`, `addEntry`, `updateMetric`                                 |
 | `inventory.ts`     | `create`, `update`, `addLink`, `removeLink`, `setTags`                     |
 | `inventory-maintenance.ts` | `createMaintenanceReminder`, `updateMaintenanceReminder`, `deleteMaintenanceReminder`, `completeMaintenanceReminder`, link CRUD |
@@ -303,11 +302,11 @@ Bootstrap is CLI-only (`scripts/auth-bootstrap.ts`), not a web route. API token 
 
 | Kind                 | Pattern              | Example                              |
 | -------------------- | -------------------- | ------------------------------------ |
-| Page                 | `page.tsx`           | `app/(app)/stream/page.tsx`          |
+| Page                 | `page.tsx`           | `app/(app)/restaurants/page.tsx`     |
 | Layout               | `layout.tsx`         | `app/(app)/layout.tsx`               |
-| REST handler         | `route.ts`           | `app/api/v1/stream/route.ts`         |
-| Server action module | kebab or domain name | `src/lib/actions/stream.ts`          |
-| Component            | PascalCase file      | `src/components/StreamEntryForm.tsx` |
+| REST handler         | `route.ts`           | `app/api/v1/restaurants/route.ts`    |
+| Server action module | kebab or domain name | `src/lib/actions/restaurants.ts`     |
+| Component            | PascalCase file      | `src/components/settings/ThemePicker.tsx` |
 | Test                 | co-located           | `src/lib/mentions/parse.test.ts`     |
 
 ---
@@ -321,7 +320,8 @@ routes:
   public: [/login, /api/health, /api/openapi.json, /api/docs]
   authenticated:
     - /
-    - /stream
+    - /browse
+    - /reminders
     - /restaurants
     - /restaurants/[id]
     - /projects

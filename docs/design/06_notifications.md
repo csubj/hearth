@@ -22,14 +22,15 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 
 | Type                     | When emitted                       | Recipients                                               |
 | ------------------------ | ---------------------------------- | -------------------------------------------------------- |
-| `stream.created`         | New stream entry                   | All users except actor                                   |
-| `stream.updated`         | Body/metadata edit                 | All except actor                                         |
-| `stream.done`            | Entry marked done                  | All except actor                                         |
-| `restaurant.created`     | New restaurant                     | All except actor                                         |
-| `restaurant.visited`     | Marked visited / rated             | All except actor                                         |
+| `restaurant.created`     | New restaurant                     | All users except actor                                   |
+| `restaurant.updated`     | Restaurant edit                    | All except actor                                         |
+| `restaurant.visited`     | Marked visited                     | All except actor                                         |
+| `restaurant.rated`       | Rating set / changed               | All except actor                                         |
 | `project.created`        | New project                        | All except actor                                         |
+| `project.updated`        | Project edit (REST)                | All except actor                                         |
 | `project.status_changed` | Status update                      | All except actor                                         |
-| `metric.entry_added`     | New metric entry                  | All except actor                                         |
+| `project.deleted`        | Project removed                    | All except actor                                         |
+| `metric.entry_added`     | New metric entry                   | All except actor                                         |
 | `inventory.created`      | New inventory item                 | All except actor                                         |
 | `inventory.updated`      | Inventory item edit                | All except actor                                         |
 | `metric.reminder`        | Metric overdue for logging         | Whole household or assigned user (see `reminder_recipient_user_id`) |
@@ -61,15 +62,13 @@ Templates (actor display name interpolated):
 
 | Type                     | Template example                                 |
 | ------------------------ | ------------------------------------------------ |
-| `stream.created`         | `{actor} added a stream note`                    |
-| `stream.done`            | `{actor} marked a stream note done`              |
 | `restaurant.created`     | `{actor} added {restaurant.name}`                |
 | `restaurant.visited`     | `{actor} visited {restaurant.name}`              |
 | `project.status_changed` | `{actor} moved "{project.title}" to In progress` |
 | `metric.entry_added`     | `{actor} logged {value} for {metric.name}`       |
 | `inventory.created`      | `{actor} added {inventory_item.name} to inventory` |
 | `inventory.updated`      | `{actor} updated {inventory_item.name}`          |
-| `mention`                | `{actor} mentioned you in a stream note`         |
+| `mention`                | `{actor} mentioned you in a project`             |
 | `user.admin_action`      | `{actor} created user @{username}`               |
 
 Include enough context to scan; full detail on click-through to entity route.
@@ -117,9 +116,8 @@ Parser lives in `src/lib/mentions/parse.ts`. Unit test edge cases: punctuation a
 
 Fields supporting mentions in v1:
 
-- `stream_entries.body`
 - `restaurants.notes`, `restaurants.visit_note`
-- `projects.description`
+- `projects.notes`
 - `metric_entries.note`
 - `inventory_items.notes`
 
@@ -131,7 +129,6 @@ Map `(entity_type, entity_id)` → route:
 
 | entity_type                 | Route                                    |
 | --------------------------- | ---------------------------------------- |
-| `stream_entry`              | `/stream#entry-{id}` or scroll via query |
 | `restaurant`                | `/restaurants/[id]`                      |
 | `project`                   | `/projects/[id]`                         |
 | `metric` / `metric_entry`   | `/metrics/[metricId]`                    |
@@ -156,11 +153,11 @@ Every mutating server action in `src/lib/actions/*` calls the emitter after succ
 ```typescript
 // pattern — not literal code
 await emitHouseholdActivity({
-  type: "stream.created",
+  type: "project.created",
   actorId: user.id,
-  entityType: "stream_entry",
-  entityId: entry.id,
-  summary: `${displayName(user)} added a stream note`,
+  entityType: "project",
+  entityId: project.id,
+  summary: `${displayName(user)} added a project`,
 });
 await emitMentions({ body, entityType, entityId, actorId: user.id });
 ```
@@ -195,16 +192,19 @@ notifications:
     page: /notifications
     actions: [markRead, markAllRead]
   types:
-    - stream.created
-    - stream.updated
-    - stream.done
     - restaurant.created
+    - restaurant.updated
     - restaurant.visited
+    - restaurant.rated
     - project.created
+    - project.updated
     - project.status_changed
+    - project.deleted
     - metric.entry_added
+    - metric.reminder
     - inventory.created
     - inventory.updated
+    - inventory.maintenance_reminder
     - mention
     - user.admin_action
 ```

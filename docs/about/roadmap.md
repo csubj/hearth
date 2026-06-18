@@ -9,7 +9,6 @@ Items explicitly **out of scope for v1** that may come later. Nothing here is co
 | Google Maps for restaurants | Browse by pin, plan outings by proximity (free tier) |
 | Push notifications | Mobile/web push for @-mentions and activity |
 | Email digests | Weekly summary of household activity |
-| Dark mode | CSS variables already structured for it |
 | Thumbnail generation | `sharp`-based thumbs on upload for faster grids |
 | Scoped API tokens | Per-resource permissions instead of full household access |
 
@@ -24,27 +23,24 @@ Items explicitly **out of scope for v1** that may come later. Nothing here is co
 | Smart home integrations | Display on e-ink dashboards, Home Assistant |
 | Automated deploy pipelines | CI deploy to Fly/Railway on tag push |
 
-## Completed (v1 MVP)
+## Completed
 
-Phases 0–7 from [MVP Phases](../design/08_mvp.md):
+Phases 0–10 from [MVP Phases](../design/08_mvp.md):
 
 - [x] Scaffold, toolchain, Docker
 - [x] Authentication and admin user management
-- [x] Home page and stream
+- [x] Home page (dashboard with stats strip and reminders)
 - [x] Restaurants (list, no map)
-- [x] Projects and metrics
-- [x] Photo attachments
+- [x] Projects (absorbed the old Stream quick-capture) and metrics
+- [x] Photo and PDF attachments
 - [x] Notifications and @-mentions
 - [x] Polish, CI, smoke tests, documentation
-
-## In progress / upcoming
-
-Phases 8–10 from [MVP Phases](../design/08_mvp.md):
-
-- [ ] Configurable auth (`AUTH_MODE`) and API tokens
-- [ ] REST API (`/api/v1/*`) with OpenAPI spec and interactive docs
-- [ ] Metrics graphing (Recharts) and existing-data-first page layout
-- [ ] Inventory — searchable catalog with tags, links, documents, import/export
+- [x] Configurable auth (`AUTH_MODE`) and admin-managed API tokens
+- [x] REST API (`/api/v1/*`) with OpenAPI spec and interactive docs
+- [x] Metrics graphing (Recharts) and existing-data-first page layout
+- [x] Inventory — searchable catalog with tags, links, documents, import/export
+- [x] Inventory maintenance reminders, metric reminders, and a reminders feed
+- [x] Per-user appearance themes (including Dark)
 
 ## Contributing to the roadmap
 

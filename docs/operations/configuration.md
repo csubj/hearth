@@ -111,10 +111,10 @@ Configured in application code (not env vars in v1):
 | Setting | Value |
 | ------- | ----- |
 | Max image size | 10 MB |
-| Max document size (inventory PDFs) | 25 MB |
+| Max document size (inventory & project PDFs) | 25 MB |
 | Max files per item | 10 |
 | Image types | JPEG, PNG, WebP, GIF |
-| Document types (inventory only) | PDF |
+| Document types (inventory & projects only) | PDF |
 
 See [Attachments design](../design/07_attachments.md) for the per-entity mime policy.
 

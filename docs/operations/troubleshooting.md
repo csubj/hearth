@@ -37,7 +37,7 @@ Check `DATABASE_URL` in `.env`.
 docker compose logs app
 ```
 
-Common causes: missing `SESSION_SECRET`, migration failure, port 3000 already in use.
+Common causes: migration failure (unwritable `data/`), port 3000 already in use.
 
 ## Authentication
 
@@ -57,9 +57,9 @@ Common causes: missing `SESSION_SECRET`, migration failure, port 3000 already in
 
 ### Sessions expire unexpectedly
 
-**Cause:** `SESSION_SECRET` changed between restarts.
+**Cause:** Sessions last up to 30 days and are stored in the database. They are cleared when the `data/` directory is reset, the account is disabled, or the password is reset.
 
-**Fix:** Set a stable `SESSION_SECRET` in `.env` / compose environment. Users re-login after secret change.
+**Fix:** Persist the `data/` volume so the session table survives restarts. There is no session-signing secret to configure.
 
 ### Can't access `/admin/users`
 

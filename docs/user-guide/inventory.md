@@ -2,7 +2,7 @@
 
 A searchable catalog of the household's physical things — appliances, electronics, tools, furniture — so details are findable when you need them: a model number for a warranty claim, the paint color in the garage, the manual for the dishwasher.
 
-Unlike the stream, inventory is **reference data** — it changes rarely and is read often. The page leads with the searchable list, not a capture form.
+Unlike day-to-day projects, inventory is **reference data** — it changes rarely and is read often. The page leads with the searchable list, not a capture form.
 
 ## Viewing inventory
 
@@ -54,7 +54,7 @@ Attach labeled URLs to an item — product pages, manuals online, warranty porta
 
 ## Photos and documents
 
-Inventory accepts both **photos** and **PDF documents** — manuals, receipts, warranty cards. Other features in hearth are photos-only.
+Inventory accepts both **photos** and **PDF documents** — manuals, receipts, warranty cards. Projects also accept PDFs; restaurants and metric entries are photos-only.
 
 1. Open the item detail page
 2. Use the upload control
@@ -92,7 +92,7 @@ Bulk operations for backup, migration, or loading an existing spreadsheet:
 
 | Operation | How |
 | --------- | --- |
-| Export | `GET /api/inventory/export` or export button in admin/settings (if exposed in UI) |
+| Export | `GET /api/inventory/export` — returns all inventory as JSON (no UI button; use the endpoint or a script) |
 | Import | `POST /api/inventory/import` with JSON matching the export format |
 
 File attachments are not included in the export JSON — back up `data/uploads/` separately for a full restore. See [Backup & restore](../operations/backup-restore.md).

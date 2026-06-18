@@ -64,6 +64,8 @@ Bulk operations for the [Inventory](../user-guide/inventory.md) feature:
 
 Export returns a structured file (items, links, tags, maintenance reminders) suitable for backup or migration; import accepts the same shape. Allowed import/upload file types are documented in [Configuration](../operations/configuration.md).
 
+> **Authentication:** Unlike the `/api/v1/*` resources, these routes live outside the versioned REST surface and authenticate with a **logged-in web session cookie**, not an API bearer token. They are intended for the web UI's import/export buttons rather than token-based scripts. On failure they return `401` with a `{ "error": "Unauthorized" }` body; a failed import returns `400` with `{ "error": "<message>" }`.
+
 ## Example requests
 
 List projects:
@@ -79,7 +81,7 @@ Create a metric entry:
 curl -X POST https://your-hearth.example.com/api/v1/metrics/$METRIC_ID/entries \
   -H "Authorization: Bearer $HEARTH_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{ "value": "42.5", "recordedAt": "2026-01-15", "note": "after morning walk" }'
+  -d '{ "value": "42.5", "recordedAt": "2026-01-15T09:30:00Z", "note": "after morning walk" }'
 ```
 
 Add an inventory item:
@@ -155,9 +157,6 @@ Errors use standard HTTP status codes and a consistent JSON body:
 | `403` | `forbidden` | Token lacks permission (e.g. admin-only route) |
 | `404` | `not_found` | Resource does not exist |
 | `409` | `conflict` | Unique constraint or state conflict |
-| `413` | `payload_too_large` | Upload exceeds size limit |
-| `422` | `unprocessable` | Well-formed but semantically invalid |
-| `429` | `rate_limited` | Too many requests |
 | `500` | `internal_error` | Unexpected server error |
 
 `details` is present for validation failures and mirrors the Zod issue paths.
@@ -180,7 +179,7 @@ Used by Docker Compose health checks, deployment smoke tests, and uptime monitor
 
 Upload a photo or document attached to an existing entity.
 
-**Authentication:** Required (session cookie for the web UI, or bearer token)
+**Authentication:** Required — **logged-in web session cookie only**. The attachment routes do not accept an API bearer token; they are used by the web UI.
 
 **Content-Type:** `multipart/form-data`
 
@@ -200,20 +199,39 @@ Upload a photo or document attached to an existing entity.
 | Status | Cause |
 | ------ | ----- |
 | `401` | Not authenticated |
-| `400` | Invalid mime, oversize, missing fields, entity not found |
+| `400` | Missing fields, invalid form data, or empty file |
+| `404` | Parent entity not found |
+| `409` | An identical attachment already exists |
 | `413` | File exceeds size limit |
+| `415` | Unsupported or disallowed file type |
 
 ### `GET /api/attachments/[id]`
 
 Serve an attached file.
 
-**Authentication:** Required
+**Authentication:** Required — logged-in web session cookie only.
 
 **Response:** File bytes with appropriate `Content-Type` and `Cache-Control: private, max-age=3600`.
 
 | Status | Cause |
 | ------ | ----- |
 | `401` | Not authenticated |
+| `404` | Attachment not found |
+
+### `DELETE /api/attachments/[id]`
+
+Delete an attachment. Allowed for the uploader or an admin.
+
+**Authentication:** Required — logged-in web session cookie only.
+
+```json
+{ "ok": true }
+```
+
+| Status | Cause |
+| ------ | ----- |
+| `401` | Not authenticated |
+| `403` | Not the uploader and not an admin |
 | `404` | Attachment not found |
 
 ## Web UI mutations (server actions)
