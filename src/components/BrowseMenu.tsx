@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HoverDetailsMenu } from "@/components/HoverDetailsMenu";
 
 const browseLinks = [
   { href: "/browse", label: "Overview" },
@@ -8,6 +9,7 @@ const browseLinks = [
   { href: "/restaurants", label: "Restaurants" },
   { href: "/metrics", label: "Metrics" },
   { href: "/inventory", label: "Inventory" },
+  { href: "/maintenance", label: "Maintenance" },
 ] as const;
 
 const linkClassName =
@@ -15,19 +17,22 @@ const linkClassName =
 
 export function BrowseMenu() {
   return (
-    <details className="relative hidden md:block">
-      <summary className="inline-flex cursor-pointer list-none items-center rounded-md px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-accent-soft hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none [&::-webkit-details-marker]:hidden">
-        Browse
-        <ChevronIcon />
-      </summary>
-      <div className="absolute left-0 z-50 mt-1 min-w-44 rounded-md border border-border bg-surface p-1 shadow-card">
-        {browseLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={linkClassName}>
-            {link.label}
-          </Link>
-        ))}
-      </div>
-    </details>
+    <HoverDetailsMenu
+      className="relative hidden md:block"
+      panelClassName="min-w-44 rounded-md border border-border bg-surface p-1 shadow-card"
+      summary={
+        <>
+          Browse
+          <ChevronIcon />
+        </>
+      }
+    >
+      {browseLinks.map((link) => (
+        <Link key={link.href} href={link.href} className={linkClassName}>
+          {link.label}
+        </Link>
+      ))}
+    </HoverDetailsMenu>
   );
 }
 

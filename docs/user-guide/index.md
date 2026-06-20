@@ -4,15 +4,15 @@ hearth is organized around a **home page** that summarizes what needs attention,
 
 ## Navigation
 
-| Nav item      | Route            | Purpose                                               |
-| ------------- | ---------------- | ----------------------------------------------------- |
-| Home          | `/`              | Dashboard — stats, reminders, and feature previews    |
-| Browse        | `/browse`        | Hub for Projects, Restaurants, Metrics, and Inventory |
-| Reminders     | `/reminders`     | Upcoming maintenance and metric logging reminders     |
-| Notifications | `/notifications` | Activity feed and @-mentions                          |
-| Settings      | `/settings`      | Change your password and pick an appearance theme     |
+| Nav item      | Route            | Purpose                                                            |
+| ------------- | ---------------- | ------------------------------------------------------------------ |
+| Home          | `/`              | Dashboard — stats, reminders, and feature previews                 |
+| Browse        | `/browse`        | Hub for Projects, Restaurants, Metrics, Inventory, and Maintenance |
+| Reminders     | `/reminders`     | Upcoming maintenance follow-ups, item upkeep, and metric reminders |
+| Notifications | `/notifications` | Activity feed and @-mentions                                       |
+| Settings      | `/settings`      | Change your password and pick an appearance theme                  |
 
-From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), or **Inventory** (`/inventory`).
+From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), **Inventory** (`/inventory`), or **Maintenance** (`/maintenance`).
 
 Admins also see **Admin** → `/admin/users` and `/admin/api-tokens`.
 
@@ -23,11 +23,12 @@ The landing page aggregates what needs attention:
 | Section            | What surfaces                                                                         |
 | ------------------ | ------------------------------------------------------------------------------------- |
 | Stats strip        | Active projects, want-to-try restaurants, stale metrics, inventory due, reminders due |
-| Upcoming reminders | Maintenance and metric reminders due in the next two weeks                            |
+| Upcoming reminders | Maintenance follow-ups, item upkeep, and metric reminders due soon                    |
 | Projects           | Quick capture + high-priority / in-progress projects                                  |
 | Restaurants        | A few "want to try" suggestions                                                       |
 | Metrics            | Latest entry per metric                                                               |
-| Inventory          | Items with overdue maintenance first                                                  |
+| Inventory          | Items with overdue item upkeep reminders first                                        |
+| Maintenance        | Recent house maintenance logs                                                         |
 | Since last visit   | Notifications since you last opened hearth                                            |
 
 Each section links to its full view. The page is designed to answer **"what's going on?"** in a few seconds.
@@ -52,6 +53,7 @@ Adding something should feel like writing on a sticky note:
 - [Projects](projects.md) — house projects from idea to done
 - [Metrics](metrics.md) — recurring measurements and charts
 - [Inventory](inventory.md) — searchable household items, manuals, and photos
+- [House maintenance](maintenance.md) — maintenance work logs, costs, and follow-ups
 - [Notifications & @-mentions](notifications-and-mentions.md) — activity feed
 - [Attachments](attachments.md) — photos and documents
 - [Your account](account.md) — password and settings

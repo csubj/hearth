@@ -1,5 +1,6 @@
 import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
 import { InventorySection } from "@/components/home/InventorySection";
+import { MaintenanceSection } from "@/components/home/MaintenanceSection";
 import { MetricsSection } from "@/components/home/MetricsSection";
 import { ProjectsSection } from "@/components/home/ProjectsSection";
 import { RestaurantsSection } from "@/components/home/RestaurantsSection";
@@ -23,6 +24,7 @@ export default function HomePage() {
         <RestaurantsSection />
         <MetricsSection />
         <InventorySection />
+        <MaintenanceSection />
       </div>
     </div>
   );

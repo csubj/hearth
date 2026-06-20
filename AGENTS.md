@@ -4,7 +4,7 @@ Instructions for AI agents and contributors working in this repository.
 
 ## What this is
 
-**hearth** is a household coordination web app — projects, restaurants, metrics, and inventory. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
+**hearth** is a household coordination web app — projects, restaurants, metrics, inventory, and maintenance. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
 
 ## Before you code
 
@@ -37,7 +37,7 @@ pnpm run auth:bootstrap   # first admin (once per instance)
 | Auth            | Lucia v3 + Argon2id — see [docs/design/02_auth.md](docs/design/02_auth.md)      |
 | Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                            |
 | Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                 |
-| Commits         | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook         |
+| Commits         | Conventional Commits — enforced by lefthook commitlint (see below)              |
 
 ## Key paths
 
@@ -50,6 +50,33 @@ drizzle/          # SQL migrations (committed)
 data/             # gitignored — hearth.db + uploads/
 docs/design/      # design docs (source of truth)
 ```
+
+## Commit messages
+
+Lefthook runs `commitlint` on every commit. Messages must pass
+[`@commitlint/config-conventional`](https://github.com/conventional-changelog/commitlint).
+
+| Rule                 | Limit                                                                                        |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| Subject (first line) | ≤ 100 characters; `type: subject` (e.g. `feat: add maintenance logs`)                        |
+| Body lines           | ≤ **100 characters each** — wrap or split long bullets                                       |
+| Blank line           | Required between subject and body                                                            |
+| Types                | `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`, `build`, `perf`, `style`, `revert` |
+
+**Good example:**
+
+```
+feat: add maintenance logs for home upkeep
+
+- Add maintenance section for services, repairs, and reminders.
+- Add API endpoints for maintenance CRUD and categories.
+- Add maintenance page and home dashboard section.
+- Document maintenance in user guide and API reference.
+```
+
+**Bad:** one long bullet line (> 100 chars), subject ending with `.`, missing blank line after subject.
+
+When drafting commit messages, count characters per line. Prefer shorter bullets over prose paragraphs.
 
 ## Do not
 

@@ -23,7 +23,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   try {
     await processMetricReminders();
     const { processInventoryMaintenanceReminders } = await import("@/lib/inventory/reminders");
+    const { processMaintenanceLogReminders } = await import("@/lib/maintenance/reminders");
     await processInventoryMaintenanceReminders();
+    await processMaintenanceLogReminders();
   } catch {
     // Reminder processing should not block page render.
   }

@@ -1,10 +1,21 @@
 import { desc, eq, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db";
-import { inventoryItems, inventoryMaintenanceReminders, metricEntries, metrics } from "@/db/schema";
+import {
+  inventoryItems,
+  inventoryMaintenanceReminders,
+  maintenanceLogReminders,
+  maintenanceLogs,
+  metricEntries,
+  metrics,
+} from "@/db/schema";
 import {
   getMaintenanceReminderAnchor,
   reminderIntervalState,
 } from "@/lib/inventory/reminder-interval";
+import {
+  getMaintenanceLogReminderAnchor,
+  reminderIntervalState as maintenanceLogReminderIntervalState,
+} from "@/lib/maintenance/reminder-interval";
 import { metricIntervalState } from "@/lib/metrics/reminder-interval";
 import {
   addReminderInterval,
@@ -14,7 +25,7 @@ import {
 } from "@/lib/reminders/interval";
 import { isReminderVisibleToUser } from "@/lib/reminders/scope";
 
-export type UpcomingReminderKind = "inventory_maintenance" | "metric";
+export type UpcomingReminderKind = "inventory_maintenance" | "metric" | "maintenance_log";
 
 export type UpcomingReminderStatus = "overdue" | "due_soon";
 
@@ -30,6 +41,7 @@ export type UpcomingReminder = {
   recipientUserId: string | null;
   inventoryItemId?: string;
   reminderId?: string;
+  maintenanceLogId?: string;
 };
 
 export type ListUpcomingRemindersInput = {
@@ -129,6 +141,78 @@ async function listInventoryMaintenanceUpcoming(
   return results;
 }
 
+async function listMaintenanceLogUpcoming(
+  input: ListUpcomingRemindersInput,
+): Promise<UpcomingReminder[]> {
+  const { viewerUserId, withinDays = 14, now = new Date() } = input;
+  const db = getDb();
+
+  const rows = await db
+    .select({
+      reminder: maintenanceLogReminders,
+      logTitle: maintenanceLogs.title,
+    })
+    .from(maintenanceLogReminders)
+    .innerJoin(maintenanceLogs, eq(maintenanceLogReminders.maintenanceLogId, maintenanceLogs.id));
+
+  const results: UpcomingReminder[] = [];
+
+  for (const { reminder, logTitle } of rows) {
+    if (!isReminderVisibleToUser(reminder.reminderRecipientUserId, viewerUserId)) {
+      continue;
+    }
+
+    let dueAt: Date | null = null;
+    let intervalLabel = "";
+
+    if (reminder.reminderType === "interval") {
+      const state = maintenanceLogReminderIntervalState(reminder);
+      if (!hasReminderInterval(state)) {
+        continue;
+      }
+      dueAt = getReminderDueAt(state, getMaintenanceLogReminderAnchor(reminder));
+      intervalLabel = formatReminderInterval(
+        reminder.reminderIntervalCount!,
+        reminder.reminderIntervalUnit!,
+        { prefixEvery: true },
+      );
+    } else if (reminder.reminderType === "one_time") {
+      if (reminder.lastCompletedAt || !reminder.dueAt) {
+        continue;
+      }
+      dueAt = reminder.dueAt;
+      intervalLabel = "one-time";
+    } else {
+      continue;
+    }
+
+    if (!dueAt) {
+      continue;
+    }
+
+    const overdue = dueAt.getTime() <= now.getTime();
+    if (!overdue && !isWithinWindow(dueAt, now, withinDays)) {
+      continue;
+    }
+
+    results.push({
+      id: reminder.id,
+      kind: "maintenance_log",
+      title: reminder.title,
+      contextLabel: logTitle,
+      href: `/maintenance/${reminder.maintenanceLogId}`,
+      dueAt,
+      status: toStatus(dueAt, now),
+      intervalLabel,
+      recipientUserId: reminder.reminderRecipientUserId,
+      maintenanceLogId: reminder.maintenanceLogId,
+      reminderId: reminder.id,
+    });
+  }
+
+  return results;
+}
+
 async function listMetricUpcoming(input: ListUpcomingRemindersInput): Promise<UpcomingReminder[]> {
   const { viewerUserId, withinDays = 14, now = new Date() } = input;
   const db = getDb();
@@ -188,17 +272,20 @@ async function listMetricUpcoming(input: ListUpcomingRemindersInput): Promise<Up
 export async function listUpcomingReminders(
   input: ListUpcomingRemindersInput,
 ): Promise<UpcomingReminder[]> {
-  const [inventoryReminders, metricReminders] = await Promise.all([
+  const [inventoryReminders, metricReminders, maintenanceLogRemindersList] = await Promise.all([
     listInventoryMaintenanceUpcoming(input),
     listMetricUpcoming(input),
+    listMaintenanceLogUpcoming(input),
   ]);
 
-  const merged = [...inventoryReminders, ...metricReminders].sort((a, b) => {
-    if (a.status !== b.status) {
-      return a.status === "overdue" ? -1 : 1;
-    }
-    return a.dueAt.getTime() - b.dueAt.getTime();
-  });
+  const merged = [...inventoryReminders, ...metricReminders, ...maintenanceLogRemindersList].sort(
+    (a, b) => {
+      if (a.status !== b.status) {
+        return a.status === "overdue" ? -1 : 1;
+      }
+      return a.dueAt.getTime() - b.dueAt.getTime();
+    },
+  );
 
   if (input.limit != null) {
     return merged.slice(0, input.limit);

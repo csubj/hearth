@@ -275,3 +275,41 @@ export const updateInventoryMaintenanceReminderSchema = z.object({
   reminderIntervalUnit: metricReminderUnitApiSchema.optional().nullable(),
   reminderRecipientUserId: z.string().uuid().optional().nullable(),
 });
+
+export const maintenanceLogSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  notes: z.string().nullable(),
+  category: z.string().nullable(),
+  company: z.string().nullable(),
+  costCents: z.number().int().nullable(),
+  startedAt: isoDateTime.nullable(),
+  completedAt: isoDateTime.nullable(),
+  createdByUserId: z.string().uuid(),
+  updatedByUserId: z.string().uuid(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+  tags: z.array(z.string()),
+});
+
+export const createMaintenanceLogSchema = z.object({
+  title: z.string().min(1).max(200),
+  notes: z.string().max(10_000).optional(),
+  category: z.string().max(100).optional(),
+  company: z.string().max(200).optional(),
+  costCents: z.number().int().min(0).optional().nullable(),
+  startedAt: isoDateTime.optional(),
+  completedAt: isoDateTime.optional(),
+  tags: z.array(z.string().min(1).max(100)).optional(),
+});
+
+export const updateMaintenanceLogSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  notes: z.string().max(10_000).nullable().optional(),
+  category: z.string().max(100).nullable().optional(),
+  company: z.string().max(200).nullable().optional(),
+  costCents: z.number().int().min(0).nullable().optional(),
+  startedAt: isoDateTime.nullable().optional(),
+  completedAt: isoDateTime.nullable().optional(),
+  tags: z.array(z.string().min(1).max(100)).optional(),
+});

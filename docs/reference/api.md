@@ -42,6 +42,8 @@ The API exposes the same entities as the web app. Each resource supports standar
 | Metric entries                  | `/api/v1/metrics/{id}/entries`                 | Dated values for a metric                                                                          |
 | Inventory                       | `/api/v1/inventory`                            | Household objects/appliances/electronics                                                           |
 | Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | Per-item upkeep schedules; `POST …/{reminderId}/complete` marks done                               |
+| Maintenance logs                | `/api/v1/maintenance`                          | House maintenance work logs with metadata and tags                                                 |
+| Maintenance categories          | `/api/v1/maintenance/categories`               | Distinct category values for filtering                                                             |
 
 ### Managed types
 

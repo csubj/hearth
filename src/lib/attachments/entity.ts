@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { metricEntries, projects, restaurants } from "@/db/schema";
+import { maintenanceLogs, metricEntries, projects, restaurants } from "@/db/schema";
 import { inventoryItems } from "@/db/schema/inventory";
 import type { EntityType } from "@/lib/notifications/emit";
 
@@ -9,6 +9,7 @@ export const ATTACHMENT_ENTITY_TYPES = [
   "project",
   "metric_entry",
   "inventory_item",
+  "maintenance_log",
 ] as const;
 
 export type AttachmentEntityType = (typeof ATTACHMENT_ENTITY_TYPES)[number];
@@ -53,6 +54,14 @@ export async function entityExists(
         .select({ id: inventoryItems.id })
         .from(inventoryItems)
         .where(eq(inventoryItems.id, entityId))
+        .limit(1);
+      return Boolean(row);
+    }
+    case "maintenance_log": {
+      const [row] = await db
+        .select({ id: maintenanceLogs.id })
+        .from(maintenanceLogs)
+        .where(eq(maintenanceLogs.id, entityId))
         .limit(1);
       return Boolean(row);
     }

@@ -1,10 +1,18 @@
 import Link from "next/link";
+import { MaintenanceLogReminderCompleteButton } from "@/components/reminders/MaintenanceLogReminderCompleteButton";
 import { MaintenanceReminderCompleteButton } from "@/components/reminders/MaintenanceReminderCompleteButton";
 import { formatReminderDueLabel } from "@/lib/reminders/interval";
 import type { UpcomingReminder } from "@/lib/reminders/feed";
 
 function kindLabel(kind: UpcomingReminder["kind"]): string {
-  return kind === "inventory_maintenance" ? "Maintenance" : "Metric";
+  switch (kind) {
+    case "inventory_maintenance":
+      return "Item upkeep";
+    case "maintenance_log":
+      return "House maintenance";
+    case "metric":
+      return "Metric";
+  }
 }
 
 export function ReminderFeedItem({
@@ -59,6 +67,13 @@ export function ReminderFeedItem({
         reminder.reminderId ? (
           <MaintenanceReminderCompleteButton
             inventoryItemId={reminder.inventoryItemId}
+            reminderId={reminder.reminderId}
+          />
+        ) : reminder.kind === "maintenance_log" &&
+          reminder.maintenanceLogId &&
+          reminder.reminderId ? (
+          <MaintenanceLogReminderCompleteButton
+            maintenanceLogId={reminder.maintenanceLogId}
             reminderId={reminder.reminderId}
           />
         ) : (

@@ -42,12 +42,13 @@ data/
 
 ## Per-entity mime policy
 
-| entity_type      | Images | Documents (PDF) | Notes                                    |
-| ---------------- | ------ | --------------- | ---------------------------------------- |
-| `restaurant`     | Yes    | No              | Menu pics, visit photos                  |
-| `project`        | Yes    | Yes             | Notes attachments, progress photos, PDFs |
-| `metric_entry`   | Yes    | No              | Scale reading, condition photo           |
-| `inventory_item` | Yes    | Yes             | Photos + manuals, receipts, warranties   |
+| entity_type       | Images | Documents (PDF) | Notes                                    |
+| ----------------- | ------ | --------------- | ---------------------------------------- |
+| `restaurant`      | Yes    | No              | Menu pics, visit photos                  |
+| `project`         | Yes    | Yes             | Notes attachments, progress photos, PDFs |
+| `metric_entry`    | Yes    | No              | Scale reading, condition photo           |
+| `inventory_item`  | Yes    | Yes             | Photos + manuals, receipts, warranties   |
+| `maintenance_log` | Yes    | Yes             | Work photos, receipts, warranties        |
 
 ### Allowed mime types
 

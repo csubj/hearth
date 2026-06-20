@@ -93,6 +93,19 @@ A searchable catalog of the household's physical things — appliances, electron
 
 Unlike the stream, inventory is reference data — it changes rarely and is read often. The page leads with the searchable list, not a capture box.
 
+### House maintenance
+
+A log of maintenance and changes to the home — services, repairs, warranties, and follow-ups — separate from inventory item upkeep schedules.
+
+- **Maintenance log:** title, notes, category (free-text, e.g. HVAC, Plumbing), company/contractor, cost, started/completed dates
+- **Follow-up reminders:** recurring intervals (e.g. every 6 months) or one-time due dates; surfaced on `/reminders` and the home dashboard
+- **Tags and links** for search and reference (manuals, invoices, vendor pages)
+- **Related projects and inventory items** — link a log to a house project or a specific appliance
+- **Attachments:** photos and PDFs (receipts, warranties, work orders)
+- **Search and filter** by category, tag, company, or text
+
+This complements **inventory item maintenance reminders** (recurring upkeep tied to a catalog item). House maintenance logs track work on the home itself.
+
 ---
 
 ## Home page (concept)
@@ -106,6 +119,7 @@ The landing page aggregates what needs attention across all features:
 | Projects    | Items in progress or recently touched                               |
 | Metrics     | Latest entry or reminder if something hasn't been logged in a while |
 | Inventory   | Quick search box; a few recently added or edited items              |
+| Maintenance | Recent logs; follow-up reminders due                                |
 
 Each section links to its full view. The page should feel like a summary, not a dashboard with widgets.
 
@@ -159,7 +173,7 @@ Photos can be attached to notes and other user inputs across features.
 
 hearth exposes a small REST API so the household can manage its data outside the web UI — scripts, home-automation glue, bulk edits, or a future companion app.
 
-- Every resource the UI manages is reachable over REST under `/api/v1/` — restaurants, projects, metrics (and their definitions), and inventory (with its tags and types)
+- Every resource the UI manages is reachable over REST under `/api/v1/` — restaurants, projects, metrics (and their definitions), inventory (with its tags and types), and maintenance logs
 - Requests authenticate with a **bearer API token**, separate from web login; tokens are created and revoked by an admin
 - The API is **self-describing**: an OpenAPI spec is served at `/api/openapi.json` with interactive docs at `/api/docs`
 - The web UI keeps using its own server actions; REST is an additional surface, not a replacement

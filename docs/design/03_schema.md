@@ -27,13 +27,13 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 
 ## Enums
 
-| Enum                | Values                                                              | Used by                              |
-| ------------------- | ------------------------------------------------------------------- | ------------------------------------ |
-| `user_role`         | `member`, `admin`                                                   | `users.role`                         |
-| `restaurant_status` | `want_to_try`, `visited`                                            | `restaurants.status`                 |
-| `project_status`    | `idea`, `in_progress`, `done`                                       | `projects.status`                    |
-| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item` | attachments, mentions, notifications |
-| `notification_type` | see `06_notifications.md`                                           | `notifications.type`                 |
+| Enum                | Values                                                                                 | Used by                              |
+| ------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ |
+| `user_role`         | `member`, `admin`                                                                      | `users.role`                         |
+| `restaurant_status` | `want_to_try`, `visited`                                                               | `restaurants.status`                 |
+| `project_status`    | `idea`, `in_progress`, `done`                                                          | `projects.status`                    |
+| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`, `maintenance_log` | attachments, mentions, notifications |
+| `notification_type` | see `06_notifications.md`                                                              | `notifications.type`                 |
 
 ---
 
@@ -295,6 +295,43 @@ Per-item recurring upkeep schedules (filter changes, inspections, etc.).
 | `created_at`  | integer NOT NULL                          |                   |
 
 **Indexes:** `(reminder_id)`.
+
+---
+
+## Maintenance logs
+
+House maintenance work logs — services, repairs, and follow-ups. Complements inventory item maintenance reminders.
+
+### `maintenance_logs`
+
+| Column               | Type             | Notes                            |
+| -------------------- | ---------------- | -------------------------------- |
+| `id`                 | text PK          |                                  |
+| `title`              | text NOT NULL    |                                  |
+| `notes`              | text NULL        | markdown; @-mentions supported   |
+| `category`           | text NULL        | free-text (HVAC, Plumbing, etc.) |
+| `company`            | text NULL        | contractor or vendor             |
+| `cost_cents`         | integer NULL     | total cost                       |
+| `started_at`         | integer NULL     | ms                               |
+| `completed_at`       | integer NULL     | ms                               |
+| `created_by_user_id` | text FK → users  |                                  |
+| `updated_by_user_id` | text FK → users  |                                  |
+| `created_at`         | integer NOT NULL |                                  |
+| `updated_at`         | integer NOT NULL |                                  |
+
+**Indexes:** `(updated_at)`, `(category)`, `(company)`.
+
+### `maintenance_log_links`, `maintenance_log_tags`, `maintenance_log_item_tags`
+
+Same patterns as project/inventory links and tags.
+
+### `maintenance_log_reminders`
+
+Follow-up reminders on a maintenance log. `reminder_type`: `interval` or `one_time`. Interval reminders use `reminder_interval_count/unit` + `last_completed_at`; one-time reminders use `due_at`.
+
+### `maintenance_log_projects`, `maintenance_log_inventory_items`
+
+M2M junction tables linking maintenance logs to projects and inventory items.
 
 ---
 

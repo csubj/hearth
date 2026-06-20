@@ -8,3 +8,4 @@ export * from "./users";
 export * from "./sessions";
 export * from "./api-tokens";
 export * from "./inventory";
+export * from "./maintenance";

@@ -11,6 +11,7 @@ All notable changes to hearth. Versioning follows [Semantic Versioning](https://
 
 ### Added
 
+- **House maintenance logs** — `/maintenance` tracks work with metadata, follow-up reminders (interval + one-time), tags, links, related projects/inventory, and attachments
 - **Home dashboard** — stats strip, upcoming reminders preview, and denser feature section cards
 - **Browse hub** — `/browse` groups Projects, Restaurants, Metrics, and Inventory; desktop nav uses a Browse dropdown
 - **Reminders feed** — `/reminders` lists overdue and due-soon inventory maintenance and metric logging reminders

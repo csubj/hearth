@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HoverDetailsMenu } from "@/components/HoverDetailsMenu";
 import { logout } from "@/lib/actions/auth";
 import { FormSubmitButton } from "@/components/ui/FormSubmitButton";
 
@@ -32,28 +33,33 @@ export function AppNav({ user, unreadCount = 0 }: { user: AppNavUser; unreadCoun
           </span>
         ) : null}
       </Link>
-      <details className="relative">
-        <summary className="inline-flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-md px-3 text-sm font-medium text-text transition-colors hover:bg-accent-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none [&::-webkit-details-marker]:hidden">
-          <UserIcon />
-          <span className="ml-2 hidden sm:inline">{user.displayName}</span>
-        </summary>
-        <div className="absolute right-0 z-50 mt-1 min-w-[10rem] rounded-md border border-border bg-surface p-1 shadow-card">
-          <Link
-            href="/settings"
-            className="flex select-none items-center rounded-sm px-3 py-2 text-sm text-text hover:bg-accent-soft"
+      <HoverDetailsMenu
+        className="relative"
+        panelAlign="right"
+        panelClassName="min-w-[10rem] rounded-md border border-border bg-surface p-1 shadow-card"
+        summaryClassName="inline-flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-md px-3 text-sm font-medium text-text transition-colors hover:bg-accent-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none [&::-webkit-details-marker]:hidden"
+        summary={
+          <>
+            <UserIcon />
+            <span className="ml-2 hidden sm:inline">{user.displayName}</span>
+          </>
+        }
+      >
+        <Link
+          href="/settings"
+          className="flex select-none items-center rounded-sm px-3 py-2 text-sm text-text hover:bg-accent-soft"
+        >
+          Settings
+        </Link>
+        <form action={logout}>
+          <FormSubmitButton
+            pendingLabel="Signing out…"
+            className="flex w-full cursor-pointer select-none items-center rounded-sm px-3 py-2 text-left text-sm text-text-muted hover:bg-accent-soft disabled:opacity-50"
           >
-            Settings
-          </Link>
-          <form action={logout}>
-            <FormSubmitButton
-              pendingLabel="Signing out…"
-              className="flex w-full cursor-pointer select-none items-center rounded-sm px-3 py-2 text-left text-sm text-text-muted hover:bg-accent-soft disabled:opacity-50"
-            >
-              Logout
-            </FormSubmitButton>
-          </form>
-        </div>
-      </details>
+            Logout
+          </FormSubmitButton>
+        </form>
+      </HoverDetailsMenu>
     </div>
   );
 }

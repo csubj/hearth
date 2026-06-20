@@ -28,6 +28,8 @@ export async function getNotificationHref(
     }
     case "inventory_item":
       return `/inventory/${entityId}`;
+    case "maintenance_log":
+      return `/maintenance/${entityId}`;
     default:
       return null;
   }

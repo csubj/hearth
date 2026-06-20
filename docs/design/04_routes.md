@@ -121,6 +121,8 @@ Route group `(app)` does not affect URLs — `/stream` not `/app/stream`.
 | `/metrics/[id]`     | auth\* | Entry history, chart, add entry                     |
 | `/inventory`        | auth\* | Searchable inventory list                           |
 | `/inventory/[id]`   | auth\* | Item detail — tags, links, files, notes             |
+| `/maintenance`      | auth\* | Searchable maintenance log list                     |
+| `/maintenance/[id]` | auth\* | Log detail — metadata, reminders, related items     |
 | `/notifications`    | auth\* | Per-user activity stream                            |
 | `/settings`         | auth\* | Change own password; choose theme                   |
 | `/admin/users`      | admin  | User CRUD                                           |
@@ -157,6 +159,8 @@ All routes require `Authorization: Bearer <token>`. See `docs/reference/api.md`.
 | Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | list, CRUD, complete         |
 | Inventory types                 | `/api/v1/inventory/types`                      | list, CRUD                   |
 | Inventory tags                  | `/api/v1/inventory/tags`                       | list, CRUD                   |
+| Maintenance logs                | `/api/v1/maintenance`                          | list, CRUD, search           |
+| Maintenance categories          | `/api/v1/maintenance/categories`               | distinct category values     |
 
 REST handlers validate with Zod, write via Drizzle, and call the notification emitter. OpenAPI paths are registered from the same schemas.
 
@@ -173,7 +177,7 @@ REST handlers validate with Zod, write via Drizzle, and call the notification em
 
 - Validates session in `required` mode (or resolves `OPEN_MODE_USERNAME` in `open` mode)
 - Renders: top nav (Home, Browse dropdown, Reminders, Notifications bell)
-- Browse dropdown links to `/browse`, `/projects`, `/restaurants`, `/metrics`, `/inventory`
+- Browse dropdown links to `/browse`, `/projects`, `/restaurants`, `/metrics`, `/inventory`, `/maintenance`
 - Mobile nav: Home, Browse (`/browse`), Reminders
 - User menu: display name, Settings, Logout; Admin link if `role === admin`
 - Updates `users.last_seen_at` on load (for "since you last visited")

@@ -61,6 +61,7 @@ Log in and spot-check:
 
 - Home page loads
 - Project quick capture works on `/projects`
+- Maintenance list loads at `/maintenance`
 - Photos and PDFs still display on project/inventory detail pages
 
 ### Upgrading past Stream removal

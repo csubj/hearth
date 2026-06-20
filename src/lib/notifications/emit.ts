@@ -3,7 +3,13 @@ import { getDb } from "@/db";
 import { mentions, notifications, users } from "@/db/schema";
 import { parseMentions, type MentionCandidate } from "@/lib/mentions/parse";
 
-export type EntityType = "restaurant" | "project" | "metric" | "metric_entry" | "inventory_item";
+export type EntityType =
+  | "restaurant"
+  | "project"
+  | "metric"
+  | "metric_entry"
+  | "inventory_item"
+  | "maintenance_log";
 
 export interface EmitHouseholdActivityInput {
   type: string;
@@ -27,6 +33,7 @@ const ENTITY_MENTION_LABEL: Record<EntityType, string> = {
   metric: "a metric",
   metric_entry: "a metric entry",
   inventory_item: "an inventory item",
+  maintenance_log: "a maintenance log",
 };
 
 async function loadActiveUsers(): Promise<MentionCandidate[]> {
@@ -239,6 +246,26 @@ export async function emitInventoryMaintenanceReminder(
     entityType: "inventory_item",
     entityId: input.inventoryItemId,
     summary: `${input.reminderTitle} (${input.itemName}) is due for maintenance`,
+    recipientUserId: input.recipientUserId,
+  });
+}
+
+export interface EmitMaintenanceLogReminderInput {
+  maintenanceLogId: string;
+  reminderTitle: string;
+  logTitle: string;
+  intervalLabel: string;
+  recipientUserId: string | null;
+}
+
+export async function emitMaintenanceLogReminder(
+  input: EmitMaintenanceLogReminderInput,
+): Promise<void> {
+  await emitIntervalReminder({
+    type: "maintenance.reminder",
+    entityType: "maintenance_log",
+    entityId: input.maintenanceLogId,
+    summary: `${input.reminderTitle} for ${input.logTitle} is due (${input.intervalLabel})`,
     recipientUserId: input.recipientUserId,
   });
 }

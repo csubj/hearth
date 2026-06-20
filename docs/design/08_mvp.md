@@ -20,7 +20,7 @@ Structured reference for agents and contributors. Defines implementation order, 
 
 ## Implementation status
 
-All phases below (0–10) are **implemented** in the codebase. Beyond the originally scoped phases, the following features also now exist and are not yet broken out into their own phase descriptions:
+All phases below (0–11) are **implemented** in the codebase. Beyond the originally scoped phases, the following features also now exist and are not yet broken out into their own phase descriptions:
 
 - **User themes** — per-user theme selection (`default`, `warm`, `dark`, `gamer`) stored in `users.theme`, set via `/settings` (`ThemePicker`). See `05_styling.md`.
 - **Inventory maintenance reminders** — per-item recurring upkeep schedules (`inventory_maintenance_reminders` + links) with a "mark done"/complete flow and `inventory.maintenance_reminder` notifications.
@@ -274,6 +274,31 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 
 ---
 
+## Phase 11 — House maintenance logs
+
+**Goal:** track house maintenance work with metadata, follow-up reminders, and links to projects/inventory.
+
+| Deliverable                                | Notes                        |
+| ------------------------------------------ | ---------------------------- |
+| `maintenance_*` migrations                 | per `03_schema.md`           |
+| `/maintenance`, `/maintenance/[id]` routes | search, tags, links, filters |
+| Follow-up reminders (interval + one-time)  | `/reminders` feed            |
+| `maintenance.*` notifications              | per `06_notifications.md`    |
+| Document attachments for maintenance logs  | PDF per `07_attachments.md`  |
+| `/api/v1/maintenance` + categories REST    | per `04_routes.md`           |
+| Home maintenance section                   | recent logs preview          |
+| Browse menu + nav                          | `/maintenance` link          |
+
+**Done when:**
+
+- [ ] Create log with category, company, cost, dates, tags, links
+- [ ] Add interval and one-time follow-up reminders; appear on `/reminders`
+- [ ] Link related project and inventory item
+- [ ] Attach photos and PDFs
+- [ ] API token can CRUD via `/api/v1/maintenance`
+
+---
+
 ## Phase map (machine-readable)
 
 ```yaml
@@ -312,6 +337,9 @@ mvp:
     - id: 10
       name: inventory
       depends_on: [9]
+    - id: 11
+      name: maintenance_logs
+      depends_on: [10]
   v1_excludes:
     - google_maps
     - push_notifications

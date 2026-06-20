@@ -84,6 +84,7 @@ Your project appears in the list. Other household members will see it on their h
 | Projects    | Log something around the house: "fix the back gate latch"              |
 | Metrics     | Create one metric (e.g. pet weight), add an entry, and watch the chart |
 | Inventory   | Add an appliance with its model and manual link                        |
+| Maintenance | Log recent work: "Annual HVAC service" with company and cost           |
 
 Each feature has a dedicated page in the [User guide](../user-guide/index.md).
 

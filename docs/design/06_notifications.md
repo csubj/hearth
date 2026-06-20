@@ -34,7 +34,11 @@ Structured reference for agents and contributors. Product behavior in `00_init.m
 | `inventory.created`              | New inventory item                 | All except actor                                                    |
 | `inventory.updated`              | Inventory item edit                | All except actor                                                    |
 | `metric.reminder`                | Metric overdue for logging         | Whole household or assigned user (see `reminder_recipient_user_id`) |
-| `inventory.maintenance_reminder` | Maintenance reminder due           | Whole household or assigned user                                    |
+| `inventory.maintenance_reminder` | Item upkeep reminder due           | Whole household or assigned user                                    |
+| `maintenance.created`            | New maintenance log                | All except actor                                                    |
+| `maintenance.updated`            | Maintenance log edit               | All except actor                                                    |
+| `maintenance.deleted`            | Maintenance log removed            | All except actor                                                    |
+| `maintenance.reminder`           | Follow-up reminder due             | Whole household or assigned user                                    |
 | `mention`                        | @-mention parsed in any text field | Mentioned user(s) always; plus standard fan-out optional            |
 | `user.admin_action`              | Admin create/disable/reset user    | All admins except actor (audit)                                     |
 

@@ -49,6 +49,8 @@ function notificationTypeForEntity(entityType: AttachmentEntityType): string {
       return "metric.entry_added";
     case "inventory_item":
       return "inventory.updated";
+    case "maintenance_log":
+      return "maintenance.updated";
   }
 }
 

@@ -41,6 +41,12 @@ registerResource({
   entityName: "InventoryType",
 });
 
+registerResource({
+  tag: "Maintenance",
+  basePath: "/api/v1/maintenance",
+  entityName: "MaintenanceLog",
+});
+
 registerMetricEntriesResource();
 registerProjectComponentsResource();
 registerInventoryMaintenanceRemindersResource();

@@ -1,6 +1,6 @@
 # Attachments
 
-Attach photos to records across hearth — restaurant reviews, projects, metric entries, and inventory items. Inventory items and projects additionally accept **PDF documents** (manuals, receipts, warranties, quotes).
+Attach photos to records across hearth — restaurant reviews, projects, metric entries, inventory items, and maintenance logs. Inventory items, projects, and maintenance logs additionally accept **PDF documents** (manuals, receipts, warranties, quotes).
 
 ## Supported formats
 
@@ -15,7 +15,7 @@ Attach photos to records across hearth — restaurant reviews, projects, metric 
 
 **Limits:** 10 MB per image, up to 10 files per item.
 
-### Documents (inventory & projects)
+### Documents (inventory, projects & maintenance logs)
 
 | Type | Extensions |
 | ---- | ---------- |
@@ -27,7 +27,7 @@ Attach photos to records across hearth — restaurant reviews, projects, metric 
 
 1. Open the detail page or edit form for an item
 2. Use the upload control
-3. Select images (or PDFs on inventory items and projects)
+3. Select images (or PDFs on inventory items, projects, and maintenance logs)
 
 The item must exist before you can attach files — create the entry first, then add files on edit.
 

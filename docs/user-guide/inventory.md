@@ -62,9 +62,9 @@ Inventory accepts both **photos** and **PDF documents** — manuals, receipts, w
 
 Limits: 10 MB per image, 25 MB per PDF, up to 10 files per item. See [Attachments](attachments.md).
 
-## Maintenance reminders
+## Item upkeep reminders
 
-Schedule recurring upkeep on any item — filter changes, annual inspections, battery swaps.
+Schedule recurring upkeep on any catalog item — filter changes, annual inspections, battery swaps. For logging completed house work (services, repairs, costs), see [House maintenance](maintenance.md).
 
 On the item detail page, use **Maintenance reminders**:
 

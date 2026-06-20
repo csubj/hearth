@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getInventoryHomeStats } from "@/lib/actions/inventory";
+import { getMaintenanceHomeStats } from "@/lib/actions/maintenance";
 import { getMetricsHomeStats } from "@/lib/actions/metrics";
 import { getProjectsHomeStats } from "@/lib/actions/projects";
 import { getRestaurantsHomeStats } from "@/lib/actions/restaurants";
@@ -26,8 +27,14 @@ const browseAreas = [
   {
     href: "/inventory",
     title: "Inventory",
-    description: "Catalog items, warranties, and maintenance schedules.",
+    description: "Catalog items, warranties, and item upkeep schedules.",
     statsKey: "inventory" as const,
+  },
+  {
+    href: "/maintenance",
+    title: "Maintenance",
+    description: "Log house maintenance, changes, costs, and follow-up reminders.",
+    statsKey: "maintenance" as const,
   },
 ] as const;
 
@@ -44,17 +51,20 @@ function formatCount(
       return `${stats.metrics.total} tracked`;
     case "inventory":
       return `${stats.inventory.total} items`;
+    case "maintenance":
+      return `${stats.maintenance.total} logs`;
   }
 }
 
 async function loadBrowseStats() {
-  const [projects, restaurants, metrics, inventory] = await Promise.all([
+  const [projects, restaurants, metrics, inventory, maintenance] = await Promise.all([
     getProjectsHomeStats(),
     getRestaurantsHomeStats(),
     getMetricsHomeStats(),
     getInventoryHomeStats(),
+    getMaintenanceHomeStats(),
   ]);
-  return { projects, restaurants, metrics, inventory };
+  return { projects, restaurants, metrics, inventory, maintenance };
 }
 
 export default async function BrowsePage() {
@@ -65,7 +75,7 @@ export default async function BrowsePage() {
       <header>
         <h1 className="font-serif text-2xl text-text">Browse</h1>
         <p className="mt-1 text-sm text-text-muted">
-          Jump into projects, restaurants, metrics, and inventory.
+          Jump into projects, restaurants, metrics, inventory, and maintenance.
         </p>
       </header>
 

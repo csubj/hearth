@@ -85,6 +85,20 @@
       "when": 1750287600000,
       "tag": "0011_user_theme",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1750374000000,
+      "tag": "0013_maintenance_logs",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1750460400000,
+      "tag": "0014_drop_maintenance_status",
+      "breakpoints": true
     }
   ]
 }

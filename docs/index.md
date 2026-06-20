@@ -44,6 +44,12 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
   A searchable record of household things — appliances, electronics, and tools, with manuals, photos, and tags.
 
+- :material-home-wrench: **House maintenance**
+
+  ***
+
+  Log maintenance work — services, repairs, costs, follow-up reminders, and links to related projects or items.
+
 - :material-bell-outline: **Notifications**
 
   ***

@@ -6,7 +6,6 @@ import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3"
 import * as schema from "./schema";
 
 let instance: BetterSQLite3Database<typeof schema> | undefined;
-let migrationsApplied = false;
 
 function resolveDatabasePath(): string {
   const url = process.env.DATABASE_URL ?? "file:./data/hearth.db";
@@ -28,12 +27,7 @@ function ensureDatabaseDirectory(dbPath: string): void {
 }
 
 function applyMigrationsIfNeeded(db: BetterSQLite3Database<typeof schema>): void {
-  if (migrationsApplied) {
-    return;
-  }
-
   migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
-  migrationsApplied = true;
 }
 
 export function getDb(): BetterSQLite3Database<typeof schema> {
@@ -52,5 +46,4 @@ export function getDb(): BetterSQLite3Database<typeof schema> {
 /** Test-only: reset singleton so a fresh in-memory DB can be opened. */
 export function resetDbForTests(): void {
   instance = undefined;
-  migrationsApplied = false;
 }

@@ -4,7 +4,7 @@ Thank you for contributing to hearth! This guide covers development setup, conve
 
 ## What this is
 
-**hearth** is a household coordination web app — projects, restaurants, metrics, and inventory. One instance = one household.
+**hearth** is a household coordination web app — projects, restaurants, metrics, inventory, and maintenance. One instance = one household.
 
 ## Before you code
 
@@ -73,8 +73,25 @@ Lefthook runs on commit and push:
 | Hook         | Purpose                                      |
 | ------------ | -------------------------------------------- |
 | `pre-commit` | Lint, format check, typecheck (staged files) |
-| `commit-msg` | Conventional Commits format                  |
+| `commit-msg` | Conventional Commits via commitlint          |
 | `pre-push`   | Full test suite                              |
+
+## Commit messages
+
+Commitlint enforces [Conventional Commits](https://www.conventionalcommits.org/) on the
+`commit-msg` hook. Important limits:
+
+- **Subject:** `type: short description` — max 100 characters, no trailing period
+- **Body:** optional; blank line after subject; **each body line max 100 characters**
+
+```text
+feat: add maintenance logs for home upkeep
+
+- Add maintenance section for services, repairs, and reminders.
+- Add API endpoints for maintenance CRUD and categories.
+```
+
+Wrap or split long bullets instead of one long sentence per line.
 
 ## Testing
 
