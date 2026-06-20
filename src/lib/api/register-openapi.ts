@@ -1,4 +1,5 @@
 import {
+  registerHomeResources,
   registerInventoryMaintenanceRemindersResource,
   registerMetricEntriesResource,
   registerProjectComponentsResource,
@@ -50,3 +51,4 @@ registerResource({
 registerMetricEntriesResource();
 registerProjectComponentsResource();
 registerInventoryMaintenanceRemindersResource();
+registerHomeResources();

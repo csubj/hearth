@@ -1,4 +1,5 @@
 import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
+import { HomeLogSection } from "@/components/home/HomeLogSection";
 import { InventorySection } from "@/components/home/InventorySection";
 import { MaintenanceSection } from "@/components/home/MaintenanceSection";
 import { MetricsSection } from "@/components/home/MetricsSection";
@@ -25,6 +26,7 @@ export default function HomePage() {
         <MetricsSection />
         <InventorySection />
         <MaintenanceSection />
+        <HomeLogSection />
       </div>
     </div>
   );

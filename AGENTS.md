@@ -4,7 +4,7 @@ Instructions for AI agents and contributors working in this repository.
 
 ## What this is
 
-**hearth** is a household coordination web app — projects, restaurants, metrics, inventory, and maintenance. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
+**hearth** is a household coordination web app — projects, restaurants, metrics, inventory, maintenance, and home log. One instance = one household. See [docs/design/00_init.md](docs/design/00_init.md).
 
 ## Before you code
 

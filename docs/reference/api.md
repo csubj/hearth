@@ -44,6 +44,8 @@ The API exposes the same entities as the web app. Each resource supports standar
 | Inventory maintenance reminders | `/api/v1/inventory/{id}/maintenance-reminders` | Per-item upkeep schedules; `POST …/{reminderId}/complete` marks done                               |
 | Maintenance logs                | `/api/v1/maintenance`                          | House maintenance work logs with metadata and tags                                                 |
 | Maintenance categories          | `/api/v1/maintenance/categories`               | Distinct category values for filtering                                                             |
+| Home Log spaces                 | `/api/v1/home/spaces`                          | Property/structure/room/area tree nodes; filter by `?kind=`, `?parentId=`                          |
+| Home Log items                  | `/api/v1/home/items`                           | Typed items (paint, appliance, electrical, etc.); filter by `?kind=`, `?spaceId=`                  |
 
 ### Managed types
 

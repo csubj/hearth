@@ -8,6 +8,7 @@ import { getPreviousLastSeenAt, getUnreadNotificationCount } from "@/lib/notific
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/home-log", label: "Home Log" },
   { href: "/reminders", label: "Reminders" },
 ] as const;
 

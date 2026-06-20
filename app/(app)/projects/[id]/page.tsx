@@ -15,6 +15,7 @@ import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { getProjectById } from "@/lib/actions/projects";
 import { loadMentionUsers } from "@/lib/users/mention-users";
+import { HomeReferencesPanel } from "@/components/home/HomeReferencesPanel";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -69,6 +70,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <ProjectComponentsTable project={project} />
+
+      <HomeReferencesPanel targetType="project" targetId={project.id} />
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

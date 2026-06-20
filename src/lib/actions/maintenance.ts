@@ -26,6 +26,7 @@ import {
 } from "@/lib/actions/maintenance-log-reminders";
 import { isMaintenanceLogReminderStale } from "@/lib/maintenance/reminder-interval";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
+import { removeHomeLinksForTarget } from "@/lib/actions/home";
 
 const MAINTENANCE_ENTITY_TYPE = "maintenance_log" as const;
 
@@ -593,6 +594,7 @@ export async function deleteMaintenanceLog(
     return { error: "Maintenance log not found" };
   }
 
+  await removeHomeLinksForTarget("maintenance_log", parsed.data.id);
   await db.delete(maintenanceLogs).where(eq(maintenanceLogs.id, parsed.data.id));
 
   await emitHouseholdActivity({

@@ -4,15 +4,15 @@ hearth is organized around a **home page** that summarizes what needs attention,
 
 ## Navigation
 
-| Nav item      | Route            | Purpose                                                            |
-| ------------- | ---------------- | ------------------------------------------------------------------ |
-| Home          | `/`              | Dashboard — stats, reminders, and feature previews                 |
-| Browse        | `/browse`        | Hub for Projects, Restaurants, Metrics, Inventory, and Maintenance |
-| Reminders     | `/reminders`     | Upcoming maintenance follow-ups, item upkeep, and metric reminders |
-| Notifications | `/notifications` | Activity feed and @-mentions                                       |
-| Settings      | `/settings`      | Change your password and pick an appearance theme                  |
+| Nav item      | Route            | Purpose                                                                      |
+| ------------- | ---------------- | ---------------------------------------------------------------------------- |
+| Home          | `/`              | Dashboard — stats, reminders, and feature previews                           |
+| Browse        | `/browse`        | Hub for Projects, Restaurants, Metrics, Inventory, Maintenance, and Home Log |
+| Reminders     | `/reminders`     | Upcoming maintenance follow-ups, item upkeep, and metric reminders           |
+| Notifications | `/notifications` | Activity feed and @-mentions                                                 |
+| Settings      | `/settings`      | Change your password and pick an appearance theme                            |
 
-From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), **Inventory** (`/inventory`), or **Maintenance** (`/maintenance`).
+From **Browse** (desktop dropdown or mobile link), open **Projects** (`/projects`), **Restaurants** (`/restaurants`), **Metrics** (`/metrics`), **Inventory** (`/inventory`), **Maintenance** (`/maintenance`), or **Home Log** (`/home-log`).
 
 Admins also see **Admin** → `/admin/users` and `/admin/api-tokens`.
 
@@ -29,6 +29,7 @@ The landing page aggregates what needs attention:
 | Metrics            | Latest entry per metric                                                               |
 | Inventory          | Items with overdue item upkeep reminders first                                        |
 | Maintenance        | Recent house maintenance logs                                                         |
+| Home Log           | Summary of properties (spaces count, items count)                                     |
 | Since last visit   | Notifications since you last opened hearth                                            |
 
 Each section links to its full view. The page is designed to answer **"what's going on?"** in a few seconds.
@@ -54,6 +55,7 @@ Adding something should feel like writing on a sticky note:
 - [Metrics](metrics.md) — recurring measurements and charts
 - [Inventory](inventory.md) — searchable household items, manuals, and photos
 - [House maintenance](maintenance.md) — maintenance work logs, costs, and follow-ups
+- [Home Log](home-log.md) — properties, rooms, materials, colors, and equipment reference
 - [Notifications & @-mentions](notifications-and-mentions.md) — activity feed
 - [Attachments](attachments.md) — photos and documents
 - [Your account](account.md) — password and settings

@@ -11,6 +11,7 @@ All notable changes to hearth. Versioning follows [Semantic Versioning](https://
 
 ### Added
 
+- **Home Log** — `/home-log` property/room/space hierarchy with typed items (paint swatches, appliances, electrical, plumbing, flooring, fixtures, window treatments, generic), cross-links to maintenance/inventory/projects with back-links on all sides, attachments, Markdown notes with @-mentions, and REST API (`/api/v1/home/spaces`, `/api/v1/home/items`)
 - **House maintenance logs** — `/maintenance` tracks work with metadata, follow-up reminders (interval + one-time), tags, links, related projects/inventory, and attachments
 - **Home dashboard** — stats strip, upcoming reminders preview, and denser feature section cards
 - **Browse hub** — `/browse` groups Projects, Restaurants, Metrics, and Inventory; desktop nav uses a Browse dropdown

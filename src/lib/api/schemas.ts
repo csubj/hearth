@@ -313,3 +313,93 @@ export const updateMaintenanceLogSchema = z.object({
   completedAt: isoDateTime.nullable().optional(),
   tags: z.array(z.string().min(1).max(100)).optional(),
 });
+
+// Home Log
+
+const homeSpaceKinds = ["property", "structure", "room", "area"] as const;
+const homeItemKinds = [
+  "paint",
+  "appliance",
+  "electrical",
+  "plumbing",
+  "fixture",
+  "flooring",
+  "window_treatment",
+  "generic",
+] as const;
+
+export const homeSpaceSchema = z.object({
+  id: z.string().uuid(),
+  parentId: z.string().uuid().nullable(),
+  kind: z.enum(homeSpaceKinds),
+  name: z.string(),
+  address: z.string().nullable(),
+  notes: z.string().nullable(),
+  sortOrder: z.number().int(),
+  createdByUserId: z.string().uuid(),
+  updatedByUserId: z.string().uuid(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+});
+
+export const createHomeSpaceSchema = z.object({
+  name: z.string().min(1).max(200),
+  kind: z.enum(homeSpaceKinds).optional(),
+  parentId: z.string().uuid().nullable().optional(),
+  address: z.string().max(500).nullable().optional(),
+  notes: z.string().max(10_000).optional(),
+});
+
+export const updateHomeSpaceSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  kind: z.enum(homeSpaceKinds).optional(),
+  address: z.string().max(500).nullable().optional(),
+  notes: z.string().max(10_000).nullable().optional(),
+});
+
+export const homeItemSchema = z.object({
+  id: z.string().uuid(),
+  spaceId: z.string().uuid(),
+  kind: z.enum(homeItemKinds),
+  name: z.string(),
+  manufacturer: z.string().nullable(),
+  modelNumber: z.string().nullable(),
+  serialNumber: z.string().nullable(),
+  colorName: z.string().nullable(),
+  colorHex: z.string().nullable(),
+  finish: z.string().nullable(),
+  productUrl: z.string().nullable(),
+  purchasedAt: isoDateTime.nullable(),
+  notes: z.string().nullable(),
+  createdByUserId: z.string().uuid(),
+  updatedByUserId: z.string().uuid(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+});
+
+export const createHomeItemSchema = z.object({
+  spaceId: z.string().uuid(),
+  kind: z.enum(homeItemKinds).optional(),
+  name: z.string().min(1).max(200),
+  manufacturer: z.string().max(200).optional(),
+  modelNumber: z.string().max(200).optional(),
+  serialNumber: z.string().max(200).optional(),
+  colorName: z.string().max(200).optional(),
+  colorHex: z.string().max(20).optional(),
+  finish: z.string().max(200).optional(),
+  productUrl: z.string().url().max(2000).optional(),
+  notes: z.string().max(10_000).optional(),
+});
+
+export const updateHomeItemSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  kind: z.enum(homeItemKinds).optional(),
+  manufacturer: z.string().max(200).nullable().optional(),
+  modelNumber: z.string().max(200).nullable().optional(),
+  serialNumber: z.string().max(200).nullable().optional(),
+  colorName: z.string().max(200).nullable().optional(),
+  colorHex: z.string().max(20).nullable().optional(),
+  finish: z.string().max(200).nullable().optional(),
+  productUrl: z.string().url().max(2000).nullable().optional(),
+  notes: z.string().max(10_000).nullable().optional(),
+});

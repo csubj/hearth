@@ -50,6 +50,12 @@ There is no audience beyond the household. No public profiles, no social feed. T
 
   Log maintenance work — services, repairs, costs, follow-up reminders, and links to related projects or items.
 
+- :material-floor-plan: **Home Log**
+
+  ***
+
+  Document your property — spaces (property, structure, room, area), typed items (paint colors with swatches, appliances, electrical, plumbing), and cross-links to maintenance, inventory, and projects.
+
 - :material-bell-outline: **Notifications**
 
   ***

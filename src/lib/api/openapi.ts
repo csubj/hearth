@@ -358,6 +358,20 @@ export function registerInventoryMaintenanceRemindersResource(): void {
   });
 }
 
+export function registerHomeResources(): void {
+  registerResource({
+    tag: "HomeLog",
+    basePath: "/api/v1/home/spaces",
+    entityName: "HomeSpace",
+  });
+
+  registerResource({
+    tag: "HomeLog",
+    basePath: "/api/v1/home/items",
+    entityName: "HomeItem",
+  });
+}
+
 export function getOpenApiDocument() {
   const generator = new OpenApiGeneratorV3(openApiRegistry.definitions);
   return generator.generateDocument({

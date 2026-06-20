@@ -15,6 +15,7 @@ import { MaintenanceNotesEditor } from "@/components/maintenance/MaintenanceNote
 import { MaintenanceRelatedPanel } from "@/components/maintenance/MaintenanceRelatedPanel";
 import { MaintenanceRemindersPanel } from "@/components/maintenance/MaintenanceRemindersPanel";
 import { MaintenanceTitleForm } from "@/components/maintenance/MaintenanceTitleForm";
+import { HomeReferencesPanel } from "@/components/home/HomeReferencesPanel";
 
 export async function MaintenanceDetailView({
   log,
@@ -67,6 +68,8 @@ export async function MaintenanceDetailView({
       />
 
       <MaintenanceRelatedPanel log={log} />
+
+      <HomeReferencesPanel targetType="maintenance_log" targetId={log.id} />
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

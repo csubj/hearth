@@ -10,6 +10,7 @@ const browseLinks = [
   { href: "/metrics", label: "Metrics" },
   { href: "/inventory", label: "Inventory" },
   { href: "/maintenance", label: "Maintenance" },
+  { href: "/home-log", label: "Home Log" },
 ] as const;
 
 const linkClassName =

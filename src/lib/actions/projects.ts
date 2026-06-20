@@ -23,6 +23,7 @@ import { displayName, requireUser } from "@/lib/auth/session";
 import { deriveProjectTitle } from "@/components/projects/format";
 import { componentRollups, countAcquired, sumComponentCosts } from "@/lib/projects/rollups";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
+import { removeHomeLinksForTarget } from "@/lib/actions/home";
 
 export type ProjectActionState = {
   error?: string;
@@ -1125,6 +1126,7 @@ export async function deleteProject(
     return { error: "Project not found" };
   }
 
+  await removeHomeLinksForTarget("project", id);
   await db.delete(projects).where(eq(projects.id, id));
 
   const actor = displayName(user);

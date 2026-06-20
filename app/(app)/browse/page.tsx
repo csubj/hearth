@@ -4,6 +4,7 @@ import { getMaintenanceHomeStats } from "@/lib/actions/maintenance";
 import { getMetricsHomeStats } from "@/lib/actions/metrics";
 import { getProjectsHomeStats } from "@/lib/actions/projects";
 import { getRestaurantsHomeStats } from "@/lib/actions/restaurants";
+import { getHomeLogHomeStats } from "@/lib/actions/home";
 
 const browseAreas = [
   {
@@ -36,6 +37,12 @@ const browseAreas = [
     description: "Log house maintenance, changes, costs, and follow-up reminders.",
     statsKey: "maintenance" as const,
   },
+  {
+    href: "/home-log",
+    title: "Home Log",
+    description: "Document properties, rooms, materials, colors, and equipment.",
+    statsKey: "homeLog" as const,
+  },
 ] as const;
 
 function formatCount(
@@ -53,18 +60,21 @@ function formatCount(
       return `${stats.inventory.total} items`;
     case "maintenance":
       return `${stats.maintenance.total} logs`;
+    case "homeLog":
+      return `${stats.homeLog.totalSpaces} spaces`;
   }
 }
 
 async function loadBrowseStats() {
-  const [projects, restaurants, metrics, inventory, maintenance] = await Promise.all([
+  const [projects, restaurants, metrics, inventory, maintenance, homeLog] = await Promise.all([
     getProjectsHomeStats(),
     getRestaurantsHomeStats(),
     getMetricsHomeStats(),
     getInventoryHomeStats(),
     getMaintenanceHomeStats(),
+    getHomeLogHomeStats(),
   ]);
-  return { projects, restaurants, metrics, inventory, maintenance };
+  return { projects, restaurants, metrics, inventory, maintenance, homeLog };
 }
 
 export default async function BrowsePage() {
@@ -75,7 +85,7 @@ export default async function BrowsePage() {
       <header>
         <h1 className="font-serif text-2xl text-text">Browse</h1>
         <p className="mt-1 text-sm text-text-muted">
-          Jump into projects, restaurants, metrics, inventory, and maintenance.
+          Jump into projects, restaurants, metrics, inventory, maintenance, and home log.
         </p>
       </header>
 

@@ -1,5 +1,5 @@
 site_name: hearth
-site_description: Household coordination — projects, restaurants, metrics, inventory, maintenance, and more.
+site_description: Household coordination — projects, restaurants, metrics, inventory, maintenance, home log, and more.
 site_url: https://csubj.github.io/hearth/
 repo_url: https://github.com/csubj/hearth
 repo_name: csubj/hearth
@@ -86,6 +86,7 @@ nav:
       - Metrics: user-guide/metrics.md
       - Inventory: user-guide/inventory.md
       - House Maintenance: user-guide/maintenance.md
+      - Home Log: user-guide/home-log.md
       - Notifications & Mentions: user-guide/notifications-and-mentions.md
       - Attachments: user-guide/attachments.md
       - Your Account: user-guide/account.md

@@ -30,6 +30,10 @@ export async function getNotificationHref(
       return `/inventory/${entityId}`;
     case "maintenance_log":
       return `/maintenance/${entityId}`;
+    case "home_space":
+      return `/home-log/${entityId}`;
+    case "home_item":
+      return `/home-log/items/${entityId}`;
     default:
       return null;
   }

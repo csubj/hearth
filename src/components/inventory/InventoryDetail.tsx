@@ -7,6 +7,7 @@ import { AttachmentsPanel } from "@/lib/attachments/AttachmentsPanel";
 import { InventoryLinksPanel, InventoryTagsForm } from "@/components/inventory/InventoryLinksTags";
 import { MaintenanceRemindersPanel } from "@/components/inventory/MaintenanceRemindersPanel";
 import { UpdateInventoryForm } from "@/components/inventory/UpdateInventoryForm";
+import { HomeReferencesPanel } from "@/components/home/HomeReferencesPanel";
 
 function formatDate(date: Date | null): string | null {
   if (!date) {
@@ -63,6 +64,8 @@ export async function InventoryDetailView({
         reminders={item.maintenanceReminders}
         users={users}
       />
+
+      <HomeReferencesPanel targetType="inventory_item" targetId={item.id} />
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

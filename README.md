@@ -7,7 +7,7 @@
 [![Node.js](https://img.shields.io/badge/node-22%20LTS-green.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-10.x-f69220.svg)](https://pnpm.io/)
 
-Household coordination — projects, restaurants, metrics, inventory, and maintenance. One deployment serves one household.
+Household coordination — projects, restaurants, metrics, inventory, maintenance, and home log. One deployment serves one household.
 
 **Documentation:** [csubj.github.io/hearth](https://csubj.github.io/hearth/) · **API docs:** `/api/docs` (when running)
 
@@ -31,6 +31,7 @@ Household coordination — projects, restaurants, metrics, inventory, and mainte
 - **Metrics** — log entries, view history, and visualize trends with charts (Recharts)
 - **Inventory** — types, tags, filters, links, CSV import/export, and per-item upkeep reminders
 - **House maintenance** — log work with metadata (company, cost, dates), follow-up reminders, tags, links, and related projects/inventory
+- **Home Log** — property/room/space hierarchy with typed items (paint swatches, appliances, electrical, plumbing, flooring), cross-links to maintenance/inventory/projects, and back-links on all sides
 - **Reminders feed** — consolidated upcoming feed for maintenance follow-ups, item upkeep, and metric logging
 - **Notifications & @mentions** — in-app notifications with mention support
 - **Attachments** — photo and document uploads

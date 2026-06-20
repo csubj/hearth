@@ -9,7 +9,9 @@ export type EntityType =
   | "metric"
   | "metric_entry"
   | "inventory_item"
-  | "maintenance_log";
+  | "maintenance_log"
+  | "home_space"
+  | "home_item";
 
 export interface EmitHouseholdActivityInput {
   type: string;
@@ -34,6 +36,8 @@ const ENTITY_MENTION_LABEL: Record<EntityType, string> = {
   metric_entry: "a metric entry",
   inventory_item: "an inventory item",
   maintenance_log: "a maintenance log",
+  home_space: "a home space",
+  home_item: "a home item",
 };
 
 async function loadActiveUsers(): Promise<MentionCandidate[]> {
