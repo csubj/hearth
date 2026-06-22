@@ -1,18 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { create, type RestaurantActionState } from "@/lib/actions/restaurants";
 
 export function CreateRestaurantForm({ users = [] }: { users?: MentionUser[] }) {
   const [state, formAction, pending] = useActionState<RestaurantActionState, FormData>(create, {});
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
-    <form
-      action={formAction}
-      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
-    >
-      <h2 className="text-sm font-medium text-text">Add a restaurant</h2>
+    <form action={formAction} className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="restaurant-name" className="block text-sm font-medium text-text">

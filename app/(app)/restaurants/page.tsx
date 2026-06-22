@@ -1,9 +1,10 @@
-import { CreateRestaurantCollapsible } from "@/components/restaurants/CreateRestaurantCollapsible";
+import { CreateDialog } from "@/components/ui/CreateDialog";
+import { CreateRestaurantForm } from "@/components/restaurants/CreateRestaurantForm";
 import { RestaurantFilters } from "@/components/restaurants/RestaurantFilters";
-import { RestaurantList } from "@/components/restaurants/RestaurantList";
+import { RestaurantInfiniteList } from "@/components/restaurants/RestaurantInfiniteList";
 import {
   listRestaurantNeighborhoods,
-  listRestaurants,
+  listRestaurantsPage,
   type RestaurantListFilters,
 } from "@/lib/actions/restaurants";
 import { loadMentionUsers } from "@/lib/users/mention-users";
@@ -32,11 +33,12 @@ export default async function RestaurantsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const filters = parseFilters(resolvedSearchParams);
-  const [items, neighborhoods, mentionUsers] = await Promise.all([
-    listRestaurants(resolvedSearchParams),
+  const [page, neighborhoods, mentionUsers] = await Promise.all([
+    listRestaurantsPage(resolvedSearchParams),
     listRestaurantNeighborhoods(),
     loadMentionUsers(),
   ]);
+  const listKey = JSON.stringify(resolvedSearchParams);
 
   return (
     <div className="space-y-6">
@@ -45,10 +47,21 @@ export default async function RestaurantsPage({
           <h1 className="font-serif text-2xl text-text">Restaurants</h1>
           <p className="mt-1 text-sm text-text-muted">Places to try and spots you&apos;ve loved.</p>
         </div>
-        <CreateRestaurantCollapsible users={mentionUsers} />
+        <CreateDialog
+          triggerLabel="Add restaurant"
+          title="Add a restaurant"
+          description="A place to try or a spot you've loved."
+        >
+          <CreateRestaurantForm users={mentionUsers} />
+        </CreateDialog>
       </header>
       <RestaurantFilters filters={filters} neighborhoods={neighborhoods} users={mentionUsers} />
-      <RestaurantList restaurants={items} />
+      <RestaurantInfiniteList
+        key={listKey}
+        initialItems={page.items}
+        initialNextOffset={page.nextOffset}
+        searchParams={resolvedSearchParams}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { createMaintenanceLog, type MaintenanceActionState } from "@/lib/actions/maintenance";
 
@@ -16,18 +17,30 @@ function ActionMessage({ state }: { state: MaintenanceActionState }) {
   return null;
 }
 
-export function MaintenanceCreateForm({ users = [] }: { users?: MentionUser[] }) {
+export function MaintenanceCreateForm({
+  users = [],
+  homeLinkSourceType,
+  homeLinkSourceId,
+}: {
+  users?: MentionUser[];
+  homeLinkSourceType?: string;
+  homeLinkSourceId?: string;
+}) {
   const [state, action, pending] = useActionState<MaintenanceActionState, FormData>(
     createMaintenanceLog,
     {},
   );
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
-    <form
-      action={action}
-      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
-    >
-      <h2 className="text-sm font-medium text-text">Log maintenance</h2>
+    <form action={action} className="space-y-3">
+      <input type="hidden" name="redirect" value="none" />
+      {homeLinkSourceType && homeLinkSourceId ? (
+        <>
+          <input type="hidden" name="homeLinkSourceType" value={homeLinkSourceType} />
+          <input type="hidden" name="homeLinkSourceId" value={homeLinkSourceId} />
+        </>
+      ) : null}
       <div>
         <label htmlFor="maintenance-title" className="block text-sm font-medium text-text">
           Title

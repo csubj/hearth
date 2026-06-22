@@ -2,13 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 import { BrowseMenu } from "@/components/BrowseMenu";
+import { HomeLogNavMenu } from "@/components/HomeLogNavMenu";
 import { displayName, touchLastSeen, validateRequest } from "@/lib/auth/session";
+import { getHomeLogHomeSummary } from "@/lib/actions/home";
 import { processMetricReminders } from "@/lib/metrics/reminders";
 import { getPreviousLastSeenAt, getUnreadNotificationCount } from "@/lib/notifications/queries";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/home-log", label: "Home Log" },
   { href: "/reminders", label: "Reminders" },
 ] as const;
 
@@ -43,6 +44,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     role: user.role,
   };
 
+  const homeLogProperties = await getHomeLogHomeSummary(100);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur">
@@ -59,6 +62,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 Home
               </Link>
               <BrowseMenu />
+              <HomeLogNavMenu
+                variant="desktop"
+                properties={homeLogProperties.map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                  address: p.address,
+                }))}
+              />
               {navLinks.slice(1).map((link) => (
                 <Link
                   key={link.href}
@@ -88,6 +99,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           >
             Browse
           </Link>
+          <HomeLogNavMenu
+            variant="mobile"
+            properties={homeLogProperties.map((p) => ({
+              id: p.id,
+              name: p.name,
+              address: p.address,
+            }))}
+          />
           {navLinks.slice(1).map((link) => (
             <Link
               key={link.href}

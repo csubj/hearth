@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { createMetric, type MetricActionState } from "@/lib/actions/metrics-mutations";
 import { ReminderIntervalFields } from "@/components/reminders/ReminderIntervalFields";
 import type { MentionUser } from "@/components/MentionTextarea";
@@ -10,6 +11,7 @@ export function CreateMetricForm({ users = [] }: { users?: MentionUser[] }) {
     createMetric,
     {},
   );
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
     <form action={formAction} className="space-y-3">

@@ -30,6 +30,7 @@ const HOME_ITEM_ENTITY_TYPE = "home_item" as const;
 export type HomeActionState = {
   error?: string;
   success?: string;
+  id?: string;
 };
 
 export type HomeBreadcrumb = Pick<HomeSpace, "id" | "name" | "kind">;
@@ -47,6 +48,19 @@ export type HomeItemDetail = HomeItem & {
 };
 
 export type HomeSpaceSummary = Pick<HomeSpace, "id" | "name" | "kind" | "sortOrder">;
+
+export type HomeTreeItem = Pick<HomeItem, "id" | "name" | "kind">;
+
+export type HomeTreeNode = {
+  id: string;
+  name: string;
+  kind: HomeSpaceKind;
+  children: HomeTreeNode[];
+  items: HomeTreeItem[];
+  inventory: { id: string; name: string }[];
+  maintenance: { id: string; title: string }[];
+  projects: { id: string; title: string }[];
+};
 
 export type HomeReferenceTarget = {
   sourceType: HomeLinkSourceType;
@@ -115,6 +129,84 @@ export async function getHomeRoots(): Promise<HomeSpace[]> {
     .from(homeSpaces)
     .where(sql`${homeSpaces.parentId} IS NULL`)
     .orderBy(homeSpaces.sortOrder, homeSpaces.name);
+}
+
+export async function getHomeTree(): Promise<HomeTreeNode[]> {
+  await requireUser();
+  const db = getDb();
+
+  const [spaces, items, rawLinks] = await Promise.all([
+    db.select().from(homeSpaces).orderBy(homeSpaces.sortOrder, homeSpaces.name),
+    db
+      .select({
+        id: homeItems.id,
+        spaceId: homeItems.spaceId,
+        name: homeItems.name,
+        kind: homeItems.kind,
+      })
+      .from(homeItems)
+      .orderBy(homeItems.kind, homeItems.name),
+    db
+      .select()
+      .from(homeLinks)
+      .where(eq(homeLinks.sourceType, "home_space"))
+      .orderBy(homeLinks.createdAt),
+  ]);
+
+  const resolvedLinks = await resolveLinks(rawLinks);
+
+  const itemsBySpace = new Map<string, HomeTreeItem[]>();
+  for (const item of items) {
+    const list = itemsBySpace.get(item.spaceId) ?? [];
+    list.push({ id: item.id, name: item.name, kind: item.kind });
+    itemsBySpace.set(item.spaceId, list);
+  }
+
+  const nodeMap = new Map<string, HomeTreeNode>();
+  for (const space of spaces) {
+    nodeMap.set(space.id, {
+      id: space.id,
+      name: space.name,
+      kind: space.kind,
+      children: [],
+      items: itemsBySpace.get(space.id) ?? [],
+      inventory: [],
+      maintenance: [],
+      projects: [],
+    });
+  }
+
+  for (const link of resolvedLinks) {
+    const node = nodeMap.get(link.sourceId);
+    if (!node) continue;
+    switch (link.targetType) {
+      case "inventory_item":
+        node.inventory.push({ id: link.targetId, name: link.targetName });
+        break;
+      case "maintenance_log":
+        node.maintenance.push({ id: link.targetId, title: link.targetName });
+        break;
+      case "project":
+        node.projects.push({ id: link.targetId, title: link.targetName });
+        break;
+    }
+  }
+
+  const roots: HomeTreeNode[] = [];
+  for (const space of spaces) {
+    const node = nodeMap.get(space.id);
+    if (!node) continue;
+    if (space.parentId) {
+      const parent = nodeMap.get(space.parentId);
+      if (parent) {
+        parent.children.push(node);
+      }
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
 }
 
 async function walkBreadcrumb(spaceId: string): Promise<HomeBreadcrumb[]> {
@@ -503,6 +595,10 @@ export async function createHomeSpace(
   });
 
   revalidateHomePaths(data.parentId ?? undefined);
+
+  if (String(formData.get("redirect") ?? "detail") === "none") {
+    return { success: `Added ${data.name}`, id };
+  }
   redirect(`/home-log/${id}`);
 }
 
@@ -803,6 +899,10 @@ export async function createHomeItem(
   });
 
   revalidateHomePaths(data.spaceId, id);
+
+  if (String(formData.get("redirect") ?? "detail") === "none") {
+    return { success: `Added ${data.name}`, id };
+  }
   redirect(`/home-log/items/${id}`);
 }
 
@@ -1008,6 +1108,28 @@ export async function linkHomeEntity(
 
   const { sourceType, sourceId, targetType, targetId } = parsed.data;
 
+  await createHomeLink({ sourceType, sourceId, targetType, targetId, userId: user.id });
+  return { success: "Linked" };
+}
+
+/**
+ * Insert a home_link row and revalidate affected paths. Shared by linkHomeEntity
+ * and by resource create actions that auto-link a new record to a home space/item.
+ * Not bound to FormData so it can be called directly from other server actions.
+ */
+export async function createHomeLink({
+  sourceType,
+  sourceId,
+  targetType,
+  targetId,
+  userId,
+}: {
+  sourceType: HomeLinkSourceType;
+  sourceId: string;
+  targetType: HomeLinkTargetType;
+  targetId: string;
+  userId: string;
+}): Promise<void> {
   await getDb()
     .insert(homeLinks)
     .values({
@@ -1016,7 +1138,7 @@ export async function linkHomeEntity(
       sourceId,
       targetType,
       targetId,
-      createdByUserId: user.id,
+      createdByUserId: userId,
       createdAt: new Date(),
     })
     .onConflictDoNothing();
@@ -1028,7 +1150,6 @@ export async function linkHomeEntity(
   }
   // Also revalidate the target page so back-links update
   revalidateTargetPath(targetType, targetId);
-  return { success: "Linked" };
 }
 
 export async function unlinkHomeEntity(

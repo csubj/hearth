@@ -9,17 +9,17 @@ import { HomeSpaceTitleForm } from "./HomeSpaceTitleForm";
 import { HomeSpaceMetadataForm } from "./HomeSpaceMetadataForm";
 import { HomeSpaceNotesEditor } from "./HomeSpaceNotesEditor";
 import { HomeSpaceDeleteButton } from "./HomeDeleteButton";
-import { HomeRelatedPanel } from "./HomeRelatedPanel";
-import { HomeItemCard } from "./HomeItemCard";
-import { HomeItemCreateForm } from "./HomeItemCreateForm";
+import { HomeSpaceSectionsNav } from "./HomeSpaceSectionsNav";
 import { spaceKindLabel } from "./format";
 
 export async function HomeSpaceDetail({
   space,
   users = [],
+  addSpaceTrigger,
 }: {
   space: HomeSpaceWithChildren;
   users?: MentionUser[];
+  addSpaceTrigger?: React.ReactNode;
 }) {
   const attachments = await listAttachmentsForEntity("home_space", space.id);
 
@@ -38,9 +38,12 @@ export async function HomeSpaceDetail({
         <HomeSpaceMetadataForm space={space} />
         <div className="space-y-6">
           {/* Child spaces */}
-          {space.children.length > 0 && (
-            <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+            <div className="flex items-center justify-between gap-3">
               <h2 className="text-sm font-medium text-text">Nested spaces</h2>
+              {addSpaceTrigger}
+            </div>
+            {space.children.length > 0 ? (
               <ul className="mt-3 space-y-2">
                 {space.children.map((child) => (
                   <li key={child.id}>
@@ -54,36 +57,18 @@ export async function HomeSpaceDetail({
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
+            ) : (
+              <p className="mt-3 text-sm text-text-muted">
+                No nested spaces yet. Add a structure, room, or area inside this space.
+              </p>
+            )}
+          </section>
         </div>
       </div>
 
       <HomeSpaceNotesEditor spaceId={space.id} initialNotes={space.notes} users={users} />
 
-      {/* Items */}
-      <section className="space-y-4">
-        <h2 className="text-base font-medium text-text">
-          Materials &amp; equipment
-          {space.items.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-text-muted">({space.items.length})</span>
-          )}
-        </h2>
-        {space.items.length > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {space.items.map((item) => (
-              <HomeItemCard key={item.id} item={item} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-text-muted">
-            No items yet — use the form below to add paint colors, appliances, or other equipment.
-          </p>
-        )}
-        <HomeItemCreateForm spaceId={space.id} />
-      </section>
-
-      <HomeRelatedPanel sourceType="home_space" sourceId={space.id} links={space.links} />
+      <HomeSpaceSectionsNav space={space} />
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

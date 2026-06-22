@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CreateDialog, useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { createToken, revokeToken, type ApiTokenActionState } from "@/lib/actions/admin/api-tokens";
 
 type TokenRow = {
@@ -38,6 +39,72 @@ function ActionMessage({ state }: { state: ApiTokenActionState }) {
   return null;
 }
 
+function CreateTokenForm({ users }: { users: UserOption[] }) {
+  const [createState, createAction, createPending] = useActionState<ApiTokenActionState, FormData>(
+    createToken,
+    {},
+  );
+  // Refresh the table on success, but keep the dialog open so the one-time
+  // secret below stays visible until the admin closes it manually.
+  useCreateDialogSuccess(Boolean(createState.success));
+
+  return (
+    <div className="space-y-3">
+      <form action={createAction} className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-text">
+            Label
+          </label>
+          <input
+            id="name"
+            name="name"
+            required
+            placeholder="home automation"
+            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor="userId" className="block text-sm font-medium text-text">
+            Acts as user
+          </label>
+          <select
+            id="userId"
+            name="userId"
+            required
+            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Select user…
+            </option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.displayName ?? user.username} (@{user.username})
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <button
+            type="submit"
+            disabled={createPending}
+            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50"
+          >
+            {createPending ? "Creating…" : "Create token"}
+          </button>
+        </div>
+      </form>
+      <ActionMessage state={createState} />
+      {createState.token ? (
+        <div className="rounded-md border border-border bg-background p-3">
+          <p className="text-xs font-medium text-text-muted">Copy this token now</p>
+          <code className="mt-1 block break-all text-sm text-text">{createState.token}</code>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function AdminApiTokensPanel({
   tokens,
   users,
@@ -45,10 +112,6 @@ export function AdminApiTokensPanel({
   tokens: TokenRow[];
   users: UserOption[];
 }) {
-  const [createState, createAction, createPending] = useActionState<ApiTokenActionState, FormData>(
-    createToken,
-    {},
-  );
   const [revokeState, revokeAction, revokePending] = useActionState<ApiTokenActionState, FormData>(
     revokeToken,
     {},
@@ -56,69 +119,26 @@ export function AdminApiTokensPanel({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <h2 className="text-lg font-medium text-text">Create API token</h2>
-        <p className="mt-1 text-sm text-text-muted">
-          Tokens authenticate requests to <code className="text-xs">/api/v1/*</code>. The full
-          secret is shown once at creation.
-        </p>
-        <form action={createAction} className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-text">
-              Label
-            </label>
-            <input
-              id="name"
-              name="name"
-              required
-              placeholder="home automation"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="userId" className="block text-sm font-medium text-text">
-              Acts as user
-            </label>
-            <select
-              id="userId"
-              name="userId"
-              required
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select user…
-              </option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.displayName ?? user.username} (@{user.username})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={createPending}
-              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50"
-            >
-              {createPending ? "Creating…" : "Create token"}
-            </button>
-          </div>
-        </form>
-        <div className="mt-3 space-y-2">
-          <ActionMessage state={createState} />
-          {createState.token ? (
-            <div className="rounded-md border border-border bg-background p-3">
-              <p className="text-xs font-medium text-text-muted">Copy this token now</p>
-              <code className="mt-1 block break-all text-sm text-text">{createState.token}</code>
-            </div>
-          ) : null}
+      <section className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
+        <div>
+          <h2 className="text-lg font-medium text-text">API tokens</h2>
+          <p className="mt-1 text-sm text-text-muted">
+            Tokens authenticate requests to <code className="text-xs">/api/v1/*</code>. The full
+            secret is shown once at creation.
+          </p>
         </div>
+        <CreateDialog
+          triggerLabel="Create token"
+          title="Create API token"
+          description="The full secret is shown once at creation — copy it before closing."
+          closeOnSuccess={false}
+        >
+          <CreateTokenForm users={users} />
+        </CreateDialog>
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <h2 className="text-lg font-medium text-text">API tokens</h2>
+        <h2 className="text-lg font-medium text-text">Existing tokens</h2>
         <ActionMessage state={revokeState} />
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[640px] text-left text-sm">

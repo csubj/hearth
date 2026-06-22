@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { MentionTextarea, type MentionUser } from "@/components/MentionTextarea";
 import { addEntry, type MetricActionState } from "@/lib/actions/metrics-mutations";
 
@@ -19,6 +20,7 @@ export function AddEntryForm({
   users?: MentionUser[];
 }) {
   const [state, formAction, pending] = useActionState<MetricActionState, FormData>(addEntry, {});
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
     <form action={formAction} className="space-y-3">

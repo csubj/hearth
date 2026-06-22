@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CreateDialog, useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import {
   createUser,
   demoteFromAdmin,
@@ -40,77 +41,89 @@ function ActionMessage({ state }: { state: AdminActionState }) {
   return null;
 }
 
-export function AdminUsersPanel({ users }: { users: AdminUserRow[] }) {
+function CreateUserForm() {
   const [createState, createAction, createPending] = useActionState<AdminActionState, FormData>(
     createUser,
     {},
   );
+  useCreateDialogSuccess(Boolean(createState.success));
 
   return (
+    <form action={createAction} className="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label htmlFor="username" className="block text-sm font-medium text-text">
+          Username
+        </label>
+        <input
+          id="username"
+          name="username"
+          required
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label htmlFor="displayName" className="block text-sm font-medium text-text">
+          Display name
+        </label>
+        <input
+          id="displayName"
+          name="displayName"
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-text">
+          Initial password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          minLength={8}
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label htmlFor="role" className="block text-sm font-medium text-text">
+          Role
+        </label>
+        <select
+          id="role"
+          name="role"
+          defaultValue="member"
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        >
+          <option value="member">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div className="sm:col-span-2">
+        <ActionMessage state={createState} />
+        <button
+          type="submit"
+          disabled={createPending}
+          className="mt-2 inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {createPending ? "Creating…" : "Create user"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function AdminUsersPanel({ users }: { users: AdminUserRow[] }) {
+  return (
     <div className="space-y-8">
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <h2 className="text-lg font-medium text-text">Create user</h2>
-        <form action={createAction} className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-text">
-              Username
-            </label>
-            <input
-              id="username"
-              name="username"
-              required
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="displayName" className="block text-sm font-medium text-text">
-              Display name
-            </label>
-            <input
-              id="displayName"
-              name="displayName"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-text">
-              Initial password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              minLength={8}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-text">
-              Role
-            </label>
-            <select
-              id="role"
-              name="role"
-              defaultValue="member"
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="member">Member</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div className="sm:col-span-2">
-            <ActionMessage state={createState} />
-            <button
-              type="submit"
-              disabled={createPending}
-              className="mt-2 inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white disabled:opacity-50"
-            >
-              {createPending ? "Creating…" : "Create user"}
-            </button>
-          </div>
-        </form>
-      </section>
+      <div className="flex justify-end">
+        <CreateDialog
+          triggerLabel="Create user"
+          title="Create user"
+          description="Add a household member or admin."
+        >
+          <CreateUserForm />
+        </CreateDialog>
+      </div>
 
       <section className="overflow-x-auto rounded-lg border border-border bg-surface shadow-card">
         <table className="min-w-full text-sm">

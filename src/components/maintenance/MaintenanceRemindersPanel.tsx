@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
+import { CreateDialog, useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import type { MentionUser } from "@/components/MentionTextarea";
 import { ReminderIntervalFields } from "@/components/reminders/ReminderIntervalFields";
 import type { MaintenanceLogReminderWithMeta } from "@/lib/actions/maintenance-log-reminders";
@@ -174,6 +175,59 @@ function ReminderCard({
   );
 }
 
+function AddReminderForm({
+  maintenanceLogId,
+  users,
+}: {
+  maintenanceLogId: string;
+  users: MentionUser[];
+}) {
+  const [createState, createAction, createPending] = useActionState<
+    MaintenanceActionState,
+    FormData
+  >(createMaintenanceLogReminder, {});
+  useCreateDialogSuccess(Boolean(createState.success));
+
+  return (
+    <form action={createAction} className="space-y-3">
+      <input type="hidden" name="maintenanceLogId" value={maintenanceLogId} />
+      <input
+        name="title"
+        required
+        placeholder="Re-inspect roof patch, schedule next service…"
+        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+      />
+      <textarea
+        name="notes"
+        rows={2}
+        placeholder="Optional notes"
+        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+      />
+      <select
+        name="reminderType"
+        defaultValue="interval"
+        className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+      >
+        <option value="interval">Recurring interval</option>
+        <option value="one_time">One-time due date</option>
+      </select>
+      <ReminderIntervalFields users={users} />
+      <div>
+        <label className="block text-sm text-text-muted">Due date (one-time)</label>
+        <input
+          name="dueAt"
+          type="date"
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <Button type="submit" disabled={createPending}>
+        Add reminder
+      </Button>
+      <ActionMessage state={createState} />
+    </form>
+  );
+}
+
 export function MaintenanceRemindersPanel({
   maintenanceLogId,
   reminders,
@@ -183,17 +237,25 @@ export function MaintenanceRemindersPanel({
   reminders: MaintenanceLogReminderWithMeta[];
   users: MentionUser[];
 }) {
-  const [createState, createAction, createPending] = useActionState<
-    MaintenanceActionState,
-    FormData
-  >(createMaintenanceLogReminder, {});
-
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-      <h2 className="text-sm font-medium text-text">Follow-up reminders</h2>
-      <p className="mt-1 text-sm text-text-muted">
-        Schedule recurring upkeep or one-time follow-ups for this work.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-medium text-text">Follow-up reminders</h2>
+          <p className="mt-1 text-sm text-text-muted">
+            Schedule recurring upkeep or one-time follow-ups for this work.
+          </p>
+        </div>
+        <CreateDialog
+          triggerLabel="Add reminder"
+          triggerVariant="secondary"
+          triggerClassName="h-9 min-h-9 px-3 text-xs"
+          title="Add follow-up reminder"
+          description="Schedule recurring upkeep or a one-time follow-up for this work."
+        >
+          <AddReminderForm maintenanceLogId={maintenanceLogId} users={users} />
+        </CreateDialog>
+      </div>
 
       {reminders.length > 0 ? (
         <ul className="mt-4 space-y-3">
@@ -209,44 +271,6 @@ export function MaintenanceRemindersPanel({
       ) : (
         <p className="mt-3 text-sm text-text-muted">No follow-up reminders yet.</p>
       )}
-
-      <form action={createAction} className="mt-4 space-y-3 border-t border-border pt-4">
-        <h3 className="text-sm font-medium text-text">Add reminder</h3>
-        <input type="hidden" name="maintenanceLogId" value={maintenanceLogId} />
-        <input
-          name="title"
-          required
-          placeholder="Re-inspect roof patch, schedule next service…"
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-        />
-        <textarea
-          name="notes"
-          rows={2}
-          placeholder="Optional notes"
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-        />
-        <select
-          name="reminderType"
-          defaultValue="interval"
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-        >
-          <option value="interval">Recurring interval</option>
-          <option value="one_time">One-time due date</option>
-        </select>
-        <ReminderIntervalFields users={users} />
-        <div>
-          <label className="block text-sm text-text-muted">Due date (one-time)</label>
-          <input
-            name="dueAt"
-            type="date"
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <Button type="submit" disabled={createPending}>
-          Add reminder
-        </Button>
-        <ActionMessage state={createState} />
-      </form>
     </section>
   );
 }

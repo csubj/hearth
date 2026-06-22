@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CreateDialog } from "@/components/ui/CreateDialog";
 import { AddEntryForm } from "@/components/metrics/AddEntryForm";
 import { EntryHistoryList } from "@/components/metrics/EntryHistoryList";
 import { isNumericMetric } from "@/components/metrics/chart";
@@ -54,28 +55,25 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
       {showChart ? <MetricChart unit={metric.unit} entries={entries} /> : null}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-text">History</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-medium text-text">History</h2>
+          <CreateDialog
+            triggerLabel="Add entry"
+            title="Add entry"
+            description="Record a value with an optional note and date."
+          >
+            <AddEntryForm metricId={metric.id} users={mentionUsers} />
+          </CreateDialog>
+        </div>
         <EntryHistoryList metric={metric} entries={entries} />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-          <h2 className="text-lg font-medium text-text">Metric settings</h2>
-          <div className="mt-4">
-            <UpdateMetricForm metric={metric} users={mentionUsers} />
-          </div>
-        </section>
-
-        <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-          <h2 className="text-lg font-medium text-text">Add entry</h2>
-          <p className="mt-1 text-sm text-text-muted">
-            Record a value with an optional note and date.
-          </p>
-          <div className="mt-4">
-            <AddEntryForm metricId={metric.id} users={mentionUsers} />
-          </div>
-        </section>
-      </div>
+      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+        <h2 className="text-lg font-medium text-text">Metric settings</h2>
+        <div className="mt-4">
+          <UpdateMetricForm metric={metric} users={mentionUsers} />
+        </div>
+      </section>
     </div>
   );
 }

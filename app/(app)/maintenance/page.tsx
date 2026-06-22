@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { CreateDialog } from "@/components/ui/CreateDialog";
 import { MaintenanceCreateForm } from "@/components/maintenance/MaintenanceCreateForm";
 import { MaintenanceFilters } from "@/components/maintenance/MaintenanceFilters";
 import { MaintenanceList } from "@/components/maintenance/MaintenanceList";
@@ -34,15 +35,22 @@ export default async function MaintenancePage({
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-serif text-2xl text-text">Maintenance</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          A log of maintenance and changes to your home — services, repairs, warranties, and
-          follow-ups.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl text-text">Maintenance</h1>
+          <p className="mt-1 text-sm text-text-muted">
+            A log of maintenance and changes to your home — services, repairs, warranties, and
+            follow-ups.
+          </p>
+        </div>
+        <CreateDialog
+          triggerLabel="Log maintenance"
+          title="Log maintenance"
+          description="Record a service, repair, or change to your home."
+        >
+          <MaintenanceCreateForm users={mentionUsers} />
+        </CreateDialog>
       </header>
-
-      <MaintenanceCreateForm users={mentionUsers} />
 
       <Suspense fallback={<p className="text-sm text-text-muted">Loading filters…</p>}>
         <MaintenanceFilters

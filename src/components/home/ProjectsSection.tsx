@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ProjectQuickCapture } from "@/components/projects/ProjectQuickCapture";
+import { CreateDialog } from "@/components/ui/CreateDialog";
+import { ProjectCreateForm } from "@/components/projects/ProjectCreateForm";
 import { ProjectStatusChip } from "@/components/projects/ProjectStatusChip";
 import { formatCents } from "@/components/projects/format";
 import { getProjectsHomeStats, getProjectsHomeSummary } from "@/lib/actions/projects";
@@ -24,16 +25,23 @@ export async function ProjectsSection() {
           </div>
           <p className="text-xs text-text-muted">High priority & in progress</p>
         </div>
-        <Link
-          href="/projects"
-          className="text-sm font-medium text-accent hover:text-accent/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-        >
-          View all
-        </Link>
-      </div>
-
-      <div className="mt-3 rounded-md border border-border bg-background p-2">
-        <ProjectQuickCapture users={mentionUsers} redirect="detail" />
+        <div className="flex items-center gap-3">
+          <CreateDialog
+            triggerLabel="New project"
+            triggerVariant="secondary"
+            triggerClassName="h-9 min-h-9 px-3 text-xs"
+            title="New project"
+            description="Capture a house project — notes, costs, and files in one place."
+          >
+            <ProjectCreateForm users={mentionUsers} />
+          </CreateDialog>
+          <Link
+            href="/projects"
+            className="text-sm font-medium text-accent hover:text-accent/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+          >
+            View all
+          </Link>
+        </div>
       </div>
 
       {filtered.length === 0 ? (

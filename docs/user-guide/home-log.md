@@ -8,9 +8,36 @@ The **Home Log** is a reference registry for your property — a place to docume
 
 Navigate to **Home Log** from the top navigation bar or **Browse → Home Log**.
 
+The page uses a **directory tree** on the left (or a collapsible panel on mobile) and a detail pane on the right. Click any node to open it — selection follows the URL, so pages are bookmarkable.
+
 1. Add a **property** (top-level space) with a name and optional address.
-2. Inside a property, add nested **structures**, **rooms**, or **areas**.
-3. Inside any space, add **items** — paint colors, appliances, electrical equipment, fixtures, flooring, and more.
+2. In the tree, expand a property and open nested **structures**, **rooms**, or **areas**.
+3. Use **Sections** on a space page, or the tree’s **Materials**, **Inventory**, **Maintenance**, and **Projects** groups, to manage items and links.
+
+Empty groups are hidden in the tree to reduce clutter. Open a space’s **Sections** panel to reach a group before the first item exists.
+
+---
+
+## Tree navigation
+
+The sidebar tree mirrors your space hierarchy:
+
+```
+Property
+├── Room (Kitchen)
+│   ├── Materials (items in this space)
+│   ├── Inventory (linked inventory items)
+│   ├── Maintenance (linked maintenance logs)
+│   └── Projects (linked projects)
+└── Room (Bedroom)
+```
+
+- **Spaces** open the space overview (name, details, notes, attachments).
+- **Group nodes** (Materials, Inventory, etc.) open that section’s list and add/link forms.
+- **Material items** open the item detail page under Home Log.
+- **Inventory, maintenance, and project leaves** open those records in their own areas.
+
+On small screens, tap **Browse spaces** above the content to show or hide the tree.
 
 ---
 
@@ -35,7 +62,7 @@ Property (123 Main St)
 
 ### Adding a space
 
-From **Home Log**, click **Add a property** (for top-level) or, from any space detail page, use **Add a space inside [name]** below the detail view.
+From **Home Log**, use the **Add property** button on the welcome page (for top-level spaces) or, from any space detail page, the **Add space** button in the **Nested spaces** panel. Each opens a pop-up dialog; the new space appears in the tree as soon as you save. You can also pick a parent in the tree and open that space first.
 
 Fields:
 
@@ -70,7 +97,7 @@ An _item_ is a material, product, or piece of equipment attached to a space. Ite
 
 ### Adding an item
 
-From any space detail page, use **Add an item** at the bottom of the page. Select the category first — the form shows only the fields relevant to that category.
+Open a space, then go to **Sections → Materials** (or expand **Materials** in the tree). Use the **Add item** button to open the create dialog. Select the category first — the form shows only the fields relevant to that category.
 
 ### Paint colors
 
@@ -91,11 +118,15 @@ Items support photos, receipts, and PDFs (up to 25 MB per file, 10 files per ite
 
 Any space or item can be linked to entries in other areas:
 
-- Open a space or item detail page.
-- Scroll to **Linked items**.
+- Open a space and go to **Sections → Inventory**, **Maintenance**, or **Projects** (or use the matching group in the tree).
+- On an item detail page, scroll to **Linked items**.
 - Search for a maintenance log, inventory item, or project by name.
 - Click **Link** to connect them.
 - Click **Unlink** to remove the connection.
+
+### Creating and linking in one step
+
+Each section page (and the item detail page) also has a **New …** button that opens a create dialog. Creating a maintenance log, inventory item, or project this way automatically links the new record to the current space or item, so you can capture and connect it without leaving the Home Log.
 
 ### Back-links
 

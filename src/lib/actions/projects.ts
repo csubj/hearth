@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, exists, inArray, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -24,6 +24,14 @@ import { deriveProjectTitle } from "@/components/projects/format";
 import { componentRollups, countAcquired, sumComponentCosts } from "@/lib/projects/rollups";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import { removeHomeLinksForTarget } from "@/lib/actions/home";
+import { maybeAutoLinkToHome } from "@/lib/home/auto-link";
+import {
+  DEFAULT_LIST_PAGE_SIZE,
+  parseLimit,
+  parseOffset,
+  toListPage,
+  type ListPage,
+} from "@/lib/pagination/list";
 
 export type ProjectActionState = {
   error?: string;
@@ -51,6 +59,7 @@ export type ProjectDetail = Project & {
 export type ProjectListFilters = {
   q?: string;
   tag?: string;
+  status?: "all" | ProjectStatus;
   sort?: "updated_desc" | "priority_desc" | "cost_desc";
 };
 
@@ -190,10 +199,16 @@ function parseListFilters(
     sortRaw === "priority_desc" || sortRaw === "cost_desc" || sortRaw === "updated_desc"
       ? sortRaw
       : "updated_desc";
+  const statusRaw =
+    typeof searchParams.status === "string" ? searchParams.status.trim() : undefined;
+  const status = PROJECT_STATUSES.includes(statusRaw as ProjectStatus)
+    ? (statusRaw as ProjectStatus)
+    : "all";
 
   return {
     q: q || undefined,
     tag: tag || undefined,
+    status,
     sort,
   };
 }
@@ -307,6 +322,135 @@ export async function listProjects(
   }
 
   return sortProjects(items, sort);
+}
+
+export async function listProjectsPage(
+  searchParams: Record<string, string | string[] | undefined> = {},
+  offset = 0,
+  limit = DEFAULT_LIST_PAGE_SIZE,
+): Promise<ListPage<ProjectListItem>> {
+  await requireUser();
+  const { q, tag, status, sort = "updated_desc" } = parseListFilters(searchParams);
+  const safeOffset = parseOffset(offset);
+  const safeLimit = parseLimit(limit);
+  const db = getDb();
+
+  const conditions: ReturnType<typeof and>[] = [];
+
+  if (status && status !== "all") {
+    conditions.push(eq(projects.status, status));
+  }
+
+  if (q) {
+    const pattern = searchPattern(q);
+    conditions.push(
+      or(
+        sql`lower(${projects.title}) like ${pattern}`,
+        sql`lower(coalesce(${projects.notes}, '')) like ${pattern}`,
+        sql`lower(coalesce(${projects.targetWhen}, '')) like ${pattern}`,
+        exists(
+          db
+            .select({ one: sql`1` })
+            .from(projectComponents)
+            .where(
+              and(
+                eq(projectComponents.projectId, projects.id),
+                sql`lower(${projectComponents.name}) like ${pattern}`,
+              ),
+            ),
+        ),
+        exists(
+          db
+            .select({ one: sql`1` })
+            .from(projectItemTags)
+            .innerJoin(projectTags, eq(projectTags.id, projectItemTags.tagId))
+            .where(
+              and(
+                eq(projectItemTags.projectId, projects.id),
+                sql`lower(${projectTags.name}) like ${pattern}`,
+              ),
+            ),
+        ),
+      ),
+    );
+  }
+
+  if (tag) {
+    const tagId = await resolveTagIdByName(tag);
+    if (!tagId) {
+      return { items: [], nextOffset: null };
+    }
+    const tagged = await db
+      .select({ projectId: projectItemTags.projectId })
+      .from(projectItemTags)
+      .where(eq(projectItemTags.tagId, tagId));
+    const projectIdsFromTag = tagged.map((row) => row.projectId);
+    if (projectIdsFromTag.length === 0) {
+      return { items: [], nextOffset: null };
+    }
+    conditions.push(inArray(projects.id, projectIdsFromTag));
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const componentAgg = db
+    .select({
+      projectId: projectComponents.projectId,
+      estimatedCostCents:
+        sql<number>`coalesce(sum(${projectComponents.quantity} * ${projectComponents.unitCostCents}), 0)`.as(
+          "estimated_cost_cents",
+        ),
+      componentCount: sql<number>`count(*)`.as("component_count"),
+      acquiredCount:
+        sql<number>`coalesce(sum(case when ${projectComponents.acquired} then 1 else 0 end), 0)`.as(
+          "acquired_count",
+        ),
+    })
+    .from(projectComponents)
+    .groupBy(projectComponents.projectId)
+    .as("component_agg");
+
+  const estimatedCostExpr = sql<number>`coalesce(${componentAgg.estimatedCostCents}, 0)`;
+  const componentCountExpr = sql<number>`coalesce(${componentAgg.componentCount}, 0)`;
+  const acquiredCountExpr = sql<number>`coalesce(${componentAgg.acquiredCount}, 0)`;
+
+  const orderBy =
+    sort === "priority_desc"
+      ? [
+          sql`${projects.priority} IS NULL`,
+          desc(projects.priority),
+          desc(projects.updatedAt),
+          desc(projects.id),
+        ]
+      : sort === "cost_desc"
+        ? [desc(estimatedCostExpr), desc(projects.updatedAt), desc(projects.id)]
+        : [desc(projects.updatedAt), desc(projects.id)];
+
+  const rows = await db
+    .select({
+      project: projects,
+      estimatedCostCents: estimatedCostExpr,
+      componentCount: componentCountExpr,
+      acquiredCount: acquiredCountExpr,
+    })
+    .from(projects)
+    .leftJoin(componentAgg, eq(componentAgg.projectId, projects.id))
+    .where(whereClause)
+    .orderBy(...orderBy)
+    .limit(safeLimit + 1)
+    .offset(safeOffset);
+
+  const tagsByProject = await loadTagsForProjects(rows.map((row) => row.project.id));
+
+  const items: ProjectListItem[] = rows.map((row) => ({
+    ...row.project,
+    tags: tagsByProject.get(row.project.id) ?? [],
+    estimatedCostCents: Number(row.estimatedCostCents ?? 0),
+    acquiredCount: Number(row.acquiredCount ?? 0),
+    componentCount: Number(row.componentCount ?? 0),
+  }));
+
+  return toListPage(items, safeOffset, safeLimit);
 }
 
 export async function getProjectById(id: string): Promise<ProjectDetail | null> {
@@ -446,6 +590,8 @@ export async function create(
       actorId: user.id,
     });
   }
+
+  await maybeAutoLinkToHome(formData, "project", id, user.id);
 
   revalidatePath("/projects");
   revalidatePath("/");

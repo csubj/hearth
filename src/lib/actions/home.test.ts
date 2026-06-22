@@ -1,7 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import { homeItems, homeLinks, homeSpaces } from "@/db/schema";
+import {
+  homeItems,
+  homeLinks,
+  homeSpaces,
+  inventoryItems,
+  maintenanceLogs,
+  projects,
+} from "@/db/schema";
 import { resetLuciaForTests } from "@/lib/auth/lucia";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { ensureApiTokensTableForTests } from "@/lib/api/auth";
@@ -21,14 +28,18 @@ import {
   updateHomeSpaceApi,
 } from "@/lib/api/home-resources";
 import {
+  createHomeLink,
+  createHomeSpace,
   getHomeRoots,
   getHomeSpaceById,
+  getHomeTree,
   getHomeLogHomeStats,
   linkHomeEntity,
   unlinkHomeEntity,
   listHomeReferencesForTarget,
   removeHomeLinksForTarget,
 } from "@/lib/actions/home";
+import { maybeAutoLinkToHome } from "@/lib/home/auto-link";
 import { normalizeColorHex, isValidColorHex } from "@/lib/home/item-presets";
 
 vi.mock("next/cache", () => ({
@@ -337,6 +348,157 @@ describe("home log server actions (read loaders)", () => {
     expect(detail?.items[0]?.name).toBe("Dishwasher");
   });
 
+  it("getHomeTree returns nested spaces with items and resolved links", async () => {
+    const user = await createTestUser({ username: "household", role: "member" });
+    const now = new Date();
+
+    const propId = crypto.randomUUID();
+    const roomId = crypto.randomUUID();
+    const itemId = crypto.randomUUID();
+    const inventoryId = crypto.randomUUID();
+    const maintenanceId = crypto.randomUUID();
+    const projectId = crypto.randomUUID();
+
+    await getDb()
+      .insert(homeSpaces)
+      .values([
+        {
+          id: propId,
+          parentId: null,
+          kind: "property",
+          name: "House",
+          address: null,
+          notes: null,
+          sortOrder: 0,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: roomId,
+          parentId: propId,
+          kind: "room",
+          name: "Kitchen",
+          address: null,
+          notes: null,
+          sortOrder: 0,
+          createdByUserId: user.id,
+          updatedByUserId: user.id,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+    await getDb().insert(homeItems).values({
+      id: itemId,
+      spaceId: roomId,
+      kind: "paint",
+      name: "Cabinet paint",
+      manufacturer: null,
+      modelNumber: null,
+      serialNumber: null,
+      colorName: null,
+      colorHex: null,
+      finish: null,
+      productUrl: null,
+      purchasedAt: null,
+      notes: null,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await getDb().insert(inventoryItems).values({
+      id: inventoryId,
+      name: "Dish soap",
+      brand: null,
+      model: null,
+      serial: null,
+      itemType: null,
+      location: null,
+      purchaseDate: null,
+      store: null,
+      price: null,
+      warrantyNote: null,
+      notes: null,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await getDb().insert(maintenanceLogs).values({
+      id: maintenanceId,
+      title: "Fix faucet",
+      notes: null,
+      category: null,
+      company: null,
+      costCents: null,
+      startedAt: null,
+      completedAt: null,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await getDb().insert(projects).values({
+      id: projectId,
+      title: "Kitchen refresh",
+      notes: null,
+      status: "idea",
+      priority: null,
+      targetWhen: null,
+      budgetCents: null,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await getDb()
+      .insert(homeLinks)
+      .values([
+        {
+          id: crypto.randomUUID(),
+          sourceType: "home_space",
+          sourceId: roomId,
+          targetType: "inventory_item",
+          targetId: inventoryId,
+          createdByUserId: user.id,
+          createdAt: now,
+        },
+        {
+          id: crypto.randomUUID(),
+          sourceType: "home_space",
+          sourceId: roomId,
+          targetType: "maintenance_log",
+          targetId: maintenanceId,
+          createdByUserId: user.id,
+          createdAt: now,
+        },
+        {
+          id: crypto.randomUUID(),
+          sourceType: "home_space",
+          sourceId: roomId,
+          targetType: "project",
+          targetId: projectId,
+          createdByUserId: user.id,
+          createdAt: now,
+        },
+      ]);
+
+    const tree = await getHomeTree();
+    expect(tree).toHaveLength(1);
+    expect(tree[0]?.name).toBe("House");
+    expect(tree[0]?.children).toHaveLength(1);
+    const kitchen = tree[0]?.children[0];
+    expect(kitchen?.name).toBe("Kitchen");
+    expect(kitchen?.items).toEqual([
+      expect.objectContaining({ id: itemId, name: "Cabinet paint", kind: "paint" }),
+    ]);
+    expect(kitchen?.inventory).toEqual([{ id: inventoryId, name: "Dish soap" }]);
+    expect(kitchen?.maintenance).toEqual([{ id: maintenanceId, title: "Fix faucet" }]);
+    expect(kitchen?.projects).toEqual([{ id: projectId, title: "Kitchen refresh" }]);
+  });
+
   it("getHomeLogHomeStats returns correct counts", async () => {
     const user = await createTestUser({ username: "household", role: "member" });
     const now = new Date();
@@ -507,6 +669,136 @@ describe("home links (cross-entity)", () => {
     expect(await getDb().select().from(homeLinks)).toHaveLength(1);
     await removeHomeLinksForTarget("maintenance_log", targetId);
     expect(await getDb().select().from(homeLinks)).toHaveLength(0);
+  });
+});
+
+describe("createHomeSpace dialog mode", () => {
+  beforeEach(() => {
+    resetTestDb();
+    process.env.AUTH_MODE = "open";
+    process.env.OPEN_MODE_USERNAME = "household";
+    mockCookieJar();
+    mockRedirect.mockClear();
+  });
+
+  it("returns success + id without redirecting when redirect=none", async () => {
+    await createTestUser({ username: "household", role: "member" });
+
+    const formData = new FormData();
+    formData.append("name", "Cabin");
+    formData.append("kind", "property");
+    formData.append("redirect", "none");
+
+    const result = await createHomeSpace({}, formData);
+
+    expect(result.error).toBeUndefined();
+    expect(result.id).toBeTruthy();
+    expect(result.success).toContain("Cabin");
+    expect(mockRedirect).not.toHaveBeenCalled();
+
+    const spaces = await getDb().select().from(homeSpaces);
+    expect(spaces).toHaveLength(1);
+    expect(spaces[0]?.name).toBe("Cabin");
+  });
+
+  it("redirects to the detail page by default", async () => {
+    await createTestUser({ username: "household", role: "member" });
+
+    const formData = new FormData();
+    formData.append("name", "Main house");
+    formData.append("kind", "property");
+
+    await createHomeSpace({}, formData);
+
+    expect(mockRedirect).toHaveBeenCalledTimes(1);
+    expect(mockRedirect.mock.calls[0]?.[0]).toMatch(/^\/home-log\//);
+  });
+});
+
+describe("maybeAutoLinkToHome", () => {
+  beforeEach(() => {
+    resetTestDb();
+    process.env.AUTH_MODE = "open";
+    process.env.OPEN_MODE_USERNAME = "household";
+    mockCookieJar();
+  });
+
+  it("creates a home_link when source context is present", async () => {
+    const user = await createTestUser({ username: "household", role: "member" });
+    const now = new Date();
+    const spaceId = crypto.randomUUID();
+    await getDb().insert(homeSpaces).values({
+      id: spaceId,
+      parentId: null,
+      kind: "room",
+      name: "Garage",
+      address: null,
+      notes: null,
+      sortOrder: 0,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const targetId = crypto.randomUUID();
+    const formData = new FormData();
+    formData.append("homeLinkSourceType", "home_space");
+    formData.append("homeLinkSourceId", spaceId);
+
+    await maybeAutoLinkToHome(formData, "project", targetId, user.id);
+
+    const links = await getDb().select().from(homeLinks);
+    expect(links).toHaveLength(1);
+    expect(links[0]?.sourceId).toBe(spaceId);
+    expect(links[0]?.targetType).toBe("project");
+    expect(links[0]?.targetId).toBe(targetId);
+  });
+
+  it("is a no-op without source context", async () => {
+    const user = await createTestUser({ username: "household", role: "member" });
+
+    const formData = new FormData();
+    await maybeAutoLinkToHome(formData, "project", crypto.randomUUID(), user.id);
+
+    expect(await getDb().select().from(homeLinks)).toHaveLength(0);
+  });
+
+  it("createHomeLink is idempotent", async () => {
+    const user = await createTestUser({ username: "household", role: "member" });
+    const now = new Date();
+    const spaceId = crypto.randomUUID();
+    await getDb().insert(homeSpaces).values({
+      id: spaceId,
+      parentId: null,
+      kind: "room",
+      name: "Shed",
+      address: null,
+      notes: null,
+      sortOrder: 0,
+      createdByUserId: user.id,
+      updatedByUserId: user.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const targetId = crypto.randomUUID();
+
+    await createHomeLink({
+      sourceType: "home_space",
+      sourceId: spaceId,
+      targetType: "inventory_item",
+      targetId,
+      userId: user.id,
+    });
+    await createHomeLink({
+      sourceType: "home_space",
+      sourceId: spaceId,
+      targetType: "inventory_item",
+      targetId,
+      userId: user.id,
+    });
+
+    expect(await getDb().select().from(homeLinks)).toHaveLength(1);
   });
 });
 

@@ -7,6 +7,13 @@ import { getDb } from "@/db";
 import { restaurants, users, type Restaurant, type RestaurantStatus } from "@/db/schema";
 import { displayName, requireUser } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
+import {
+  DEFAULT_LIST_PAGE_SIZE,
+  parseLimit,
+  parseOffset,
+  toListPage,
+  type ListPage,
+} from "@/lib/pagination/list";
 import { combineRestaurantMentionText } from "@/lib/restaurants/mention-text";
 
 export type RestaurantActionState = {
@@ -101,13 +108,8 @@ export async function listRestaurantNeighborhoods(): Promise<string[]> {
     .filter((value): value is string => Boolean(value?.trim()));
 }
 
-export async function listRestaurants(
-  searchParams: Record<string, string | string[] | undefined> = {},
-): Promise<RestaurantListItem[]> {
-  await requireUser();
-  const { status, sort, neighborhood, addedBy } = parseListFilters(searchParams);
-  const db = getDb();
-
+function buildListConditions(filters: RestaurantListFilters) {
+  const { status, neighborhood, addedBy } = filters;
   const conditions = [];
   if (status === "want_to_try" || status === "visited") {
     conditions.push(eq(restaurants.status, status));
@@ -118,11 +120,23 @@ export async function listRestaurants(
   if (addedBy) {
     conditions.push(eq(restaurants.createdByUserId, addedBy));
   }
+  return conditions;
+}
 
-  const orderBy =
-    sort === "rating"
-      ? [sql`${restaurants.rating} IS NULL`, desc(restaurants.rating), desc(restaurants.createdAt)]
-      : [desc(restaurants.createdAt)];
+function buildListOrderBy(sort: RestaurantListFilters["sort"]) {
+  return sort === "rating"
+    ? [sql`${restaurants.rating} IS NULL`, desc(restaurants.rating), desc(restaurants.createdAt)]
+    : [desc(restaurants.createdAt)];
+}
+
+export async function listRestaurants(
+  searchParams: Record<string, string | string[] | undefined> = {},
+): Promise<RestaurantListItem[]> {
+  await requireUser();
+  const filters = parseListFilters(searchParams);
+  const db = getDb();
+
+  const conditions = buildListConditions(filters);
 
   const rows = await db
     .select({
@@ -133,9 +147,39 @@ export async function listRestaurants(
     .from(restaurants)
     .innerJoin(users, eq(restaurants.createdByUserId, users.id))
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(...orderBy);
+    .orderBy(...buildListOrderBy(filters.sort));
 
   return rows.map((row) => toListItem(row.restaurant, row.addedByName, row.addedByUsername));
+}
+
+export async function listRestaurantsPage(
+  searchParams: Record<string, string | string[] | undefined> = {},
+  offset = 0,
+  limit = DEFAULT_LIST_PAGE_SIZE,
+): Promise<ListPage<RestaurantListItem>> {
+  await requireUser();
+  const filters = parseListFilters(searchParams);
+  const safeOffset = parseOffset(offset);
+  const safeLimit = parseLimit(limit);
+  const db = getDb();
+
+  const conditions = buildListConditions(filters);
+
+  const rows = await db
+    .select({
+      restaurant: restaurants,
+      addedByName: users.displayName,
+      addedByUsername: users.username,
+    })
+    .from(restaurants)
+    .innerJoin(users, eq(restaurants.createdByUserId, users.id))
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(...buildListOrderBy(filters.sort))
+    .limit(safeLimit + 1)
+    .offset(safeOffset);
+
+  const items = rows.map((row) => toListItem(row.restaurant, row.addedByName, row.addedByUsername));
+  return toListPage(items, safeOffset, safeLimit);
 }
 
 export async function getRestaurantById(id: string): Promise<Restaurant | undefined> {

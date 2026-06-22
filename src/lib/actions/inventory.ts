@@ -24,12 +24,21 @@ import {
   type MaintenanceReminderWithLinks,
 } from "@/lib/actions/inventory-maintenance";
 import { isMaintenanceReminderStale } from "@/lib/inventory/reminder-interval";
+import { maybeAutoLinkToHome } from "@/lib/home/auto-link";
+import {
+  DEFAULT_LIST_PAGE_SIZE,
+  parseLimit,
+  parseOffset,
+  toListPage,
+  type ListPage,
+} from "@/lib/pagination/list";
 
 const INVENTORY_ENTITY_TYPE = "inventory_item" as const;
 
 export type InventoryActionState = {
   error?: string;
   success?: string;
+  id?: string;
 };
 
 export type InventoryListItem = InventoryItem & {
@@ -241,14 +250,12 @@ async function loadOverdueReminderItemIds(viewerUserId: string): Promise<Set<str
   return overdue;
 }
 
-export async function listInventoryItems(
-  searchParams: Record<string, string | string[] | undefined> = {},
-): Promise<InventoryListItem[]> {
-  const { user } = await requireUser();
-  const { q, tag, itemType } = parseListFilters(searchParams);
+async function buildInventoryListConditions(
+  filters: InventoryListFilters,
+): Promise<{ empty: boolean; conditions: ReturnType<typeof and>[] }> {
+  const { q, tag, itemType } = filters;
   const db = getDb();
-
-  const conditions = [];
+  const conditions: ReturnType<typeof and>[] = [];
 
   if (q) {
     const pattern = searchPattern(q);
@@ -268,39 +275,86 @@ export async function listInventoryItems(
     conditions.push(eq(inventoryItems.itemType, itemType));
   }
 
-  let itemIdsFromTag: string[] | null = null;
   if (tag) {
     const tagId = await resolveTagIdByName(tag);
     if (!tagId) {
-      return [];
+      return { empty: true, conditions: [] };
     }
     const tagged = await db
       .select({ itemId: inventoryItemTags.inventoryItemId })
       .from(inventoryItemTags)
       .where(eq(inventoryItemTags.tagId, tagId));
-    itemIdsFromTag = tagged.map((row) => row.itemId);
+    const itemIdsFromTag = tagged.map((row) => row.itemId);
     if (itemIdsFromTag.length === 0) {
-      return [];
+      return { empty: true, conditions: [] };
     }
     conditions.push(inArray(inventoryItems.id, itemIdsFromTag));
   }
 
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+  return { empty: false, conditions };
+}
 
-  const items = await db
-    .select()
-    .from(inventoryItems)
-    .where(whereClause)
-    .orderBy(desc(inventoryItems.updatedAt));
-
+async function enrichInventoryItems(
+  items: InventoryItem[],
+  viewerUserId: string,
+): Promise<InventoryListItem[]> {
   const tagsByItem = await loadTagsForItems(items.map((item) => item.id));
-  const overdueItemIds = await loadOverdueReminderItemIds(user.id);
+  const overdueItemIds = await loadOverdueReminderItemIds(viewerUserId);
 
   return items.map((item) => ({
     ...item,
     tags: tagsByItem.get(item.id) ?? [],
     hasOverdueReminder: overdueItemIds.has(item.id),
   }));
+}
+
+export async function listInventoryItems(
+  searchParams: Record<string, string | string[] | undefined> = {},
+): Promise<InventoryListItem[]> {
+  const { user } = await requireUser();
+  const filters = parseListFilters(searchParams);
+  const db = getDb();
+
+  const { empty, conditions } = await buildInventoryListConditions(filters);
+  if (empty) {
+    return [];
+  }
+
+  const items = await db
+    .select()
+    .from(inventoryItems)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(inventoryItems.updatedAt));
+
+  return enrichInventoryItems(items, user.id);
+}
+
+export async function listInventoryItemsPage(
+  searchParams: Record<string, string | string[] | undefined> = {},
+  offset = 0,
+  limit = DEFAULT_LIST_PAGE_SIZE,
+): Promise<ListPage<InventoryListItem>> {
+  const { user } = await requireUser();
+  const filters = parseListFilters(searchParams);
+  const safeOffset = parseOffset(offset);
+  const safeLimit = parseLimit(limit);
+  const db = getDb();
+
+  const { empty, conditions } = await buildInventoryListConditions(filters);
+  if (empty) {
+    return { items: [], nextOffset: null };
+  }
+
+  const items = await db
+    .select()
+    .from(inventoryItems)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(inventoryItems.updatedAt))
+    .limit(safeLimit + 1)
+    .offset(safeOffset);
+
+  const enriched = await enrichInventoryItems(items, user.id);
+  return toListPage(enriched, safeOffset, safeLimit);
 }
 
 export async function getInventoryItemById(id: string): Promise<InventoryDetail | null> {
@@ -422,8 +476,14 @@ export async function create(
     });
   }
 
+  await maybeAutoLinkToHome(formData, INVENTORY_ENTITY_TYPE, id, user.id);
+
   revalidatePath("/inventory");
   revalidatePath("/");
+
+  if (String(formData.get("redirect") ?? "detail") === "none") {
+    return { success: `Added ${data.name}`, id };
+  }
   redirect(`/inventory/${id}`);
 }
 

@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { createHomeItem, type HomeActionState } from "@/lib/actions/home";
 import type { HomeItemKind } from "@/db/schema/home";
 import { ITEM_KIND_PRESETS } from "@/lib/home/item-presets";
@@ -33,13 +34,11 @@ export function HomeItemCreateForm({ spaceId }: { spaceId: string }) {
   const [state, action, pending] = useActionState<HomeActionState, FormData>(createHomeItem, {});
   const [kind, setKind] = useState<HomeItemKind>("generic");
   const preset = ITEM_KIND_PRESETS[kind];
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
-    <form
-      action={action}
-      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
-    >
-      <h2 className="text-sm font-medium text-text">Add an item</h2>
+    <form action={action} className="space-y-3">
+      <input type="hidden" name="redirect" value="none" />
       <input type="hidden" name="spaceId" value={spaceId} />
 
       <div className="grid gap-3 sm:grid-cols-2">

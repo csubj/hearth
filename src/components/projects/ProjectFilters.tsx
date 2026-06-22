@@ -9,11 +9,13 @@ export function ProjectFilters({
   currentQ,
   currentTag,
   currentSort,
+  currentStatus,
 }: {
   tags: ProjectTag[];
   currentQ?: string;
   currentTag?: string;
   currentSort?: string;
+  currentStatus?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,6 +44,32 @@ export function ProjectFilters({
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           onChange={(event) => updateParam("q", event.target.value)}
         />
+      </div>
+
+      <div>
+        <span className="block text-sm font-medium text-text">Status</span>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <FilterChip
+            label="All"
+            active={!currentStatus || currentStatus === "all"}
+            onClick={() => updateParam("status", "")}
+          />
+          <FilterChip
+            label="In progress"
+            active={currentStatus === "in_progress"}
+            onClick={() => updateParam("status", "in_progress")}
+          />
+          <FilterChip
+            label="Ideas"
+            active={currentStatus === "idea"}
+            onClick={() => updateParam("status", "idea")}
+          />
+          <FilterChip
+            label="Done"
+            active={currentStatus === "done"}
+            onClick={() => updateParam("status", "done")}
+          />
+        </div>
       </div>
 
       <div>
@@ -86,7 +114,10 @@ export function ProjectFilters({
         </div>
       ) : null}
 
-      {(currentQ || currentTag || (currentSort && currentSort !== "updated_desc")) && (
+      {(currentQ ||
+        currentTag ||
+        (currentStatus && currentStatus !== "all") ||
+        (currentSort && currentSort !== "updated_desc")) && (
         <Link href="/projects" className="text-sm text-accent hover:text-accent/80">
           Clear filters
         </Link>

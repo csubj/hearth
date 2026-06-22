@@ -27,12 +27,14 @@ import {
 import { isMaintenanceLogReminderStale } from "@/lib/maintenance/reminder-interval";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import { removeHomeLinksForTarget } from "@/lib/actions/home";
+import { maybeAutoLinkToHome } from "@/lib/home/auto-link";
 
 const MAINTENANCE_ENTITY_TYPE = "maintenance_log" as const;
 
 export type MaintenanceActionState = {
   error?: string;
   success?: string;
+  id?: string;
 };
 
 export type MaintenanceListItem = MaintenanceLog & {
@@ -482,7 +484,13 @@ export async function createMaintenanceLog(
     summary: `${displayName(user)} logged maintenance: ${data.title}`,
   });
 
+  await maybeAutoLinkToHome(formData, MAINTENANCE_ENTITY_TYPE, id, user.id);
+
   revalidateMaintenancePaths();
+
+  if (String(formData.get("redirect") ?? "detail") === "none") {
+    return { success: `Logged ${data.title}`, id };
+  }
   redirect(`/maintenance/${id}`);
 }
 

@@ -1,10 +1,11 @@
 import { Suspense } from "react";
-import { CreateInventoryForm } from "@/components/inventory/CreateInventoryForm";
+import { CreateDialog } from "@/components/ui/CreateDialog";
+import { InventoryCreateForm } from "@/components/inventory/CreateInventoryForm";
 import { InventoryFilters } from "@/components/inventory/InventoryFilters";
-import { InventoryList } from "@/components/inventory/InventoryList";
+import { InventoryInfiniteList } from "@/components/inventory/InventoryInfiniteList";
 import {
   listInventoryItemTypes,
-  listInventoryItems,
+  listInventoryItemsPage,
   listInventoryTags,
 } from "@/lib/actions/inventory";
 
@@ -22,11 +23,12 @@ export default async function InventoryPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const filters = parseFilters(resolvedSearchParams);
-  const [items, tags, itemTypes] = await Promise.all([
-    listInventoryItems(resolvedSearchParams),
+  const [page, tags, itemTypes] = await Promise.all([
+    listInventoryItemsPage(resolvedSearchParams),
     listInventoryTags(),
     listInventoryItemTypes(),
   ]);
+  const listKey = JSON.stringify(resolvedSearchParams);
 
   return (
     <div className="space-y-6">
@@ -37,7 +39,13 @@ export default async function InventoryPage({
             Household catalog — appliances, tools, manuals, and more.
           </p>
         </div>
-        <CreateInventoryForm />
+        <CreateDialog
+          triggerLabel="Add item"
+          title="New inventory item"
+          description="Add an appliance, tool, or other household item."
+        >
+          <InventoryCreateForm />
+        </CreateDialog>
       </header>
 
       <Suspense fallback={<p className="text-sm text-text-muted">Loading filters…</p>}>
@@ -50,7 +58,12 @@ export default async function InventoryPage({
         />
       </Suspense>
 
-      <InventoryList items={items} />
+      <InventoryInfiniteList
+        key={listKey}
+        initialItems={page.items}
+        initialNextOffset={page.nextOffset}
+        searchParams={resolvedSearchParams}
+      />
     </div>
   );
 }

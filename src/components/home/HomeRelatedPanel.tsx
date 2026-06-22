@@ -3,7 +3,7 @@
 import { useActionState, useState, useTransition } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import type { HomeLinkSourceType } from "@/db/schema/home";
+import type { HomeLinkSourceType, HomeLinkTargetType } from "@/db/schema/home";
 import {
   linkHomeEntity,
   unlinkHomeEntity,
@@ -55,10 +55,12 @@ export function HomeRelatedPanel({
   sourceType,
   sourceId,
   links,
+  only,
 }: {
   sourceType: HomeLinkSourceType;
   sourceId: string;
   links: HomeResolvedLink[];
+  only?: HomeLinkTargetType;
 }) {
   const [maintenanceQuery, setMaintenanceQuery] = useState("");
   const [inventoryQuery, setInventoryQuery] = useState("");
@@ -104,6 +106,46 @@ export function HomeRelatedPanel({
   const maintenanceLinks = links.filter((l) => l.targetType === "maintenance_log");
   const inventoryLinks = links.filter((l) => l.targetType === "inventory_item");
   const projectLinks = links.filter((l) => l.targetType === "project");
+
+  const categories: Array<{
+    targetType: HomeLinkTargetType;
+    title: string;
+    items: HomeResolvedLink[];
+    query: string;
+    results: Array<{ id: string } & Record<string, string>>;
+    nameKey: string;
+    search: (value: string) => void;
+  }> = [
+    {
+      targetType: "maintenance_log",
+      title: "Maintenance logs",
+      items: maintenanceLinks,
+      query: maintenanceQuery,
+      results: maintenanceResults,
+      nameKey: "title",
+      search: searchMaintenance,
+    },
+    {
+      targetType: "inventory_item",
+      title: "Inventory items",
+      items: inventoryLinks,
+      query: inventoryQuery,
+      results: inventoryResults,
+      nameKey: "name",
+      search: searchInventory,
+    },
+    {
+      targetType: "project",
+      title: "Projects",
+      items: projectLinks,
+      query: projectQuery,
+      results: projectResults,
+      nameKey: "title",
+      search: searchProjects,
+    },
+  ];
+
+  const visibleCategories = only ? categories.filter((c) => c.targetType === only) : categories;
 
   function LinkedItems({ items, targetType }: { items: HomeResolvedLink[]; targetType: string }) {
     if (items.length === 0) {
@@ -174,65 +216,34 @@ export function HomeRelatedPanel({
 
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-      <h2 className="text-sm font-medium text-text">Linked items</h2>
+      <h2 className="text-sm font-medium text-text">{only ? targetLabel(only) : "Linked items"}</h2>
       <p className="mt-1 text-xs text-text-muted">
-        Connect this {sourceType === "home_space" ? "space" : "item"} to maintenance logs,
-        inventory, and projects.
+        Connect this {sourceType === "home_space" ? "space" : "item"} to{" "}
+        {only ? targetLabel(only).toLowerCase() : "maintenance logs, inventory, and projects"}.
       </p>
 
       <div className="mt-4 space-y-5">
-        {/* Maintenance */}
-        <div>
-          <h3 className="text-sm font-medium text-text-muted">Maintenance logs</h3>
-          <LinkedItems items={maintenanceLinks} targetType="maintenance_log" />
-          <div className="mt-3 space-y-2">
-            <input
-              type="search"
-              value={maintenanceQuery}
-              onChange={(e) => searchMaintenance(e.target.value)}
-              placeholder="Search maintenance to link…"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            {isSearching && <p className="text-xs text-text-muted">Searching…</p>}
-            <SearchResults
-              results={maintenanceResults}
-              nameKey="title"
-              targetType="maintenance_log"
-            />
+        {visibleCategories.map((category) => (
+          <div key={category.targetType}>
+            {!only && <h3 className="text-sm font-medium text-text-muted">{category.title}</h3>}
+            <LinkedItems items={category.items} targetType={category.targetType} />
+            <div className="mt-3 space-y-2">
+              <input
+                type="search"
+                value={category.query}
+                onChange={(e) => category.search(e.target.value)}
+                placeholder={`Search ${targetLabel(category.targetType).toLowerCase()} to link…`}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+              {isSearching && <p className="text-xs text-text-muted">Searching…</p>}
+              <SearchResults
+                results={category.results}
+                nameKey={category.nameKey}
+                targetType={category.targetType}
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Inventory */}
-        <div>
-          <h3 className="text-sm font-medium text-text-muted">Inventory items</h3>
-          <LinkedItems items={inventoryLinks} targetType="inventory_item" />
-          <div className="mt-3 space-y-2">
-            <input
-              type="search"
-              value={inventoryQuery}
-              onChange={(e) => searchInventory(e.target.value)}
-              placeholder="Search inventory to link…"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <SearchResults results={inventoryResults} nameKey="name" targetType="inventory_item" />
-          </div>
-        </div>
-
-        {/* Projects */}
-        <div>
-          <h3 className="text-sm font-medium text-text-muted">Projects</h3>
-          <LinkedItems items={projectLinks} targetType="project" />
-          <div className="mt-3 space-y-2">
-            <input
-              type="search"
-              value={projectQuery}
-              onChange={(e) => searchProjects(e.target.value)}
-              placeholder="Search projects to link…"
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            />
-            <SearchResults results={projectResults} nameKey="title" targetType="project" />
-          </div>
-        </div>
+        ))}
       </div>
 
       <ActionMessage state={linkState} />

@@ -4,6 +4,10 @@ import type { HomeItemDetail } from "@/lib/actions/home";
 import type { MentionUser } from "@/components/MentionTextarea";
 import { listAttachmentsForEntity } from "@/lib/attachments/queries";
 import { AttachmentsPanel } from "@/lib/attachments/AttachmentsPanel";
+import { CreateDialog } from "@/components/ui/CreateDialog";
+import { InventoryCreateForm } from "@/components/inventory/CreateInventoryForm";
+import { MaintenanceCreateForm } from "@/components/maintenance/MaintenanceCreateForm";
+import { ProjectCreateForm } from "@/components/projects/ProjectCreateForm";
 import { HomeItemMetadataForm } from "./HomeItemMetadataForm";
 import { HomeItemNotesEditor } from "./HomeItemNotesEditor";
 import { HomeItemDeleteButton } from "./HomeDeleteButton";
@@ -61,6 +65,44 @@ export async function HomeItemDetailView({
       </div>
 
       <HomeItemNotesEditor itemId={item.id} initialNotes={item.notes} users={users} />
+
+      <div className="flex flex-wrap gap-2">
+        <CreateDialog
+          triggerLabel="New maintenance"
+          triggerVariant="secondary"
+          triggerClassName="h-9 min-h-9 px-3 text-xs"
+          title="Log maintenance"
+          description={`Record maintenance and link it to ${item.name}.`}
+        >
+          <MaintenanceCreateForm
+            users={users}
+            homeLinkSourceType="home_item"
+            homeLinkSourceId={item.id}
+          />
+        </CreateDialog>
+        <CreateDialog
+          triggerLabel="New inventory item"
+          triggerVariant="secondary"
+          triggerClassName="h-9 min-h-9 px-3 text-xs"
+          title="New inventory item"
+          description={`Create an inventory item and link it to ${item.name}.`}
+        >
+          <InventoryCreateForm homeLinkSourceType="home_item" homeLinkSourceId={item.id} />
+        </CreateDialog>
+        <CreateDialog
+          triggerLabel="New project"
+          triggerVariant="secondary"
+          triggerClassName="h-9 min-h-9 px-3 text-xs"
+          title="New project"
+          description={`Create a project and link it to ${item.name}.`}
+        >
+          <ProjectCreateForm
+            users={users}
+            homeLinkSourceType="home_item"
+            homeLinkSourceId={item.id}
+          />
+        </CreateDialog>
+      </div>
 
       <HomeRelatedPanel sourceType="home_item" sourceId={item.id} links={item.links} />
 

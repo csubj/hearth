@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
+import { CreateDialog, useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import type { MentionUser } from "@/components/MentionTextarea";
 import { ReminderIntervalFields } from "@/components/reminders/ReminderIntervalFields";
 import type { MaintenanceReminderWithLinks } from "@/lib/actions/inventory-maintenance";
@@ -228,6 +229,65 @@ function ReminderCard({
   );
 }
 
+function AddReminderForm({
+  inventoryItemId,
+  users,
+}: {
+  inventoryItemId: string;
+  users: MentionUser[];
+}) {
+  const [createState, createAction, createPending] = useActionState<InventoryActionState, FormData>(
+    createMaintenanceReminder,
+    {},
+  );
+  useCreateDialogSuccess(Boolean(createState.success));
+
+  return (
+    <form action={createAction} className="space-y-3">
+      <input type="hidden" name="inventoryItemId" value={inventoryItemId} />
+      <div>
+        <label className="block text-sm text-text-muted">Title</label>
+        <input
+          name="title"
+          required
+          placeholder="Replace HVAC filter"
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-sm text-text-muted">Notes (optional)</label>
+        <textarea
+          name="notes"
+          rows={2}
+          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <ReminderIntervalFields
+        idPrefix="create-maintenance"
+        users={users}
+        description="Mark done when maintenance is complete to reset the interval."
+      />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <input
+          name="linkLabel"
+          placeholder="Link label (optional)"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+        <input
+          name="linkUrl"
+          type="url"
+          placeholder="https:// (optional)"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+      </div>
+      <Button type="submit" disabled={createPending}>
+        {createPending ? "Adding…" : "Add reminder"}
+      </Button>
+      <ActionMessage state={createState} />
+    </form>
+  );
+}
+
 export function MaintenanceRemindersPanel({
   inventoryItemId,
   reminders,
@@ -237,17 +297,25 @@ export function MaintenanceRemindersPanel({
   reminders: MaintenanceReminderWithLinks[];
   users: MentionUser[];
 }) {
-  const [createState, createAction, createPending] = useActionState<InventoryActionState, FormData>(
-    createMaintenanceReminder,
-    {},
-  );
-
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-      <h2 className="text-sm font-medium text-text">Maintenance reminders</h2>
-      <p className="mt-1 text-sm text-text-muted">
-        Schedule recurring upkeep — filter changes, inspections, and other interval-based tasks.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-medium text-text">Maintenance reminders</h2>
+          <p className="mt-1 text-sm text-text-muted">
+            Schedule recurring upkeep — filter changes, inspections, and other interval-based tasks.
+          </p>
+        </div>
+        <CreateDialog
+          triggerLabel="Add reminder"
+          triggerVariant="secondary"
+          triggerClassName="h-9 min-h-9 px-3 text-xs"
+          title="Add maintenance reminder"
+          description="Schedule a recurring upkeep task for this item."
+        >
+          <AddReminderForm inventoryItemId={inventoryItemId} users={users} />
+        </CreateDialog>
+      </div>
 
       {reminders.length > 0 ? (
         <ul className="mt-4 space-y-3">
@@ -263,50 +331,6 @@ export function MaintenanceRemindersPanel({
       ) : (
         <p className="mt-3 text-sm text-text-muted">No maintenance reminders yet.</p>
       )}
-
-      <form action={createAction} className="mt-6 space-y-3 border-t border-border pt-4">
-        <h3 className="text-sm font-medium text-text">Add reminder</h3>
-        <input type="hidden" name="inventoryItemId" value={inventoryItemId} />
-        <div>
-          <label className="block text-sm text-text-muted">Title</label>
-          <input
-            name="title"
-            required
-            placeholder="Replace HVAC filter"
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-text-muted">Notes (optional)</label>
-          <textarea
-            name="notes"
-            rows={2}
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <ReminderIntervalFields
-          idPrefix="create-maintenance"
-          users={users}
-          description="Mark done when maintenance is complete to reset the interval."
-        />
-        <div className="grid gap-2 sm:grid-cols-2">
-          <input
-            name="linkLabel"
-            placeholder="Link label (optional)"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-          <input
-            name="linkUrl"
-            type="url"
-            placeholder="https:// (optional)"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <Button type="submit" disabled={createPending}>
-          {createPending ? "Adding…" : "Add reminder"}
-        </Button>
-        <ActionMessage state={createState} />
-      </form>
     </section>
   );
 }

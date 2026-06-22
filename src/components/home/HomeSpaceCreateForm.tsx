@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { createHomeSpace, type HomeActionState, type HomeSpaceSummary } from "@/lib/actions/home";
 import type { HomeSpaceKind } from "@/db/schema/home";
 import { spaceKindLabel } from "./format";
@@ -27,15 +28,11 @@ export function HomeSpaceCreateForm({
   defaultKind?: HomeSpaceKind;
 }) {
   const [state, action, pending] = useActionState<HomeActionState, FormData>(createHomeSpace, {});
-
-  const heading = parentSpace ? `Add a space inside ${parentSpace.name}` : "Add a property";
+  useCreateDialogSuccess(Boolean(state.success));
 
   return (
-    <form
-      action={action}
-      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
-    >
-      <h2 className="text-sm font-medium text-text">{heading}</h2>
+    <form action={action} className="space-y-3">
+      <input type="hidden" name="redirect" value="none" />
       {parentSpace && <input type="hidden" name="parentId" value={parentSpace.id} />}
 
       <div className="grid gap-3 sm:grid-cols-2">

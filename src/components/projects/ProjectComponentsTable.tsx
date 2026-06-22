@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/Collapsible";
+import { CreateDialog, useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { PROJECT_COMPONENT_KINDS } from "@/db/schema";
 import type { ProjectDetail } from "@/lib/actions/projects";
 import {
@@ -270,16 +271,89 @@ function ComponentRow({
   );
 }
 
-export function ProjectComponentsTable({ project }: { project: ProjectDetail }) {
+function AddComponentForm({ projectId }: { projectId: string }) {
   const [addState, addAction, addPending] = useActionState<ProjectActionState, FormData>(
     addComponent,
     {},
   );
+  useCreateDialogSuccess(Boolean(addState.success));
 
+  return (
+    <form action={addAction} className="space-y-2">
+      <input type="hidden" name="projectId" value={projectId} />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <input
+          name="name"
+          required
+          placeholder="Name"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
+        />
+        <select
+          name="kind"
+          defaultValue="item"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        >
+          {PROJECT_COMPONENT_KINDS.map((kind) => (
+            <option key={kind} value={kind}>
+              {componentKindLabel(kind)}
+            </option>
+          ))}
+        </select>
+        <input
+          name="quantity"
+          type="number"
+          min={1}
+          defaultValue={1}
+          placeholder="Qty"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+        <input
+          name="unitCostCents"
+          type="number"
+          min={0}
+          defaultValue={0}
+          placeholder="Unit cost (cents)"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+        />
+        <input
+          name="purchaseUrl"
+          type="url"
+          placeholder="Purchase link (optional)"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
+        />
+        <textarea
+          name="note"
+          rows={2}
+          placeholder="How to acquire / notes (optional)"
+          className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <Button type="submit" disabled={addPending}>
+          {addPending ? "Adding…" : "Add to budget"}
+        </Button>
+        <ActionMessage state={addState} />
+      </div>
+    </form>
+  );
+}
+
+export function ProjectComponentsTable({ project }: { project: ProjectDetail }) {
   return (
     <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h2 className="text-lg font-medium text-text">Budget</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-medium text-text">Budget</h2>
+          <CreateDialog
+            triggerLabel="Add item"
+            triggerVariant="secondary"
+            triggerClassName="h-9 min-h-9 px-3 text-xs"
+            title="Add budget item"
+            description="Add a material, tool, or other line item to this project's budget."
+          >
+            <AddComponentForm projectId={project.id} />
+          </CreateDialog>
+        </div>
         <div className="text-right text-sm text-text-muted">
           <p>
             Estimated:{" "}
@@ -317,67 +391,6 @@ export function ProjectComponentsTable({ project }: { project: ProjectDetail }) 
       ) : (
         <p className="mt-3 text-sm text-text-muted">No budget items yet.</p>
       )}
-
-      <form
-        action={addAction}
-        className="mt-4 space-y-2 rounded-md border border-dashed border-border p-3"
-      >
-        <p className="text-sm font-medium text-text">Add item</p>
-        <input type="hidden" name="projectId" value={project.id} />
-        <div className="grid gap-2 sm:grid-cols-2">
-          <input
-            name="name"
-            required
-            placeholder="Name"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
-          />
-          <select
-            name="kind"
-            defaultValue="item"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-          >
-            {PROJECT_COMPONENT_KINDS.map((kind) => (
-              <option key={kind} value={kind}>
-                {componentKindLabel(kind)}
-              </option>
-            ))}
-          </select>
-          <input
-            name="quantity"
-            type="number"
-            min={1}
-            defaultValue={1}
-            placeholder="Qty"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-          <input
-            name="unitCostCents"
-            type="number"
-            min={0}
-            defaultValue={0}
-            placeholder="Unit cost (cents)"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
-          <input
-            name="purchaseUrl"
-            type="url"
-            placeholder="Purchase link (optional)"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
-          />
-          <textarea
-            name="note"
-            rows={2}
-            placeholder="How to acquire / notes (optional)"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm sm:col-span-2"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Button type="submit" disabled={addPending}>
-            {addPending ? "Adding…" : "Add to budget"}
-          </Button>
-          <ActionMessage state={addState} />
-        </div>
-      </form>
     </section>
   );
 }

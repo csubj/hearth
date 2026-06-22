@@ -51,8 +51,14 @@ export function ProjectCard({ project }: { project: ProjectListItem }) {
       {excerpt ? <p className="mt-2 line-clamp-2 text-sm text-text-muted">{excerpt}</p> : null}
       <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-text-muted">
         <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+        {project.targetWhen ? <span>by {project.targetWhen}</span> : null}
         {project.estimatedCostCents > 0 ? (
-          <span>{formatCents(project.estimatedCostCents)} est.</span>
+          <span>
+            {formatCents(project.estimatedCostCents)} est.
+            {project.budgetCents != null ? ` of ${formatCents(project.budgetCents)} budget` : ""}
+          </span>
+        ) : project.budgetCents != null ? (
+          <span>{formatCents(project.budgetCents)} budget</span>
         ) : null}
         {project.componentCount > 0 ? (
           <span>
