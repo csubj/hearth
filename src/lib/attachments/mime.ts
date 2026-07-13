@@ -10,8 +10,7 @@ const WEBP_RIFF = "RIFF";
 const WEBP_MARKER = "WEBP";
 
 export type MimeValidationResult =
-  | { ok: true; mimeType: AllowedMimeType; extension: string }
-  | { ok: false; error: string };
+  { ok: true; mimeType: AllowedMimeType; extension: string } | { ok: false; error: string };
 
 function startsWithBytes(buffer: Buffer, prefix: readonly number[]): boolean {
   if (buffer.length < prefix.length) {

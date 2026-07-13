@@ -1,12 +1,7 @@
 import type { ZodError } from "zod";
 
 export type ApiErrorCode =
-  | "validation_error"
-  | "unauthorized"
-  | "forbidden"
-  | "not_found"
-  | "conflict"
-  | "internal_error";
+  "validation_error" | "unauthorized" | "forbidden" | "not_found" | "conflict" | "internal_error";
 
 export type ApiErrorBody = {
   error: {

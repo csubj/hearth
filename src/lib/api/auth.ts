@@ -6,8 +6,7 @@ import { hashApiToken } from "@/lib/api/token-crypto";
 import { unauthorizedError } from "@/lib/api/errors";
 
 export type ApiTokenAuthResult =
-  | { ok: true; user: AuthUser; tokenId: string }
-  | { ok: false; response: Response };
+  { ok: true; user: AuthUser; tokenId: string } | { ok: false; response: Response };
 
 function userRowToAuthUser(row: typeof users.$inferSelect): AuthUser {
   return {

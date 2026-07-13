@@ -3,8 +3,7 @@ import { getLucia, type AuthSession, type AuthUser } from "@/lib/auth/lucia";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
 
 export type ApiSessionResult =
-  | { user: AuthUser; session: AuthSession }
-  | { user: null; session: null };
+  { user: AuthUser; session: AuthSession } | { user: null; session: null };
 
 export async function validateApiSession(): Promise<ApiSessionResult> {
   const lucia = getLucia();

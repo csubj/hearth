@@ -131,9 +131,7 @@ List endpoints are paginated. Pass `limit` and `cursor` as query parameters; the
 
 ```json
 {
-  "data": [
-    /* ...items... */
-  ],
+  "data": [/* ...items... */],
   "nextCursor": "opaque-cursor-or-null"
 }
 ```

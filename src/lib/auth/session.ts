@@ -8,8 +8,7 @@ import { getOpenModeUsername, isOpenMode } from "@/lib/auth/config";
 import { getLucia, type AuthSession, type AuthUser } from "./lucia";
 
 export type SessionResult =
-  | { user: AuthUser; session: AuthSession }
-  | { user: null; session: null };
+  { user: AuthUser; session: AuthSession } | { user: null; session: null };
 
 const OPEN_MODE_SESSION_ID = "__hearth_open_mode__";
 

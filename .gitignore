@@ -43,5 +43,5 @@ site/
 *.swp
 *.swo
 .cursor/
-
+.pi/
 :memory:*
