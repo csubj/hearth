@@ -2,12 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 
-export function isReminderVisibleToUser(
-  recipientUserId: string | null,
-  viewerUserId: string,
-): boolean {
-  return recipientUserId == null || recipientUserId === viewerUserId;
-}
+export { isReminderVisibleToUser } from "@/lib/reminders/interval";
 
 export async function resolveReminderRecipientIds(
   recipientUserId: string | null,

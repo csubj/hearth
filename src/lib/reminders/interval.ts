@@ -14,6 +14,13 @@ export type ReminderIntervalState = {
   lastReminderAt: Date | null;
 };
 
+export function isReminderVisibleToUser(
+  recipientUserId: string | null,
+  viewerUserId: string,
+): boolean {
+  return recipientUserId == null || recipientUserId === viewerUserId;
+}
+
 export function addReminderInterval(date: Date, count: number, unit: ReminderUnit): Date {
   const result = new Date(date);
   switch (unit) {

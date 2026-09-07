@@ -5,7 +5,7 @@ import {
   isStale,
   type ReminderIntervalState,
 } from "@/lib/reminders/interval";
-import { isReminderVisibleToUser } from "@/lib/reminders/scope";
+import { isReminderVisibleToUser } from "@/lib/reminders/interval";
 
 export {
   addReminderInterval,
