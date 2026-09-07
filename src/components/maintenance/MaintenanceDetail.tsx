@@ -82,7 +82,11 @@ export async function MaintenanceDetailView({
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <MaintenanceDeleteButton logId={log.id} />
+        <MaintenanceDeleteButton
+          logId={log.id}
+          logTitle={log.title}
+          reminderCount={log.reminders.length}
+        />
       </section>
     </div>
   );

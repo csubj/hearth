@@ -1,34 +1,42 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { deleteProject, type ProjectActionState } from "@/lib/actions/projects";
 
-export function ProjectDeleteButton({ projectId }: { projectId: string }) {
+export function ProjectDeleteButton({
+  projectId,
+  projectTitle,
+  componentCount,
+}: {
+  projectId: string;
+  projectTitle: string;
+  componentCount?: number;
+}) {
   const [state, action, pending] = useActionState<ProjectActionState, FormData>(deleteProject, {});
 
   return (
-    <form
-      action={action}
-      onSubmit={(event) => {
-        if (!window.confirm("Delete this project? This cannot be undone.")) {
-          event.preventDefault();
-        }
+    <ConfirmDialog
+      title={"Delete project"}
+      description={`Delete "${projectTitle}"? This cannot be undone.`}
+      onConfirm={() => {
+        const fd = new FormData();
+        fd.append("id", projectId);
+        action(fd);
       }}
+      confirming={pending}
     >
-      <input type="hidden" name="id" value={projectId} />
-      <Button
-        type="submit"
-        disabled={pending}
-        className="border-red-200 text-red-700 hover:bg-red-50"
-      >
-        {pending ? "Deleting…" : "Delete project"}
-      </Button>
+      {componentCount != null && componentCount > 0 && (
+        <p className="text-sm text-text-muted">
+          This project has {componentCount} component{componentCount === 1 ? "" : "s"} that will
+          also be deleted.
+        </p>
+      )}
       {state.error ? (
-        <p className="mt-2 text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-600" role="alert">
           {state.error}
         </p>
       ) : null}
-    </form>
+    </ConfirmDialog>
   );
 }

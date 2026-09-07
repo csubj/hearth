@@ -117,7 +117,7 @@ export async function HomeItemDetailView({
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <HomeItemDeleteButton itemId={item.id} />
+        <HomeItemDeleteButton itemId={item.id} itemName={item.name} spaceName={item.space.name} />
       </section>
     </div>
   );

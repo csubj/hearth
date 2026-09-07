@@ -45,3 +45,4 @@ site/
 .cursor/
 .pi/
 :memory:*
+openspec/

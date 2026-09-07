@@ -1,30 +1,45 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { deleteMaintenanceLog, type MaintenanceActionState } from "@/lib/actions/maintenance";
 
-export function MaintenanceDeleteButton({ logId }: { logId: string }) {
+export function MaintenanceDeleteButton({
+  logId,
+  logTitle,
+  reminderCount,
+}: {
+  logId: string;
+  logTitle: string;
+  reminderCount?: number;
+}) {
   const [state, action, pending] = useActionState<MaintenanceActionState, FormData>(
     deleteMaintenanceLog,
     {},
   );
 
   return (
-    <form action={action}>
-      <input type="hidden" name="id" value={logId} />
-      <Button
-        type="submit"
-        disabled={pending}
-        className="border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
-      >
-        {pending ? "Deleting…" : "Delete maintenance log"}
-      </Button>
+    <ConfirmDialog
+      title={"Delete maintenance log"}
+      description={`Delete "${logTitle}"? This cannot be undone.`}
+      onConfirm={() => {
+        const fd = new FormData();
+        fd.append("id", logId);
+        action(fd);
+      }}
+      confirming={pending}
+    >
+      {reminderCount != null && reminderCount > 0 && (
+        <p className="text-sm text-text-muted">
+          This log has {reminderCount} reminder{reminderCount === 1 ? "" : "s"} that will also be
+          deleted.
+        </p>
+      )}
       {state.error ? (
-        <p className="mt-2 text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-600" role="alert">
           {state.error}
         </p>
       ) : null}
-    </form>
+    </ConfirmDialog>
   );
 }

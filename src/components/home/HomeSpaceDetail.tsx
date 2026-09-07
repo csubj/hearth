@@ -81,7 +81,12 @@ export async function HomeSpaceDetail({
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <HomeSpaceDeleteButton spaceId={space.id} />
+        <HomeSpaceDeleteButton
+          spaceId={space.id}
+          spaceName={space.name}
+          childrenCount={space.children.length}
+          itemsCount={space.items.length}
+        />
       </section>
     </div>
   );

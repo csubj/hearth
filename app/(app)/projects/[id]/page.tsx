@@ -80,7 +80,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
-        <ProjectDeleteButton projectId={project.id} />
+        <ProjectDeleteButton
+          projectId={project.id}
+          projectTitle={project.title}
+          componentCount={project.components.length}
+        />
       </section>
     </div>
   );
