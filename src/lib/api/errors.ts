@@ -35,9 +35,9 @@ export function notFoundError(message = "Resource not found"): Response {
 export function validationError(error: ZodError): Response {
   return apiError(
     "validation_error",
-    error.errors[0]?.message ?? "Validation failed",
+    error.issues[0]?.message ?? "Validation failed",
     400,
-    error.errors.map((issue) => ({
+    error.issues.map((issue) => ({
       path: issue.path.join("."),
       message: issue.message,
     })),

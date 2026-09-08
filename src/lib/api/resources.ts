@@ -12,7 +12,7 @@ import {
   type ProjectComponent,
   type Restaurant,
 } from "@/db/schema";
-import type { AuthUser } from "@/lib/auth/lucia";
+import type { AuthUser } from "@/lib/auth/session-store";
 import { componentRollups } from "@/lib/projects/rollups";
 import { addEntryRecord, createMetricRecord, updateMetricRecord } from "@/lib/actions/metrics";
 import { displayName } from "@/lib/auth/session";

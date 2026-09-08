@@ -2,7 +2,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { projects, users } from "@/db/schema";
-import { getLucia } from "@/lib/auth/lucia";
+import { getSessionStore } from "@/lib/auth/session-store";
 
 const BASE_URL = process.env.SMOKE_BASE_URL ?? "http://127.0.0.1:3000";
 const USERNAME = process.env.HEARTH_BOOTSTRAP_USERNAME ?? "smokeadmin";
@@ -25,9 +25,9 @@ async function assertAuthenticatedProjectsAccess(): Promise<{ userId: string; co
     throw new Error(`Bootstrap user "${USERNAME}" not found — run auth:bootstrap first`);
   }
 
-  const lucia = getLucia();
-  const session = await lucia.createSession(user.id, {});
-  const cookie = `${lucia.sessionCookieName}=${session.id}`;
+  const sessionStore = getSessionStore();
+  const session = await sessionStore.createSession(user.id);
+  const cookie = `${sessionStore.sessionCookieName}=${session.id}`;
 
   const response = await fetch(`${BASE_URL}/projects`, {
     headers: { Cookie: cookie },

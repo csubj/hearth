@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { projectComponents, projectItemTags, projectTags, projects } from "@/db/schema";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { deriveProjectTitle } from "@/components/projects/format";
 
@@ -50,7 +50,7 @@ import {
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
 }

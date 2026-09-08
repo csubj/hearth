@@ -1,7 +1,7 @@
 import { and, desc, eq, lt, or, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { homeItems, homeSpaces, type HomeItem, type HomeSpace } from "@/db/schema/home";
-import type { AuthUser } from "@/lib/auth/lucia";
+import type { AuthUser } from "@/lib/auth/session-store";
 import { displayName } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import { decodeCursor, paginateRows, type PaginationQuery } from "@/lib/api/pagination";

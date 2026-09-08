@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDb, resetDbForTests } from "@/db";
 import { notifications } from "@/db/schema";
 import { migrateTestDb } from "@/db/test-setup";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { getUnreadNotificationCount } from "@/lib/notifications/queries";
 
@@ -30,7 +30,7 @@ import { markAllRead } from "@/lib/actions/notifications";
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
 }

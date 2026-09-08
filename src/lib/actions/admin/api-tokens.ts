@@ -36,7 +36,7 @@ export async function createToken(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   try {
@@ -63,7 +63,7 @@ export async function revokeToken(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid token" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid token" };
   }
 
   const revoked = await revokeApiTokenById(parsed.data.tokenId);

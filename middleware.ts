@@ -17,9 +17,10 @@ export function middleware(request: NextRequest): NextResponse {
   const hasSessionCookie = Boolean(sessionCookie?.value);
 
   if (pathname === "/login") {
-    if (hasSessionCookie) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+    // Do not bounce to "/" on cookie presence alone. The login page validates
+    // the session and redirects to "/" only when it is actually valid.
+    // Bouncing here on a stale/invalid cookie creates a redirect loop
+    // (/ -> /login -> /) until the cookie is cleared.
     return NextResponse.next();
   }
 

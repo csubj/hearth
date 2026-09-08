@@ -3,7 +3,7 @@ import { and, count, eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { notifications, users } from "@/db/schema";
-import { getLucia, resetLuciaForTests } from "@/lib/auth/lucia";
+import { getSessionStore, resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { verifyPassword } from "@/lib/auth/password";
 import { canDemoteAdmin, canDisableUser } from "@/lib/auth/admin-guards";
 import { login } from "@/lib/actions/auth";
@@ -35,7 +35,7 @@ vi.mock("next/headers", () => ({
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
 }
@@ -89,7 +89,7 @@ describe("auth login", () => {
     expect(await verifyPassword("password123", stored!.passwordHash)).toBe(true);
 
     const sessionId = await loginAs(user.id);
-    const result = await getLucia().validateSession(sessionId);
+    const result = await getSessionStore().validateSession(sessionId);
     expect(result.user?.id).toBe(user.id);
     expect(result.session?.id).toBe(sessionId);
   });
@@ -128,9 +128,9 @@ describe("auth login", () => {
     const sessionId = await loginAs(user.id);
 
     await getDb().update(users).set({ disabledAt: new Date() }).where(eq(users.id, user.id));
-    await getLucia().invalidateUserSessions(user.id);
+    await getSessionStore().invalidateUserSessions(user.id);
 
-    const result = await getLucia().validateSession(sessionId);
+    const result = await getSessionStore().validateSession(sessionId);
     expect(result.user).toBeNull();
     expect(result.session).toBeNull();
   });
@@ -138,9 +138,9 @@ describe("auth login", () => {
   it("validateApiSession invalidates disabled users", async () => {
     const user = await createTestUser({ username: "apiuser" });
     const sessionId = await loginAs(user.id);
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     await getDb().update(users).set({ disabledAt: new Date() }).where(eq(users.id, user.id));
 
@@ -148,7 +148,7 @@ describe("auth login", () => {
     expect(result.user).toBeNull();
     expect(result.session).toBeNull();
 
-    const sessionCheck = await lucia.validateSession(sessionId);
+    const sessionCheck = await sessionStore.validateSession(sessionId);
     expect(sessionCheck.user).toBeNull();
     expect(sessionCheck.session).toBeNull();
   });
@@ -165,13 +165,13 @@ describe("admin guard", () => {
   it("member user has member role", async () => {
     const user = await createTestUser({ role: "member" });
     const sessionId = await loginAs(user.id);
-    const { user: authUser } = await getLucia().validateSession(sessionId);
+    const { user: authUser } = await getSessionStore().validateSession(sessionId);
     expect(authUser?.role).toBe("member");
   });
 
   it("admin user has admin role", async () => {
     const { user, sessionId } = await createAdminSession();
-    const { user: authUser } = await getLucia().validateSession(sessionId);
+    const { user: authUser } = await getSessionStore().validateSession(sessionId);
     expect(authUser?.role).toBe("admin");
     expect(authUser?.id).toBe(user.id);
   });
@@ -207,9 +207,9 @@ describe("admin guard", () => {
   it("denies admin actions to members via requireAdmin", async () => {
     const member = await createTestUser({ username: "member", role: "member" });
     const sessionId = await loginAs(member.id);
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     await requireAdmin();
     expect(mockRedirect).toHaveBeenCalledWith("/?error=Admin access required");
@@ -217,9 +217,9 @@ describe("admin guard", () => {
 
   it("disableUser rejects disabling the last admin", async () => {
     const { user: admin, sessionId } = await createAdminSession();
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     const result = await disableUser({}, formData({ userId: admin.id }));
 
@@ -228,9 +228,9 @@ describe("admin guard", () => {
 
   it("demoteFromAdmin rejects demoting the last admin", async () => {
     const { user: admin, sessionId } = await createAdminSession();
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     const result = await demoteFromAdmin({}, formData({ userId: admin.id }));
 
@@ -248,9 +248,9 @@ describe("admin audit notifications", () => {
 
   it("emits user.admin_action when an admin creates a user", async () => {
     const { user: admin, sessionId } = await createAdminSession();
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     const result = await createUser(
       {},
@@ -275,9 +275,9 @@ describe("admin audit notifications", () => {
   it("emits user.admin_action to other admins", async () => {
     const { user: admin, sessionId } = await createAdminSession();
     const otherAdmin = await createTestUser({ username: "admin2", role: "admin" });
-    const lucia = getLucia();
+    const sessionStore = getSessionStore();
     const { jar } = mockCookieJar();
-    jar.set(lucia.sessionCookieName, sessionId);
+    jar.set(sessionStore.sessionCookieName, sessionId);
 
     await createUser(
       {},

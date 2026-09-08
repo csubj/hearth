@@ -7,7 +7,7 @@ import {
   inventoryLinks,
   inventoryTags,
 } from "@/db/schema/inventory";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import { ensureInventoryTablesForTests } from "@/lib/actions/inventory-test-setup";
@@ -33,7 +33,7 @@ vi.mock("@/lib/notifications/emit", () => ({
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
   ensureInventoryTablesForTests();

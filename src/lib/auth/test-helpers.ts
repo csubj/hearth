@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { users, type User } from "@/db/schema";
-import { getLucia } from "@/lib/auth/lucia";
+import { getSessionStore } from "@/lib/auth/session-store";
 import { hashPassword } from "@/lib/auth/password";
 
 export async function createTestUser(
@@ -35,7 +35,7 @@ export async function createTestUser(
 }
 
 export async function loginAs(userId: string): Promise<string> {
-  const session = await getLucia().createSession(userId, {});
+  const session = await getSessionStore().createSession(userId);
   return session.id;
 }
 

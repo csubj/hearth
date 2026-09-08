@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { metricEntries, metrics } from "@/db/schema";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import {
@@ -30,7 +30,7 @@ vi.mock("@/lib/notifications/emit", () => ({
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
   ensureMetricTablesForTests();

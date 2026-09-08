@@ -9,7 +9,7 @@ import {
   assertCanDemoteAdmin,
   assertCanDisableUser,
 } from "@/lib/auth/admin-guards";
-import { getLucia } from "@/lib/auth/lucia";
+import { getSessionStore } from "@/lib/auth/session-store";
 import { hashPassword, validatePasswordPolicy } from "@/lib/auth/password";
 import { displayName, requireAdmin } from "@/lib/auth/session";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
@@ -108,7 +108,7 @@ export async function resetUserPassword(
     return { error: "User not found" };
   }
 
-  await getLucia().invalidateUserSessions(userId);
+  await getSessionStore().invalidateUserSessions(userId);
 
   await emitHouseholdActivity({
     type: "user.admin_action",
@@ -156,7 +156,7 @@ export async function disableUser(
     throw error;
   }
 
-  await getLucia().invalidateUserSessions(userId);
+  await getSessionStore().invalidateUserSessions(userId);
 
   await emitHouseholdActivity({
     type: "user.admin_action",

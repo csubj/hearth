@@ -430,7 +430,7 @@ export async function create(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const data = parsed.data;
@@ -509,7 +509,7 @@ export async function update(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const data = parsed.data;
@@ -587,7 +587,7 @@ export async function addLink(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { inventoryItemId, label, url } = parsed.data;
@@ -642,7 +642,7 @@ export async function removeLink(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { linkId, inventoryItemId } = parsed.data;
@@ -693,7 +693,7 @@ export async function setTags(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { inventoryItemId, tags: tagsRaw } = parsed.data;
@@ -909,7 +909,7 @@ export async function importInventoryData(
 ): Promise<{ imported: number }> {
   const parsed = importPayloadSchema.safeParse(payload);
   if (!parsed.success) {
-    throw new Error(parsed.error.errors[0]?.message ?? "Invalid import data.");
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid import data.");
   }
 
   const db = getDb();

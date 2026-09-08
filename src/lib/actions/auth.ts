@@ -5,7 +5,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
-import { getLucia } from "@/lib/auth/lucia";
+import { getSessionStore } from "@/lib/auth/session-store";
 import {
   hashPassword,
   MAX_PASSWORD_LENGTH,
@@ -92,9 +92,9 @@ export async function login(_prev: AuthActionState, formData: FormData): Promise
     return invalidCredentials;
   }
 
-  const lucia = getLucia();
-  const session = await lucia.createSession(user.id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
+  const sessionStore = getSessionStore();
+  const session = await sessionStore.createSession(user.id);
+  const sessionCookie = sessionStore.createSessionCookie(session.id);
   (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
   const now = new Date();
@@ -105,12 +105,12 @@ export async function login(_prev: AuthActionState, formData: FormData): Promise
 }
 
 export async function logout(): Promise<void> {
-  const lucia = getLucia();
-  const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value;
+  const sessionStore = getSessionStore();
+  const sessionId = (await cookies()).get(sessionStore.sessionCookieName)?.value;
   if (sessionId) {
-    await lucia.invalidateSession(sessionId);
+    await sessionStore.invalidateSession(sessionId);
   }
-  const sessionCookie = lucia.createBlankSessionCookie();
+  const sessionCookie = sessionStore.createBlankSessionCookie();
   (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
   redirect("/login");
 }
@@ -152,10 +152,10 @@ export async function changePassword(
   const now = new Date();
   await db.update(users).set({ passwordHash, updatedAt: now }).where(eq(users.id, user.id));
 
-  const lucia = getLucia();
-  await lucia.invalidateUserSessions(user.id);
-  const session = await lucia.createSession(user.id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
+  const sessionStore = getSessionStore();
+  await sessionStore.invalidateUserSessions(user.id);
+  const session = await sessionStore.createSession(user.id);
+  const sessionCookie = sessionStore.createSessionCookie(session.id);
   (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
   redirect("/settings?changed=1");

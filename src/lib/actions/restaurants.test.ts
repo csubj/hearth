@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { restaurants } from "@/db/schema";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { create, listRestaurants, markVisited, setRating, update } from "@/lib/actions/restaurants";
 import { combineRestaurantMentionText } from "@/lib/restaurants/mention-text";
@@ -64,7 +64,7 @@ function setupRestaurantsTable(): void {
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
   setupRestaurantsTable();

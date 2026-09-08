@@ -21,7 +21,7 @@ import {
 } from "@/lib/api/resources";
 import { createApiTokenForUser } from "@/lib/auth/api-tokens";
 import { getOpenModeUsername, isOpenMode } from "@/lib/auth/config";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { requireAdmin, requireUser, validateRequest } from "@/lib/auth/session";
 import { createAdminSession, createTestUser } from "@/lib/auth/test-helpers";
 
@@ -42,7 +42,7 @@ vi.mock("next/headers", () => ({
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   delete process.env.AUTH_MODE;
   delete process.env.OPEN_MODE_USERNAME;

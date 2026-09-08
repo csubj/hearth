@@ -7,7 +7,7 @@ import {
   type InventoryItem,
   type InventoryTag,
 } from "@/db/schema/inventory";
-import type { AuthUser } from "@/lib/auth/lucia";
+import type { AuthUser } from "@/lib/auth/session-store";
 import { displayName } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import { decodeCursor, paginateRows, type PaginationQuery } from "@/lib/api/pagination";

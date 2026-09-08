@@ -541,7 +541,7 @@ export async function create(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { notes, status = "idea", redirect: redirectMode = "detail" } = parsed.data;
@@ -620,7 +620,7 @@ export async function updateTitle(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { id, title } = parsed.data;
@@ -662,7 +662,7 @@ export async function updateNotes(
     .safeParse({ projectId, notes });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const db = getDb();
@@ -711,7 +711,7 @@ export async function setStatus(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { id, status } = parsed.data;
@@ -774,7 +774,7 @@ export async function setPriority(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { id, priority } = parsed.data;
@@ -818,7 +818,7 @@ export async function setTags(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { projectId, tags: tagsRaw } = parsed.data;
@@ -865,7 +865,7 @@ export async function addLink(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { projectId, label, url } = parsed.data;
@@ -911,7 +911,7 @@ export async function removeLink(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { linkId, projectId } = parsed.data;
@@ -963,7 +963,7 @@ export async function addComponent(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const {
@@ -1044,7 +1044,7 @@ export async function updateComponent(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { componentId, projectId, name, kind, quantity, unitCostCents, purchaseUrl, note } =
@@ -1111,7 +1111,7 @@ export async function setComponentAcquired(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { componentId, projectId, acquired } = parsed.data;
@@ -1164,7 +1164,7 @@ export async function removeComponent(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { componentId, projectId } = parsed.data;
@@ -1203,7 +1203,7 @@ export async function reorderComponent(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { componentId, projectId, direction } = parsed.data;
@@ -1261,7 +1261,7 @@ export async function deleteProject(
     });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { id } = parsed.data;

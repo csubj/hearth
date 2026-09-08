@@ -6,7 +6,7 @@ import {
   type InventoryMaintenanceReminder,
   type InventoryMaintenanceReminderLink,
 } from "@/db/schema";
-import type { AuthUser } from "@/lib/auth/lucia";
+import type { AuthUser } from "@/lib/auth/session-store";
 import { paginateRows, type PaginationQuery } from "@/lib/api/pagination";
 import { toIso } from "@/lib/api/serialize";
 import { resolveReminderFields } from "@/lib/reminders/form";

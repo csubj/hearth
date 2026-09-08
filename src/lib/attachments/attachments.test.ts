@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
 import { attachments, projects, restaurants } from "@/db/schema";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser, loginAs } from "@/lib/auth/test-helpers";
 import { emitHouseholdActivity } from "@/lib/notifications/emit";
 import { GET, DELETE } from "../../../app/api/attachments/[id]/route";
@@ -35,7 +35,7 @@ const { cookies } = await import("next/headers");
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   migrateTestDb();
   createAttachmentsTestTable();

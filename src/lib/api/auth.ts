@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { apiTokens, users } from "@/db/schema";
-import type { AuthUser } from "@/lib/auth/lucia";
+import type { AuthUser } from "@/lib/auth/session-store";
 import { hashApiToken } from "@/lib/api/token-crypto";
 import { unauthorizedError } from "@/lib/api/errors";
 

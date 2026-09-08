@@ -19,6 +19,7 @@ out/
 # Test & lint artifacts
 coverage/
 .eslintcache
+.vitest/
 
 # Logs & debug
 *.log

@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { users } from "@/db/schema";
 import { getOpenModeUsername, isOpenMode } from "@/lib/auth/config";
-import { getLucia, type AuthSession, type AuthUser } from "./lucia";
+import { getSessionStore, type AuthSession, type AuthUser } from "./session-store";
 
 export type SessionResult =
   { user: AuthUser; session: AuthSession } | { user: null; session: null };
@@ -48,8 +48,8 @@ function isRealSession(session: AuthSession | null): session is AuthSession {
 }
 
 export const validateRequest = cache(async (): Promise<SessionResult> => {
-  const lucia = getLucia();
-  const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value ?? null;
+  const sessionStore = getSessionStore();
+  const sessionId = (await cookies()).get(sessionStore.sessionCookieName)?.value ?? null;
   if (!sessionId) {
     if (isOpenMode()) {
       const openUser = await resolveOpenModeUser();
@@ -60,15 +60,15 @@ export const validateRequest = cache(async (): Promise<SessionResult> => {
     return { user: null, session: null };
   }
 
-  const result = await lucia.validateSession(sessionId);
+  const result = await sessionStore.validateSession(sessionId);
 
   try {
     if (result.session?.fresh) {
-      const sessionCookie = lucia.createSessionCookie(result.session.id);
+      const sessionCookie = sessionStore.createSessionCookie(result.session.id);
       (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     }
     if (!result.session) {
-      const sessionCookie = lucia.createBlankSessionCookie();
+      const sessionCookie = sessionStore.createBlankSessionCookie();
       (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     }
   } catch {
@@ -76,9 +76,9 @@ export const validateRequest = cache(async (): Promise<SessionResult> => {
   }
 
   if (result.user?.disabledAt) {
-    await lucia.invalidateSession(sessionId);
+    await sessionStore.invalidateSession(sessionId);
     try {
-      const sessionCookie = lucia.createBlankSessionCookie();
+      const sessionCookie = sessionStore.createBlankSessionCookie();
       (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     } catch {
       // ignore
@@ -109,14 +109,14 @@ export async function requireUser(): Promise<{ user: AuthUser; session: AuthSess
 }
 
 export async function requireAdmin(): Promise<{ user: AuthUser; session: AuthSession }> {
-  const lucia = getLucia();
-  const sessionId = (await cookies()).get(lucia.sessionCookieName)?.value ?? null;
+  const sessionStore = getSessionStore();
+  const sessionId = (await cookies()).get(sessionStore.sessionCookieName)?.value ?? null;
   if (!sessionId) {
     redirect("/login?returnTo=/admin");
     return undefined as never;
   }
 
-  const result = await lucia.validateSession(sessionId);
+  const result = await sessionStore.validateSession(sessionId);
   if (!result.user || !result.session || result.user.disabledAt) {
     redirect("/login?returnTo=/admin");
     return undefined as never;

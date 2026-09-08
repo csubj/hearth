@@ -9,7 +9,7 @@ import {
   maintenanceLogs,
   projects,
 } from "@/db/schema";
-import { resetLuciaForTests } from "@/lib/auth/lucia";
+import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { ensureApiTokensTableForTests } from "@/lib/api/auth";
 import { createApiTokenForUser } from "@/lib/auth/api-tokens";
@@ -73,7 +73,7 @@ function mockCookieJar() {
 
 function resetTestDb(): void {
   resetDbForTests();
-  resetLuciaForTests();
+  resetSessionStoreForTests();
   process.env.DATABASE_URL = ":memory:";
   delete process.env.AUTH_MODE;
   delete process.env.OPEN_MODE_USERNAME;

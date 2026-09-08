@@ -3,8 +3,8 @@ import path from "node:path";
 import { getUploadsDir } from "./config";
 
 export function resolveUploadPath(storagePath: string): string {
-  const uploadsDir = path.resolve(process.cwd(), getUploadsDir());
-  const resolved = path.resolve(uploadsDir, storagePath);
+  const uploadsDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), getUploadsDir());
+  const resolved = path.resolve(/* turbopackIgnore: true */ uploadsDir, storagePath);
 
   if (resolved !== uploadsDir && !resolved.startsWith(`${uploadsDir}${path.sep}`)) {
     throw new Error("Invalid storage path.");
@@ -14,7 +14,7 @@ export function resolveUploadPath(storagePath: string): string {
 }
 
 export async function ensureUploadsDir(): Promise<string> {
-  const uploadsDir = path.resolve(process.cwd(), getUploadsDir());
+  const uploadsDir = path.resolve(/* turbopackIgnore: true */ process.cwd(), getUploadsDir());
   await fs.mkdir(uploadsDir, { recursive: true });
   return uploadsDir;
 }
