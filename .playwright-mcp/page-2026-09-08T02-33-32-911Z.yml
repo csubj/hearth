@@ -1,0 +1,57 @@
+- generic [active] [ref=f7e1]:
+  - generic [ref=f7e2]:
+    - banner [ref=f7e3]:
+      - generic [ref=f7e4]:
+        - generic [ref=f7e5]:
+          - link "hearth" [ref=f7e6] [cursor=pointer]:
+            - /url: /
+          - navigation "Main" [ref=f7e7]:
+            - link "Home" [ref=f7e8] [cursor=pointer]:
+              - /url: /
+            - group [ref=f7e9]:
+              - generic "Browse" [ref=f7e10] [cursor=pointer]
+            - generic [ref=f7e13]:
+              - link "Home Log" [ref=f7e14] [cursor=pointer]:
+                - /url: /home-log
+              - group [ref=f7e15]:
+                - generic "Browse properties" [ref=f7e16] [cursor=pointer]
+            - link "Reminders" [ref=f7e20] [cursor=pointer]:
+              - /url: /reminders
+        - generic [ref=f7e21]:
+          - link "Admin" [ref=f7e22] [cursor=pointer]:
+            - /url: /admin/users
+          - link "Notifications, 7 unread" [ref=f7e23] [cursor=pointer]:
+            - /url: /notifications
+            - generic [ref=f7e27]: "7"
+          - group [ref=f7e28]:
+            - generic "cj" [ref=f7e29] [cursor=pointer]
+    - main [ref=f7e34]:
+      - generic [ref=f7e35]:
+        - generic [ref=f7e36]:
+          - heading "Reminders" [level=1] [ref=f7e37]
+          - paragraph [ref=f7e38]: Inventory maintenance and metric logging due in the next two weeks.
+        - generic [ref=f7e40]:
+          - heading "Overdue" [level=3] [ref=f7e41]
+          - list [ref=f7e42]:
+            - listitem [ref=f7e43]:
+              - generic [ref=f7e44]:
+                - generic [ref=f7e45]:
+                  - generic [ref=f7e46]: Metric
+                  - link "floras weeight" [ref=f7e47] [cursor=pointer]:
+                    - /url: /metrics/42e5f088-c7fa-4fd6-8b0c-b86be5ae2262
+                - paragraph [ref=f7e48]: Last logged Jun 18, 2026 · every 1 day
+              - generic [ref=f7e49]:
+                - generic [ref=f7e50]: Overdue by 80 days
+                - link "Log entry" [ref=f7e51] [cursor=pointer]:
+                  - /url: /metrics/42e5f088-c7fa-4fd6-8b0c-b86be5ae2262
+            - listitem [ref=f7e52]:
+              - generic [ref=f7e53]:
+                - generic [ref=f7e54]:
+                  - generic [ref=f7e55]: Item upkeep
+                  - link "asdasd" [ref=f7e56] [cursor=pointer]:
+                    - /url: /inventory/70d96b5b-bf5c-4e97-9cb6-5b8d0aa850b8
+                - paragraph [ref=f7e57]: Fridge · every 7 days
+              - generic [ref=f7e58]:
+                - generic [ref=f7e59]: Overdue by 74 days
+                - button "Mark done" [ref=f7e61]
+  - button "Open Next.js Dev Tools" [ref=f7e67] [cursor=pointer]

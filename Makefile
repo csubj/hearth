@@ -21,8 +21,7 @@ help: ## Show this help
 install: ## Install dependencies with pnpm
 	$(PNPM) install
 
-setup: install ## Install deps and git hooks
-	$(PNPM) exec lefthook install
+setup: install ## Install dependencies with pnpm
 
 ## --- Development ---
 

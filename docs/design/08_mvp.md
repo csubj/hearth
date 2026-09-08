@@ -45,7 +45,6 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 | Tailwind v4                 | per `05_styling.md`                                                                        |
 | Drizzle + better-sqlite3    | `src/db/`, `drizzle/` migrations                                                           |
 | Vitest + ESLint + Prettier  | per `01_tech.md`                                                                           |
-| Lefthook                    | wire existing `lefthook.yml`                                                               |
 | `.env.example`              | `DATABASE_URL`, `SESSION_SECRET`, bootstrap vars                                           |
 | Docker                      | `Dockerfile`, `docker-compose.yml` per `09_deploy.md`                                      |
 | Health route                | `GET /api/health`                                                                          |

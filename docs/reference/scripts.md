@@ -26,29 +26,29 @@ Defined in `package.json`:
 
 Run `make help` for the full list:
 
-| Target                | Purpose                               |
-| --------------------- | ------------------------------------- |
-| `make install`        | `pnpm install`                        |
-| `make setup`          | Install deps + lefthook hooks         |
-| `make dev`            | Dev server                            |
-| `make build`          | Production build                      |
-| `make start`          | Production server                     |
-| `make test`           | Run tests                             |
-| `make lint`           | ESLint                                |
-| `make typecheck`      | TypeScript                            |
-| `make check`          | Lint + typecheck + test               |
-| `make db-migrate`     | Apply migrations                      |
-| `make db-generate`    | Generate migration                    |
-| `make auth-bootstrap` | First admin CLI                       |
-| `make docker-build`   | Build Docker image                    |
-| `make docker-up`      | Start with local build                |
-| `make docker-up-ghcr` | Start with GHCR image                 |
-| `make docker-down`    | Stop containers                       |
-| `make docker-logs`    | Tail app logs                         |
-| `make smoke`          | Docker smoke test                     |
-| `make docs-install`   | Install MkDocs dependencies           |
-| `make docs-serve`     | Preview docs at http://127.0.0.1:8000 |
-| `make docs-build`     | Build static site to `site/`          |
+| Target                | Purpose                                 |
+| --------------------- | --------------------------------------- |
+| `make install`        | `pnpm install`                          |
+| `make setup`          | Install deps                            |
+| `make dev`            | Dev server                              |
+| `make build`          | Production build                        |
+| `make start`          | Production server                       |
+| `make test`           | Run tests                               |
+| `make lint`           | ESLint                                  |
+| `make typecheck`      | TypeScript                              |
+| `make check`          | Lint + typecheck + test                 |
+| `make db-migrate`     | Apply migrations                        |
+| `make db-generate`    | Generate migration                      |
+| `make auth-bootstrap` | First admin CLI                         |
+| `make docker-build`   | Build Docker image                      |
+| `make docker-up`      | Start with local build                  |
+| `make docker-up-ghcr` | Start with GHCR image                   |
+| `make docker-down`    | Stop containers                         |
+| `make docker-logs`    | Tail app logs                           |
+| `make smoke`          | Docker smoke test                       |
+| `make docs-install`   | Install MkDocs dependencies             |
+| `make docs-serve`     | Preview docs at <http://127.0.0.1:8000> |
+| `make docs-build`     | Build static site to `site/`            |
 
 ## auth:bootstrap
 
@@ -101,20 +101,9 @@ Run before migrations when removing legacy features:
 
 Docker entrypoint runs both automatically before the server starts (migrations run when the app boots).
 
-## Git hooks (lefthook)
+## Quality gates
 
-| Hook         | When          | Runs                                         |
-| ------------ | ------------- | -------------------------------------------- |
-| `pre-commit` | Before commit | Lint, format check, typecheck (staged files) |
-| `commit-msg` | After message | Conventional Commits validation              |
-| `pre-push`   | Before push   | Full test suite                              |
-
-Install hooks:
-
-```bash
-lefthook install
-# or: make setup
-```
+Run `make check` (lint + typecheck + test) before pushing. CI runs the same gates on every pull request.
 
 ## Documentation
 

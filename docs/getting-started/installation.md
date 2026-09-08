@@ -24,7 +24,6 @@ Optional for documentation:
 git clone https://github.com/csubj/hearth.git
 cd hearth
 pnpm install
-lefthook install
 ```
 
 Or with Make:

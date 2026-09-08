@@ -1,0 +1,58 @@
+- generic [active] [ref=f8e1]:
+    - generic [ref=f8e2]:
+        - banner [ref=f8e3]:
+            - generic [ref=f8e4]:
+                - generic [ref=f8e5]:
+                    - link "hearth" [ref=f8e6] [cursor=pointer]:
+                        - /url: /
+                    - navigation "Main" [ref=f8e7]:
+                        - link "Home" [ref=f8e8] [cursor=pointer]:
+                            - /url: /
+                        - group [ref=f8e9]:
+                            - generic "Browse" [ref=f8e10] [cursor=pointer]
+                        - generic [ref=f8e13]:
+                            - link "Home Log" [ref=f8e14] [cursor=pointer]:
+                                - /url: /home-log
+                            - group [ref=f8e15]:
+                                - generic "Browse properties" [ref=f8e16] [cursor=pointer]
+                        - link "Reminders" [ref=f8e20] [cursor=pointer]:
+                            - /url: /reminders
+                - generic [ref=f8e21]:
+                    - link "Admin" [ref=f8e22] [cursor=pointer]:
+                        - /url: /admin/users
+                    - link "Notifications, 7 unread" [ref=f8e23] [cursor=pointer]:
+                        - /url: /notifications
+                        - generic [ref=f8e27]: "7"
+                    - group [ref=f8e28]:
+                        - generic "cj" [ref=f8e29] [cursor=pointer]
+        - main [ref=f8e34]:
+            - generic [ref=f8e35]:
+                - generic [ref=f8e36]:
+                    - generic [ref=f8e37]:
+                        - heading "Metrics" [level=1] [ref=f8e38]
+                        - paragraph [ref=f8e39]: Ongoing measurements and observations for the household.
+                    - button "New metric" [ref=f8e40]
+                - list [ref=f8e43]:
+                    - listitem [ref=f8e44]:
+                        - 'link "floras weeight Unit: 14 Needs update Latest: 12133 14 on Jun 18, 2026 ↑ 12010 14 4 entries Every 1 day" [ref=f8e45] [cursor=pointer]':
+                            - /url: /metrics/42e5f088-c7fa-4fd6-8b0c-b86be5ae2262
+                            - generic [ref=f8e46]:
+                                - generic [ref=f8e47]:
+                                    - heading "floras weeight" [level=2] [ref=f8e48]
+                                    - paragraph [ref=f8e49]: "Unit: 14"
+                                - generic [ref=f8e50]: Needs update
+                            - paragraph [ref=f8e51]: "Latest: 12133 14 on Jun 18, 2026"
+                            - generic [ref=f8e52]:
+                                - generic [ref=f8e53]: ↑ 12010 14
+                                - generic [ref=f8e54]: 4 entries
+                                - generic [ref=f8e55]: Every 1 day
+                    - listitem [ref=f8e56]:
+                        - 'link "Face Size Unit: Inches No entries yet 0 entries" [ref=f8e57] [cursor=pointer]':
+                            - /url: /metrics/93d3705d-9fed-49a5-8d05-31b0d90f8df7
+                            - generic [ref=f8e59]:
+                                - heading "Face Size" [level=2] [ref=f8e60]
+                                - paragraph [ref=f8e61]: "Unit: Inches"
+                            - paragraph [ref=f8e62]: No entries yet
+                            - generic [ref=f8e63]: 0 entries
+    - button "Open Next.js Dev Tools" [ref=f8e70] [cursor=pointer]
+    - alert [ref=f8e74]

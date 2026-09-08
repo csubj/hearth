@@ -18,7 +18,6 @@ Thank you for contributing to hearth! This guide covers development setup, conve
 git clone https://github.com/csubj/hearth.git
 cd hearth
 pnpm install
-lefthook install
 cp .env.example .env
 pnpm db:migrate
 pnpm run auth:bootstrap
@@ -41,17 +40,17 @@ make check            # lint + typecheck + test
 
 ## Conventions
 
-| Area            | Rule                                                                            |
-| --------------- | ------------------------------------------------------------------------------- |
-| Package manager | **pnpm only**                                                                   |
-| Router          | Next.js **App Router** (`app/`), not Pages Router                               |
-| Components      | Server Components default; `"use client"` only when needed                      |
-| Mutations       | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve |
-| Database        | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/`        |
-| Auth            | Lucia v3 + Argon2id — see [Authentication](design/02_auth.md)                   |
-| Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                            |
-| Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                 |
-| Commits         | Conventional Commits (`feat:`, `fix:`, `chore:`) — enforced by lefthook         |
+| Area            | Rule                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Package manager | **pnpm only**                                                                              |
+| Router          | Next.js **App Router** (`app/`), not Pages Router                                          |
+| Components      | Server Components default; `"use client"` only when needed                                 |
+| Mutations       | **Server actions** in `src/lib/actions/`; API routes only for file upload/serve            |
+| Database        | SQLite via Drizzle; schema in `src/db/schema/`; migrations in `drizzle/`                   |
+| Auth            | Lucia v3 + Argon2id — see [Authentication](design/02_auth.md)                              |
+| Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                                       |
+| Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                            |
+| Commits         | Conventional Commits (`feat:`, `fix:`, `chore:`) — see [Commit messages](#commit-messages) |
 
 ## Key paths
 
@@ -66,20 +65,9 @@ docs/             # documentation (this site)
 docs/design/      # design docs (source of truth)
 ```
 
-## Git hooks
-
-Lefthook runs on commit and push:
-
-| Hook         | Purpose                                      |
-| ------------ | -------------------------------------------- |
-| `pre-commit` | Lint, format check, typecheck (staged files) |
-| `commit-msg` | Conventional Commits via commitlint          |
-| `pre-push`   | Full test suite                              |
-
 ## Commit messages
 
-Commitlint enforces [Conventional Commits](https://www.conventionalcommits.org/) on the
-`commit-msg` hook. Important limits:
+Follow [Conventional Commits](https://www.conventionalcommits.org/). Important limits:
 
 - **Subject:** `type: short description` — max 100 characters, no trailing period
 - **Body:** optional; blank line after subject; **each body line max 100 characters**

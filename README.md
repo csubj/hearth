@@ -49,13 +49,12 @@ Household coordination — projects, restaurants, metrics, inventory, maintenanc
 git clone https://github.com/csubj/hearth.git
 cd hearth
 pnpm install
-lefthook install
 cp .env.example .env
 pnpm run auth:bootstrap   # once per instance; migrations run on startup
 pnpm dev
 ```
 
-Open http://localhost:3000 and sign in with the bootstrap account. Database and uploads live in `./data/` (gitignored).
+Open <http://localhost:3000> and sign in with the bootstrap account. Database and uploads live in `./data/` (gitignored).
 
 The defaults in `.env.example` work out of the box. Optionally set `AUTH_MODE` (`required` or `open`) and the `HEARTH_BOOTSTRAP_*` credentials before bootstrapping.
 
@@ -110,7 +109,7 @@ See [docs/design/01_tech.md](docs/design/01_tech.md) for full rationale and conv
 Run `make help` for the full list. Common shortcuts:
 
 ```bash
-make setup    # pnpm install + lefthook
+make setup    # pnpm install
 make check    # lint + typecheck + test
 make smoke    # docker smoke test
 make docs-serve   # preview docs at http://127.0.0.1:8000
@@ -153,7 +152,7 @@ For a manual end-to-end check in the browser:
 
 1. `docker compose up -d --build`
 2. `docker compose exec app pnpm run auth:bootstrap`
-3. Open http://localhost:3000 → sign in → add a project from Home or `/projects`
+3. Open <http://localhost:3000> → sign in → add a project from Home or `/projects`
 
 ### Published image (GHCR)
 
@@ -200,7 +199,7 @@ See [docs/design/10_ci.md](docs/design/10_ci.md) for workflow details.
 
 ## Contributing
 
-Contributions are welcome. Read [docs/contributing.md](docs/contributing.md) for setup, conventions, and commit message format (Conventional Commits, enforced by lefthook).
+Contributions are welcome. Read [docs/contributing.md](docs/contributing.md) for setup, conventions, and commit message format (Conventional Commits).
 
 Implementation follows [docs/design/08_mvp.md](docs/design/08_mvp.md). The v1 MVP (phases 0–7) is complete.
 

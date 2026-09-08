@@ -74,7 +74,6 @@ Never commit `.env` — already gitignored.
 
 ```bash
 pnpm install
-lefthook install
 cp .env.example .env
 pnpm run auth:bootstrap   # first time only
 pnpm dev
@@ -82,7 +81,7 @@ pnpm dev
 
 Migrations run automatically when the dev server starts.
 
-App: http://localhost:3000
+App: <http://localhost:3000>
 
 Database and uploads live in `./data/` (gitignored).
 

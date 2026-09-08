@@ -16,7 +16,6 @@ Instructions for AI agents and contributors working in this repository.
 
 ```bash
 pnpm install
-lefthook install
 pnpm dev              # local dev server
 pnpm test             # vitest
 pnpm lint             # eslint
@@ -37,7 +36,7 @@ pnpm run auth:bootstrap   # first admin (once per instance)
 | Auth            | Lucia v3 + Argon2id — see [docs/design/02_auth.md](docs/design/02_auth.md)      |
 | Styling         | Tailwind v4 + Radix wrappers in `src/components/ui/`                            |
 | Tests           | Vitest; in-memory DB: `DATABASE_URL=file::memory:?cache=shared`                 |
-| Commits         | Conventional Commits — enforced by lefthook commitlint (see below)              |
+| Commits         | Conventional Commits — see [Commit messages](#commit-messages)                  |
 
 ## Key paths
 
@@ -53,8 +52,7 @@ docs/design/      # design docs (source of truth)
 
 ## Commit messages
 
-Lefthook runs `commitlint` on every commit. Messages must pass
-[`@commitlint/config-conventional`](https://github.com/conventional-changelog/commitlint).
+Follow [Conventional Commits](https://www.conventionalcommits.org/) when you commit.
 
 | Rule                 | Limit                                                                                        |
 | -------------------- | -------------------------------------------------------------------------------------------- |
@@ -91,7 +89,7 @@ When drafting commit messages, count characters per line. Prefer shorter bullets
 
 Follow phases in [docs/design/08_mvp.md](docs/design/08_mvp.md):
 
-0. Scaffold → 1. Auth → 2. Home/Projects → 3. Restaurants → 4. Projects/Metrics → 5. Attachments → 6. Notifications → 7. Polish
+1. Scaffold → 1. Auth → 2. Home/Projects → 3. Restaurants → 4. Projects/Metrics → 5. Attachments → 6. Notifications → 7. Polish
 
 ## Questions
 
