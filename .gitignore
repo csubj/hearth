@@ -25,6 +25,7 @@ coverage/
 *.log
 pnpm-debug.log*
 pnpm-error.log*
+.playwright-mcp/
 
 # Deploy tooling
 .vercel
@@ -47,3 +48,4 @@ site/
 .pi/
 :memory:*
 openspec/
+.playwright-mcp/
