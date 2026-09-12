@@ -1,12 +1,12 @@
 import type { HomeLinkSourceType, HomeLinkTargetType } from "@/db/schema";
 import { createHomeLink } from "@/lib/actions/home";
 
-const SOURCE_TYPES: readonly HomeLinkSourceType[] = ["home_space", "home_item"];
+const SOURCE_TYPES: readonly HomeLinkSourceType[] = ["home_space"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * If the form carries home-log link context (homeLinkSourceType + homeLinkSourceId),
- * link the freshly created resource to that home space/item. No-op otherwise.
+ * link the freshly created resource to that home space. No-op otherwise.
  *
  * Used by project/maintenance/inventory create actions so a resource created from
  * within a home-log section is automatically associated with the current space.

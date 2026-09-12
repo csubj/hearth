@@ -40,7 +40,7 @@ export function InventoryFilters({
           id="inventory-search"
           type="search"
           defaultValue={currentQ ?? ""}
-          placeholder="Name, model, serial, location…"
+          placeholder="Name, brand, model, serial, notes…"
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           onChange={(event) => updateParam("q", event.target.value)}
         />

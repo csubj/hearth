@@ -1,9 +1,9 @@
 ---
 doc: mvp
 project: hearth
-version: 1
+version: 2
 status: decided
-last_updated: 2026-06-14
+last_updated: 2026-09-11
 related:
   - docs/design/00_init.md
   - docs/design/03_schema.md
@@ -267,7 +267,7 @@ The original "Stream" feature was built and then removed (merged into Projects, 
 **Done when:**
 
 - [ ] Create item with tags, links, photo, and PDF manual
-- [ ] Search by name/model/serial/location works
+- [ ] Search by name/model/serial/space works
 - [ ] Export → import round-trip preserves items
 - [ ] API token can CRUD inventory via `/api/v1/inventory`
 

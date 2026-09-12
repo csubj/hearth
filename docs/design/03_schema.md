@@ -1,9 +1,9 @@
 ---
 doc: schema
 project: hearth
-version: 2
+version: 3
 status: decided
-last_updated: 2026-06-16
+last_updated: 2026-09-11
 related:
   - docs/design/00_init.md
   - docs/design/01_tech.md
@@ -27,13 +27,15 @@ Structured reference for agents and contributors. Drizzle schema and migrations 
 
 ## Enums
 
-| Enum                | Values                                                                                 | Used by                              |
-| ------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ |
-| `user_role`         | `member`, `admin`                                                                      | `users.role`                         |
-| `restaurant_status` | `want_to_try`, `visited`                                                               | `restaurants.status`                 |
-| `project_status`    | `idea`, `in_progress`, `done`                                                          | `projects.status`                    |
-| `entity_type`       | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`, `maintenance_log` | attachments, mentions, notifications |
-| `notification_type` | see `06_notifications.md`                                                              | `notifications.type`                 |
+| Enum                  | Values                                                                                                            | Used by                              |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `user_role`           | `member`, `admin`                                                                                                 | `users.role`                         |
+| `restaurant_status`   | `want_to_try`, `visited`                                                                                          | `restaurants.status`                 |
+| `project_status`      | `idea`, `in_progress`, `done`                                                                                     | `projects.status`                    |
+| `entity_type`         | `restaurant`, `project`, `metric`, `metric_entry`, `inventory_item`, `maintenance_log`                            | attachments, mentions, notifications |
+| `home_space_kind`     | `property`, `structure`, `room`, `area`                                                                           | `home_spaces.kind`                   |
+| `inventory_item_kind` | `paint`, `fixture`, `flooring`, `window_treatment`, `electrical`, `plumbing`, `appliance`, `furniture`, `generic` | `inventory_items.kind`               |
+| `notification_type`   | see `06_notifications.md`                                                                                         | `notifications.type`                 |
 
 ---
 
@@ -211,30 +213,72 @@ Rollups (`estimated_cost_cents`, `acquired_cost_cents`, `remaining_cost_cents`) 
 
 ---
 
+## Home log
+
+Spaces are the physical places a household tracks (a property, a building, a room, an area). Spaces nest under parent spaces. Links connect a space to maintenance logs and projects.
+
+### `home_spaces`
+
+| Column               | Type                  | Notes                                   |
+| -------------------- | --------------------- | --------------------------------------- |
+| `id`                 | text PK               |                                         |
+| `parent_id`          | text FK → home_spaces | ON DELETE CASCADE                       |
+| `kind`               | text NOT NULL         | `property`, `structure`, `room`, `area` |
+| `name`               | text NOT NULL         |                                         |
+| `address`            | text NULL             |                                         |
+| `notes`              | text NULL             |                                         |
+| `sort_order`         | integer NOT NULL      | default 0                               |
+| `created_by_user_id` | text FK → users       |                                         |
+| `updated_by_user_id` | text FK → users       |                                         |
+| `created_at`         | integer NOT NULL      |                                         |
+| `updated_at`         | integer NOT NULL      |                                         |
+
+**Indexes:** `(parent_id)`, `(kind)`, `(updated_at DESC)`.
+
+### `home_links`
+
+| Column               | Type             | Notes                        |
+| -------------------- | ---------------- | ---------------------------- |
+| `id`                 | text PK          |                              |
+| `source_type`        | text NOT NULL    | `home_space`                 |
+| `source_id`          | text NOT NULL    |                              |
+| `target_type`        | text NOT NULL    | `maintenance_log`, `project` |
+| `target_id`          | text NOT NULL    |                              |
+| `created_by_user_id` | text FK → users  |                              |
+| `created_at`         | integer NOT NULL |                              |
+
+**Indexes:** unique `(source_type, source_id, target_type, target_id)`; `(source_type, source_id)`; `(target_type, target_id)`.
+
+---
+
 ## Inventory
 
 ### `inventory_items`
 
-| Column               | Type             | Notes                                  |
-| -------------------- | ---------------- | -------------------------------------- |
-| `id`                 | text PK          |                                        |
-| `name`               | text NOT NULL    | e.g. "Washer"                          |
-| `brand`              | text NULL        |                                        |
-| `model`              | text NULL        |                                        |
-| `serial`             | text NULL        | serial number                          |
-| `item_type`          | text NULL        | e.g. appliance, electronics, furniture |
-| `location`           | text NULL        | e.g. basement, garage                  |
-| `purchase_date`      | integer NULL     | ms                                     |
-| `store`              | text NULL        | where purchased                        |
-| `price`              | text NULL        | freeform — "$899"                      |
-| `warranty_note`      | text NULL        | expiry, claim info                     |
-| `notes`              | text NULL        | freeform                               |
-| `created_by_user_id` | text FK → users  |                                        |
-| `updated_by_user_id` | text FK → users  |                                        |
-| `created_at`         | integer NOT NULL |                                        |
-| `updated_at`         | integer NOT NULL |                                        |
+| Column               | Type                  | Notes                      |
+| -------------------- | --------------------- | -------------------------- |
+| `id`                 | text PK               |                            |
+| `name`               | text NOT NULL         | e.g. "Washer"              |
+| `brand`              | text NULL             |                            |
+| `model`              | text NULL             |                            |
+| `serial`             | text NULL             | serial number              |
+| `kind`               | text NULL             | enum `inventory_item_kind` |
+| `space_id`           | text FK → home_spaces | ON DELETE SET NULL         |
+| `color_name`         | text NULL             |                            |
+| `color_hex`          | text NULL             |                            |
+| `finish`             | text NULL             |                            |
+| `product_url`        | text NULL             |                            |
+| `purchase_date`      | integer NULL          | ms                         |
+| `store`              | text NULL             | where purchased            |
+| `price`              | text NULL             | freeform — "$899"          |
+| `warranty_note`      | text NULL             | expiry, claim info         |
+| `notes`              | text NULL             | freeform                   |
+| `created_by_user_id` | text FK → users       |                            |
+| `updated_by_user_id` | text FK → users       |                            |
+| `created_at`         | integer NOT NULL      |                            |
+| `updated_at`         | integer NOT NULL      |                            |
 
-**Indexes:** `(name)`, `(item_type)`, `(location)`, `(updated_at DESC)` for search/list.
+**Indexes:** `(name)`, `(kind)`, `(space_id)`, `(updated_at DESC)` for search/list.
 
 ### `inventory_links`
 

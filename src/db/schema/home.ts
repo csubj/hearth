@@ -11,7 +11,7 @@ import { users } from "./users";
 export const HOME_SPACE_KINDS = ["property", "structure", "room", "area"] as const;
 export type HomeSpaceKind = (typeof HOME_SPACE_KINDS)[number];
 
-export const HOME_LINK_SOURCE_TYPES = ["home_space", "home_item"] as const;
+export const HOME_LINK_SOURCE_TYPES = ["home_space"] as const;
 export type HomeLinkSourceType = (typeof HOME_LINK_SOURCE_TYPES)[number];
 
 export const HOME_LINK_TARGET_TYPES = ["maintenance_log", "project"] as const;

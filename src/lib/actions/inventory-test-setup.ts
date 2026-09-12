@@ -11,8 +11,12 @@ export function ensureInventoryTablesForTests(): void {
       brand text,
       model text,
       serial text,
-      item_type text,
-      location text,
+      kind text,
+      space_id text REFERENCES home_spaces(id) ON DELETE SET NULL,
+      color_name text,
+      color_hex text,
+      finish text,
+      product_url text,
       purchase_date integer,
       store text,
       price text,
@@ -30,10 +34,10 @@ export function ensureInventoryTablesForTests(): void {
     CREATE INDEX IF NOT EXISTS inventory_items_name_idx ON inventory_items (name)
   `);
   db.run(sql`
-    CREATE INDEX IF NOT EXISTS inventory_items_item_type_idx ON inventory_items (item_type)
+    CREATE INDEX IF NOT EXISTS inventory_items_kind_idx ON inventory_items (kind)
   `);
   db.run(sql`
-    CREATE INDEX IF NOT EXISTS inventory_items_location_idx ON inventory_items (location)
+    CREATE INDEX IF NOT EXISTS inventory_items_space_id_idx ON inventory_items (space_id)
   `);
   db.run(sql`
     CREATE INDEX IF NOT EXISTS inventory_items_updated_at_idx ON inventory_items (updated_at)

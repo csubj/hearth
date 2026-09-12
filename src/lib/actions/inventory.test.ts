@@ -80,15 +80,15 @@ describe("inventory records", () => {
     expect(detail?.links[0]?.label).toBe("Manual");
   });
 
-  it("searches by name, model, serial, and location", async () => {
+  it("searches by name, model, serial, and notes", async () => {
     const user = await createTestUser({ username: "alex", password: "password123" });
     mockRequireUser.mockResolvedValue({ user });
 
     await importInventoryData(
       {
         items: [
-          { name: "Washer", model: "WM4000", location: "basement" },
-          { name: "Dryer", model: "DLEX4000", location: "garage" },
+          { name: "Washer", model: "WM4000", notes: "basement" },
+          { name: "Dryer", model: "DLEX4000", notes: "garage" },
         ],
       },
       user.id,
@@ -98,9 +98,9 @@ describe("inventory records", () => {
     expect(byModel).toHaveLength(1);
     expect(byModel[0]?.name).toBe("Washer");
 
-    const byLocation = await listInventoryItems({ q: "garage" });
-    expect(byLocation).toHaveLength(1);
-    expect(byLocation[0]?.name).toBe("Dryer");
+    const byNotes = await listInventoryItems({ q: "garage" });
+    expect(byNotes).toHaveLength(1);
+    expect(byNotes[0]?.name).toBe("Dryer");
   });
 
   it("export and import round-trip preserves items", async () => {

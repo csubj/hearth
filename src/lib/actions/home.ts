@@ -371,11 +371,10 @@ export async function listHomeReferencesForTarget(
   }
 
   const spaceIds = links.filter((l) => l.sourceType === "home_space").map((l) => l.sourceId);
-  const itemIds = links.filter((l) => l.sourceType === "home_item").map((l) => l.sourceId);
 
-  const [spacesMap, itemsMap] = await Promise.all([
+  const spacesMap =
     spaceIds.length > 0
-      ? db
+      ? await db
           .select({ id: homeSpaces.id, name: homeSpaces.name, kind: homeSpaces.kind })
           .from(homeSpaces)
           .where(
@@ -385,30 +384,7 @@ export async function listHomeReferencesForTarget(
             )})`,
           )
           .then((rows) => new Map(rows.map((r) => [r.id, r])))
-      : Promise.resolve(new Map<string, { id: string; name: string; kind: HomeSpaceKind }>()),
-    itemIds.length > 0
-      ? db
-          .select({
-            id: inventoryItems.id,
-            name: inventoryItems.name,
-            kind: inventoryItems.kind,
-            spaceId: inventoryItems.spaceId,
-          })
-          .from(inventoryItems)
-          .where(
-            sql`${inventoryItems.id} IN (${sql.join(
-              itemIds.map((id) => sql`${id}`),
-              sql`, `,
-            )})`,
-          )
-          .then((rows) => new Map(rows.map((r) => [r.id, r])))
-      : Promise.resolve(
-          new Map<
-            string,
-            { id: string; name: string; kind: InventoryItemKind | null; spaceId: string | null }
-          >(),
-        ),
-  ]);
+      : new Map<string, { id: string; name: string; kind: HomeSpaceKind }>();
 
   const results: HomeReferenceTarget[] = [];
   for (const link of links) {
@@ -421,17 +397,6 @@ export async function listHomeReferencesForTarget(
           sourceName: space.name,
           sourceKind: space.kind,
           spaceId: null,
-        });
-      }
-    } else {
-      const item = itemsMap.get(link.sourceId);
-      if (item) {
-        results.push({
-          sourceType: "home_item",
-          sourceId: item.id,
-          sourceName: item.name,
-          sourceKind: item.kind,
-          spaceId: item.spaceId,
         });
       }
     }
@@ -749,7 +714,7 @@ export async function linkHomeEntity(
   const { user } = await requireUser();
   const parsed = z
     .object({
-      sourceType: z.enum(["home_space", "home_item"] as const),
+      sourceType: z.enum(["home_space"] as const),
       sourceId: z.string().uuid(),
       targetType: z.enum(["maintenance_log", "project"] as const),
       targetId: z.string().uuid(),
@@ -818,7 +783,7 @@ export async function unlinkHomeEntity(
   await requireUser();
   const parsed = z
     .object({
-      sourceType: z.enum(["home_space", "home_item"] as const),
+      sourceType: z.enum(["home_space"] as const),
       sourceId: z.string().uuid(),
       targetType: z.enum(["maintenance_log", "project"] as const),
       targetId: z.string().uuid(),

@@ -25,7 +25,7 @@ Structured reference for agents and contributors. Product tone in `00_init.md` (
 | **Role**        | Utility-first layout and spacing; design tokens via `@theme`                                                                                                                                                                   |
 | **Rationale**   | Fast iteration, consistent spacing, pairs well with Next.js App Router and Radix unstyled primitives. One toolchain for responsive layout without fighting CSS modules for every prop.                                         |
 | **Conventions** | Global tokens in `app/globals.css`. Component-specific classes inline with Tailwind. Avoid `@apply` except for repeated form control base styles. Do not add MUI, Chakra, or shadcn as a full dependency — wrap Radix locally. |
-| **References**  | https://tailwindcss.com · `docs/design/05_styling.md`                                                                                                                                                                          |
+| **References**  | <https://tailwindcss.com> · `docs/design/05_styling.md`                                                                                                                                                                        |
 
 | Field           | Value                                                                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -115,7 +115,7 @@ Line height relaxed (`leading-relaxed`) for note-like content.
 
 - **Search bar** pinned at top of list (inventory leads with findability, not capture)
 - **Tag chips** — filter by tag; selected tags highlighted with accent outline
-- **Item card** — name prominent; secondary line: type · location · model; tag chips inline
+- **Item card** — name prominent; secondary line: kind · assigned space · model; tag chips inline
 - **Detail page** — metadata grid (brand, model, serial, purchase info); links section; photo + document file list; notes at bottom
 - **Compact create** — "Add item" in header opens collapsible form or Radix `Dialog` for the full field set
 

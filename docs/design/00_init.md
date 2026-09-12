@@ -85,10 +85,10 @@ Start with one concrete use case; generalize the pattern as needed.
 
 A searchable catalog of the household's physical things — appliances, electronics, tools, furniture — so details are findable when you actually need them: a model number for a warranty claim, the paint color in the garage, the manual for the dishwasher.
 
-- Item record: name, brand, model, serial number, item type, location, purchase date, store, price, warranty notes, and free-form notes
+- Item record: name, brand, model, serial number, kind, assigned space, purchase date, store, price, warranty notes, and free-form notes
 - **Tags** for flexible grouping ("kitchen", "needs-repair", "under-warranty") and **links** (label + URL) for manuals, product pages, or receipts
 - **Photos and documents:** attach pictures of the item plus PDFs, manuals, and receipts — inventory is the one place documents are allowed, not just images
-- **Search** across name, brand, model, serial, location, and notes; filter by tag or type
+- **Search** across name, brand, model, serial, and notes; filter by tag or kind
 - **Import/export:** bulk-load an existing spreadsheet and export the catalog for backup or a move
 
 Unlike the stream, inventory is reference data — it changes rarely and is read often. The page leads with the searchable list, not a capture box.
