@@ -6,6 +6,9 @@ import { MentionTextarea } from "@/components/MentionTextarea";
 import { Button } from "@/components/ui/Button";
 import type { InventoryDetail } from "@/lib/actions/inventory";
 import { update, type InventoryActionState } from "@/lib/actions/inventory";
+import { inventoryItemKinds } from "@/db/schema/inventory";
+import { itemKindLabel } from "@/components/home/format";
+import type { HomeSpaceSummary } from "@/lib/actions/home";
 
 function ActionMessage({ state }: { state: InventoryActionState }) {
   if (state.error) {
@@ -31,9 +34,11 @@ function toDateInputValue(date: Date | null): string {
 export function UpdateInventoryForm({
   item,
   users = [],
+  spaces = [],
 }: {
   item: InventoryDetail;
   users?: MentionUser[];
+  spaces?: HomeSpaceSummary[];
 }) {
   const [state, action, pending] = useActionState<InventoryActionState, FormData>(update, {});
 
@@ -91,26 +96,40 @@ export function UpdateInventoryForm({
           />
         </div>
         <div>
-          <label htmlFor="edit-type" className="block text-sm font-medium text-text">
-            Type
+          <label htmlFor="edit-kind" className="block text-sm font-medium text-text">
+            Kind
           </label>
-          <input
-            id="edit-type"
-            name="itemType"
-            defaultValue={item.itemType ?? ""}
+          <select
+            id="edit-kind"
+            name="kind"
+            defaultValue={item.kind ?? ""}
             className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
+          >
+            <option value="">Uncategorized</option>
+            {inventoryItemKinds.map((kind) => (
+              <option key={kind} value={kind}>
+                {itemKindLabel(kind)}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
-          <label htmlFor="edit-location" className="block text-sm font-medium text-text">
-            Location
+          <label htmlFor="edit-space" className="block text-sm font-medium text-text">
+            Space
           </label>
-          <input
-            id="edit-location"
-            name="location"
-            defaultValue={item.location ?? ""}
+          <select
+            id="edit-space"
+            name="spaceId"
+            defaultValue={item.spaceId ?? ""}
             className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          />
+          >
+            <option value="">No space</option>
+            {spaces.map((space) => (
+              <option key={space.id} value={space.id}>
+                {space.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="edit-purchase-date" className="block text-sm font-medium text-text">

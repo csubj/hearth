@@ -1,10 +1,12 @@
 import { and, desc, eq, inArray, lt, or, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import {
+  inventoryItemKinds,
   inventoryItemTags,
   inventoryItems,
   inventoryTags,
   type InventoryItem,
+  type InventoryItemKind,
   type InventoryTag,
 } from "@/db/schema/inventory";
 import type { AuthUser } from "@/lib/auth/session-store";
@@ -24,7 +26,7 @@ import type { z } from "zod";
 export type InventoryListQuery = PaginationQuery & {
   q?: string;
   tag?: string;
-  type?: string;
+  kind?: string;
 };
 
 function searchPattern(query: string): string {
@@ -138,8 +140,12 @@ export function serializeInventoryItem(row: InventoryItem, tags: InventoryTag[] 
     brand: row.brand,
     model: row.model,
     serial: row.serial,
-    itemType: row.itemType,
-    location: row.location,
+    kind: row.kind,
+    spaceId: row.spaceId,
+    colorName: row.colorName,
+    colorHex: row.colorHex,
+    finish: row.finish,
+    productUrl: row.productUrl,
     purchaseDate: toIso(row.purchaseDate),
     store: row.store,
     price: row.price,
@@ -170,14 +176,13 @@ export async function listInventoryItemsApi(query: InventoryListQuery) {
         sql`lower(coalesce(${inventoryItems.brand}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.model}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.serial}, '')) like ${pattern}`,
-        sql`lower(coalesce(${inventoryItems.location}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.notes}, '')) like ${pattern}`,
       )!,
     );
   }
 
-  if (query.type) {
-    conditions.push(eq(inventoryItems.itemType, query.type));
+  if (query.kind) {
+    conditions.push(eq(inventoryItems.kind, query.kind as InventoryItemKind));
   }
 
   if (query.tag) {
@@ -252,8 +257,12 @@ export async function createInventoryItemApi(
       brand: input.brand ?? null,
       model: input.model ?? null,
       serial: input.serial ?? null,
-      itemType: input.itemType ?? null,
-      location: input.location ?? null,
+      kind: input.kind ?? null,
+      spaceId: input.spaceId ?? null,
+      colorName: input.colorName ?? null,
+      colorHex: input.colorHex ?? null,
+      finish: input.finish ?? null,
+      productUrl: input.productUrl ?? null,
       purchaseDate: input.purchaseDate ? new Date(input.purchaseDate) : null,
       store: input.store ?? null,
       price: input.price ?? null,
@@ -313,8 +322,12 @@ export async function updateInventoryItemApi(
       brand: input.brand !== undefined ? input.brand : existing.brand,
       model: input.model !== undefined ? input.model : existing.model,
       serial: input.serial !== undefined ? input.serial : existing.serial,
-      itemType: input.itemType !== undefined ? input.itemType : existing.itemType,
-      location: input.location !== undefined ? input.location : existing.location,
+      kind: input.kind !== undefined ? input.kind : existing.kind,
+      spaceId: input.spaceId !== undefined ? input.spaceId : existing.spaceId,
+      colorName: input.colorName !== undefined ? input.colorName : existing.colorName,
+      colorHex: input.colorHex !== undefined ? input.colorHex : existing.colorHex,
+      finish: input.finish !== undefined ? input.finish : existing.finish,
+      productUrl: input.productUrl !== undefined ? input.productUrl : existing.productUrl,
       purchaseDate:
         input.purchaseDate !== undefined
           ? input.purchaseDate
@@ -427,52 +440,20 @@ export async function deleteInventoryTagApi(id: string) {
   return true;
 }
 
-export async function listInventoryTypesApi() {
-  const rows = await getDb()
-    .selectDistinct({ itemType: inventoryItems.itemType })
-    .from(inventoryItems)
-    .where(sql`${inventoryItems.itemType} IS NOT NULL AND ${inventoryItems.itemType} != ''`)
-    .orderBy(inventoryItems.itemType);
-
-  return rows.map((row) => row.itemType).filter((value): value is string => Boolean(value?.trim()));
+export async function listInventoryTypesApi(): Promise<string[]> {
+  return [...inventoryItemKinds];
 }
 
 export async function renameInventoryTypeApi(
   currentName: string,
   input: z.infer<typeof renameInventoryTypeSchema>,
 ) {
-  const db = getDb();
-  const [match] = await db
-    .select({ id: inventoryItems.id })
-    .from(inventoryItems)
-    .where(eq(inventoryItems.itemType, currentName))
-    .limit(1);
-
-  if (!match) {
+  if (!(inventoryItemKinds as readonly string[]).includes(currentName)) {
     return null;
   }
-
-  await db
-    .update(inventoryItems)
-    .set({ itemType: input.name.trim() })
-    .where(eq(inventoryItems.itemType, currentName));
-
   return { name: input.name.trim() };
 }
 
 export async function deleteInventoryTypeApi(name: string) {
-  const db = getDb();
-  const [match] = await db
-    .select({ id: inventoryItems.id })
-    .from(inventoryItems)
-    .where(eq(inventoryItems.itemType, name))
-    .limit(1);
-
-  if (!match) {
-    return false;
-  }
-
-  await db.update(inventoryItems).set({ itemType: null }).where(eq(inventoryItems.itemType, name));
-
-  return true;
+  return (inventoryItemKinds as readonly string[]).includes(name);
 }

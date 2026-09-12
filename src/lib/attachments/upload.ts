@@ -53,8 +53,6 @@ function notificationTypeForEntity(entityType: AttachmentEntityType): string {
       return "maintenance.updated";
     case "home_space":
       return "home_log.space_updated";
-    case "home_item":
-      return "home_log.item_updated";
   }
 }
 

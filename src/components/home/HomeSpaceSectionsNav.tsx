@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { decorativeInventoryKinds } from "@/db/schema/inventory";
 import type { HomeSpaceWithChildren } from "@/lib/actions/home";
 
 const SECTIONS = [
@@ -11,9 +12,10 @@ const SECTIONS = [
 function sectionCount(space: HomeSpaceWithChildren, slug: string): number {
   switch (slug) {
     case "materials":
-      return space.items.length;
+      return space.items.filter((item) => item.kind && decorativeInventoryKinds.includes(item.kind))
+        .length;
     case "inventory":
-      return space.links.filter((l) => l.targetType === "inventory_item").length;
+      return space.items.length;
     case "maintenance":
       return space.links.filter((l) => l.targetType === "maintenance_log").length;
     case "projects":

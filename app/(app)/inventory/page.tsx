@@ -4,16 +4,17 @@ import { InventoryCreateForm } from "@/components/inventory/CreateInventoryForm"
 import { InventoryFilters } from "@/components/inventory/InventoryFilters";
 import { InventoryInfiniteList } from "@/components/inventory/InventoryInfiniteList";
 import {
-  listInventoryItemTypes,
+  listInventoryItemKinds,
   listInventoryItemsPage,
   listInventoryTags,
 } from "@/lib/actions/inventory";
+import { listAllHomeSpaces } from "@/lib/actions/home";
 
 function parseFilters(searchParams: Record<string, string | string[] | undefined>) {
   const q = typeof searchParams.q === "string" ? searchParams.q.trim() : undefined;
   const tag = typeof searchParams.tag === "string" ? searchParams.tag.trim() : undefined;
-  const type = typeof searchParams.type === "string" ? searchParams.type.trim() : undefined;
-  return { q, tag, type };
+  const kind = typeof searchParams.kind === "string" ? searchParams.kind.trim() : undefined;
+  return { q, tag, kind };
 }
 
 export default async function InventoryPage({
@@ -23,10 +24,11 @@ export default async function InventoryPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const filters = parseFilters(resolvedSearchParams);
-  const [page, tags, itemTypes] = await Promise.all([
+  const [page, tags, kinds, spaces] = await Promise.all([
     listInventoryItemsPage(resolvedSearchParams),
     listInventoryTags(),
-    listInventoryItemTypes(),
+    listInventoryItemKinds(),
+    listAllHomeSpaces(),
   ]);
   const listKey = JSON.stringify(resolvedSearchParams);
 
@@ -44,17 +46,17 @@ export default async function InventoryPage({
           title="New inventory item"
           description="Add an appliance, tool, or other household item."
         >
-          <InventoryCreateForm />
+          <InventoryCreateForm spaces={spaces} />
         </CreateDialog>
       </header>
 
       <Suspense fallback={<p className="text-sm text-text-muted">Loading filters…</p>}>
         <InventoryFilters
           tags={tags}
-          itemTypes={itemTypes}
+          kinds={kinds}
           currentQ={filters.q}
           currentTag={filters.tag}
-          currentType={filters.type}
+          currentKind={filters.kind}
         />
       </Suspense>
 

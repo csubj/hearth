@@ -1,30 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDb, resetDbForTests } from "@/db";
 import { migrateTestDb } from "@/db/test-setup";
-import {
-  homeItems,
-  homeLinks,
-  homeSpaces,
-  inventoryItems,
-  maintenanceLogs,
-  projects,
-} from "@/db/schema";
+import { homeLinks, homeSpaces, inventoryItems, maintenanceLogs, projects } from "@/db/schema";
 import { resetSessionStoreForTests } from "@/lib/auth/session-store";
 import { createTestUser } from "@/lib/auth/test-helpers";
 import { ensureApiTokensTableForTests } from "@/lib/api/auth";
 import { createApiTokenForUser } from "@/lib/auth/api-tokens";
 import {
-  createHomeItemApi,
   createHomeSpaceApi,
-  deleteHomeItemApi,
   deleteHomeSpaceApi,
-  getHomeItemApi,
   getHomeSpaceApi,
-  listHomeItemsApi,
   listHomeSpacesApi,
-  serializeHomeItem,
   serializeHomeSpace,
-  updateHomeItemApi,
   updateHomeSpaceApi,
 } from "@/lib/api/home-resources";
 import {
@@ -173,63 +160,6 @@ describe("home log API resources (spaces)", () => {
   });
 });
 
-describe("home log API resources (items)", () => {
-  beforeEach(() => {
-    resetTestDb();
-    process.env.AUTH_MODE = "open";
-    process.env.OPEN_MODE_USERNAME = "household";
-    mockCookieJar();
-  });
-
-  it("creates, reads, updates, and deletes an item", async () => {
-    const user = await createTestUser({ username: "household", role: "member" });
-
-    const space = await createHomeSpaceApi(user, { name: "Living room", kind: "room" });
-
-    const item = await createHomeItemApi(user, {
-      spaceId: space!.id,
-      kind: "paint",
-      name: "Wall paint",
-      manufacturer: "Benjamin Moore",
-      colorName: "Chantilly Lace",
-      colorHex: "f5f0e8",
-    });
-    expect(item).not.toBeNull();
-    expect(item?.kind).toBe("paint");
-    expect(item?.colorHex).toBe("#F5F0E8");
-
-    const serialized = serializeHomeItem(item!);
-    expect(serialized.colorHex).toBe("#F5F0E8");
-
-    const patched = await updateHomeItemApi(user, item!.id, { name: "Ceiling paint" });
-    expect(patched?.name).toBe("Ceiling paint");
-
-    const deleted = await deleteHomeItemApi(item!.id);
-    expect(deleted).toBe(true);
-
-    const gone = await getHomeItemApi(item!.id);
-    expect(gone).toBeNull();
-  });
-
-  it("lists items with spaceId and kind filters", async () => {
-    const user = await createTestUser({ username: "household", role: "member" });
-    const space = await createHomeSpaceApi(user, { name: "Kitchen", kind: "room" });
-
-    await createHomeItemApi(user, { spaceId: space!.id, kind: "appliance", name: "Refrigerator" });
-    await createHomeItemApi(user, { spaceId: space!.id, kind: "paint", name: "Cabinet paint" });
-
-    const all = await listHomeItemsApi({ limit: 50 });
-    expect(all.data).toHaveLength(2);
-
-    const appliances = await listHomeItemsApi({ limit: 50, kind: "appliance" });
-    expect(appliances.data).toHaveLength(1);
-    expect(appliances.data[0]?.name).toBe("Refrigerator");
-
-    const forSpace = await listHomeItemsApi({ limit: 50, spaceId: space!.id });
-    expect(forSpace.data).toHaveLength(2);
-  });
-});
-
 describe("home log server actions (read loaders)", () => {
   beforeEach(() => {
     resetTestDb();
@@ -318,19 +248,22 @@ describe("home log server actions (read loaders)", () => {
           updatedAt: now,
         },
       ]);
-    await getDb().insert(homeItems).values({
+    await getDb().insert(inventoryItems).values({
       id: itemId,
       spaceId: roomId,
       kind: "appliance",
       name: "Dishwasher",
-      manufacturer: null,
-      modelNumber: null,
-      serialNumber: null,
+      brand: null,
+      model: null,
+      serial: null,
       colorName: null,
       colorHex: null,
       finish: null,
       productUrl: null,
-      purchasedAt: null,
+      purchaseDate: null,
+      store: null,
+      price: null,
+      warrantyNote: null,
       notes: null,
       createdByUserId: user.id,
       updatedByUserId: user.id,
@@ -354,7 +287,6 @@ describe("home log server actions (read loaders)", () => {
 
     const propId = crypto.randomUUID();
     const roomId = crypto.randomUUID();
-    const itemId = crypto.randomUUID();
     const inventoryId = crypto.randomUUID();
     const maintenanceId = crypto.randomUUID();
     const projectId = crypto.randomUUID();
@@ -389,33 +321,18 @@ describe("home log server actions (read loaders)", () => {
           updatedAt: now,
         },
       ]);
-    await getDb().insert(homeItems).values({
-      id: itemId,
-      spaceId: roomId,
-      kind: "paint",
-      name: "Cabinet paint",
-      manufacturer: null,
-      modelNumber: null,
-      serialNumber: null,
-      colorName: null,
-      colorHex: null,
-      finish: null,
-      productUrl: null,
-      purchasedAt: null,
-      notes: null,
-      createdByUserId: user.id,
-      updatedByUserId: user.id,
-      createdAt: now,
-      updatedAt: now,
-    });
     await getDb().insert(inventoryItems).values({
       id: inventoryId,
+      spaceId: roomId,
+      kind: "generic",
       name: "Dish soap",
       brand: null,
       model: null,
       serial: null,
-      itemType: null,
-      location: null,
+      colorName: null,
+      colorHex: null,
+      finish: null,
+      productUrl: null,
       purchaseDate: null,
       store: null,
       price: null,
@@ -460,15 +377,6 @@ describe("home log server actions (read loaders)", () => {
           id: crypto.randomUUID(),
           sourceType: "home_space",
           sourceId: roomId,
-          targetType: "inventory_item",
-          targetId: inventoryId,
-          createdByUserId: user.id,
-          createdAt: now,
-        },
-        {
-          id: crypto.randomUUID(),
-          sourceType: "home_space",
-          sourceId: roomId,
           targetType: "maintenance_log",
           targetId: maintenanceId,
           createdByUserId: user.id,
@@ -491,10 +399,7 @@ describe("home log server actions (read loaders)", () => {
     expect(tree[0]?.children).toHaveLength(1);
     const kitchen = tree[0]?.children[0];
     expect(kitchen?.name).toBe("Kitchen");
-    expect(kitchen?.items).toEqual([
-      expect.objectContaining({ id: itemId, name: "Cabinet paint", kind: "paint" }),
-    ]);
-    expect(kitchen?.inventory).toEqual([{ id: inventoryId, name: "Dish soap" }]);
+    expect(kitchen?.inventoryCount).toBe(1);
     expect(kitchen?.maintenance).toEqual([{ id: maintenanceId, title: "Fix faucet" }]);
     expect(kitchen?.projects).toEqual([{ id: projectId, title: "Kitchen refresh" }]);
   });
@@ -517,19 +422,22 @@ describe("home log server actions (read loaders)", () => {
       createdAt: now,
       updatedAt: now,
     });
-    await getDb().insert(homeItems).values({
+    await getDb().insert(inventoryItems).values({
       id: crypto.randomUUID(),
       spaceId,
       kind: "generic",
       name: "Shovel",
-      manufacturer: null,
-      modelNumber: null,
-      serialNumber: null,
+      brand: null,
+      model: null,
+      serial: null,
       colorName: null,
       colorHex: null,
       finish: null,
       productUrl: null,
-      purchasedAt: null,
+      purchaseDate: null,
+      store: null,
+      price: null,
+      warrantyNote: null,
       notes: null,
       createdByUserId: user.id,
       updatedByUserId: user.id,
@@ -786,14 +694,14 @@ describe("maybeAutoLinkToHome", () => {
     await createHomeLink({
       sourceType: "home_space",
       sourceId: spaceId,
-      targetType: "inventory_item",
+      targetType: "maintenance_log",
       targetId,
       userId: user.id,
     });
     await createHomeLink({
       sourceType: "home_space",
       sourceId: spaceId,
-      targetType: "inventory_item",
+      targetType: "maintenance_log",
       targetId,
       userId: user.id,
     });
@@ -803,13 +711,11 @@ describe("maybeAutoLinkToHome", () => {
 });
 
 describe("openapi includes home log paths", () => {
-  it("home spaces and items are registered in the OpenAPI spec", async () => {
+  it("home spaces are registered in the OpenAPI spec", async () => {
     await import("@/lib/api/register-openapi");
     const { getOpenApiDocument } = await import("@/lib/api/openapi");
     const doc = getOpenApiDocument() as { paths: Record<string, unknown> };
     expect(doc.paths["/api/v1/home/spaces"]).toBeDefined();
     expect(doc.paths["/api/v1/home/spaces/{id}"]).toBeDefined();
-    expect(doc.paths["/api/v1/home/items"]).toBeDefined();
-    expect(doc.paths["/api/v1/home/items/{id}"]).toBeDefined();
   });
 });

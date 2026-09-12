@@ -10,7 +10,8 @@ import { HomeSpaceMetadataForm } from "./HomeSpaceMetadataForm";
 import { HomeSpaceNotesEditor } from "./HomeSpaceNotesEditor";
 import { HomeSpaceDeleteButton } from "./HomeDeleteButton";
 import { HomeSpaceSectionsNav } from "./HomeSpaceSectionsNav";
-import { spaceKindLabel } from "./format";
+import { spaceKindLabel, itemKindLabel } from "./format";
+import type { InventoryItemKind } from "@/db/schema/inventory";
 
 export async function HomeSpaceDetail({
   space,
@@ -65,6 +66,49 @@ export async function HomeSpaceDetail({
           </section>
         </div>
       </div>
+
+      {space.items.length > 0 ? (
+        <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <h2 className="text-sm font-medium text-text">Inventory</h2>
+          {(() => {
+            const groups = new Map<string, typeof space.items>();
+            for (const item of space.items) {
+              const key = item.kind ?? "uncategorized";
+              const list = groups.get(key) ?? [];
+              list.push(item);
+              groups.set(key, list);
+            }
+            return (
+              <div className="mt-3 space-y-4">
+                {[...groups.entries()].map(([kind, list]) => (
+                  <div key={kind}>
+                    <h3 className="text-xs font-medium tracking-wide text-text-muted uppercase">
+                      {kind === "uncategorized"
+                        ? "Uncategorized"
+                        : itemKindLabel(kind as InventoryItemKind)}
+                    </h3>
+                    <ul className="mt-2 space-y-2">
+                      {list.map((item) => (
+                        <li key={item.id}>
+                          <Link
+                            href={`/inventory/${item.id}`}
+                            className="flex items-center justify-between rounded-md border border-border px-3 py-2 transition-colors hover:bg-background"
+                          >
+                            <span className="text-sm text-text">{item.name}</span>
+                            <span className="text-xs text-text-muted">
+                              {[item.brand, item.model].filter(Boolean).join(" · ")}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </section>
+      ) : null}
 
       <HomeSpaceNotesEditor spaceId={space.id} initialNotes={space.notes} users={users} />
 

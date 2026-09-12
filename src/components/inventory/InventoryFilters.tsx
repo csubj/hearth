@@ -6,16 +6,16 @@ import type { InventoryTag } from "@/db/schema/inventory";
 
 export function InventoryFilters({
   tags,
-  itemTypes,
+  kinds,
   currentQ,
   currentTag,
-  currentType,
+  currentKind,
 }: {
   tags: InventoryTag[];
-  itemTypes: string[];
+  kinds: string[];
   currentQ?: string;
   currentTag?: string;
-  currentType?: string;
+  currentKind?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,21 +46,21 @@ export function InventoryFilters({
         />
       </div>
 
-      {itemTypes.length > 0 ? (
+      {kinds.length > 0 ? (
         <div>
-          <span className="block text-sm font-medium text-text">Type</span>
+          <span className="block text-sm font-medium text-text">Kind</span>
           <div className="mt-2 flex flex-wrap gap-2">
             <FilterChip
-              label="All types"
-              active={!currentType}
-              onClick={() => updateParam("type", "")}
+              label="All kinds"
+              active={!currentKind}
+              onClick={() => updateParam("kind", "")}
             />
-            {itemTypes.map((type) => (
+            {kinds.map((kind) => (
               <FilterChip
-                key={type}
-                label={type}
-                active={currentType === type}
-                onClick={() => updateParam("type", type)}
+                key={kind}
+                label={kind}
+                active={currentKind === kind}
+                onClick={() => updateParam("kind", kind)}
               />
             ))}
           </div>
@@ -88,7 +88,7 @@ export function InventoryFilters({
         </div>
       ) : null}
 
-      {(currentQ || currentTag || currentType) && (
+      {(currentQ || currentTag || currentKind) && (
         <Link href="/inventory" className="text-sm text-accent hover:text-accent/80">
           Clear filters
         </Link>

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getDb } from "@/db";
 import {
+  inventoryItemKinds,
   inventoryItemTags,
   inventoryItems,
   inventoryLinks,
@@ -13,10 +14,11 @@ import {
   inventoryMaintenanceReminders,
   inventoryTags,
   type InventoryItem,
+  type InventoryItemKind,
   type InventoryLink,
   type InventoryTag,
 } from "@/db/schema/inventory";
-import { attachments } from "@/db/schema";
+import { attachments, homeSpaces } from "@/db/schema";
 import { displayName, requireUser } from "@/lib/auth/session";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 import {
@@ -24,7 +26,7 @@ import {
   type MaintenanceReminderWithLinks,
 } from "@/lib/actions/inventory-maintenance";
 import { isMaintenanceReminderStale } from "@/lib/inventory/reminder-interval";
-import { maybeAutoLinkToHome } from "@/lib/home/auto-link";
+import { normalizeColorHex } from "@/lib/home/item-presets";
 import {
   DEFAULT_LIST_PAGE_SIZE,
   parseLimit,
@@ -50,12 +52,13 @@ export type InventoryDetail = InventoryItem & {
   tags: InventoryTag[];
   links: InventoryLink[];
   maintenanceReminders: MaintenanceReminderWithLinks[];
+  space: { id: string; name: string } | null;
 };
 
 export type InventoryListFilters = {
   q?: string;
   tag?: string;
-  itemType?: string;
+  kind?: string;
 };
 
 export type InventoryExportAttachment = {
@@ -72,8 +75,8 @@ export type InventoryExportItem = {
   brand: string | null;
   model: string | null;
   serial: string | null;
-  itemType: string | null;
-  location: string | null;
+  kind: string | null;
+  spaceId: string | null;
   purchaseDate: string | null;
   store: string | null;
   price: string | null;
@@ -111,8 +114,18 @@ const itemFieldsSchema = z.object({
   brand: optionalText(200),
   model: optionalText(200),
   serial: optionalText(200),
-  itemType: optionalText(100),
-  location: optionalText(200),
+  kind: z.enum(inventoryItemKinds).optional(),
+  spaceId: z.string().uuid().optional(),
+  colorName: optionalText(200),
+  colorHex: optionalText(20),
+  finish: optionalText(200),
+  productUrl: z
+    .string()
+    .trim()
+    .url("Valid URL is required")
+    .max(2000)
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
   purchaseDate: z.coerce.date().optional(),
   store: optionalText(200),
   price: optionalText(50),
@@ -125,12 +138,12 @@ function parseListFilters(
 ): InventoryListFilters {
   const q = typeof searchParams.q === "string" ? searchParams.q.trim() : undefined;
   const tag = typeof searchParams.tag === "string" ? searchParams.tag.trim() : undefined;
-  const itemType = typeof searchParams.type === "string" ? searchParams.type.trim() : undefined;
+  const kind = typeof searchParams.kind === "string" ? searchParams.kind.trim() : undefined;
 
   return {
     q: q || undefined,
     tag: tag || undefined,
-    itemType: itemType || undefined,
+    kind: kind || undefined,
   };
 }
 
@@ -223,15 +236,9 @@ export async function listInventoryTags(): Promise<InventoryTag[]> {
   return getDb().select().from(inventoryTags).orderBy(inventoryTags.name);
 }
 
-export async function listInventoryItemTypes(): Promise<string[]> {
+export async function listInventoryItemKinds(): Promise<string[]> {
   await requireUser();
-  const rows = await getDb()
-    .selectDistinct({ itemType: inventoryItems.itemType })
-    .from(inventoryItems)
-    .where(sql`${inventoryItems.itemType} IS NOT NULL AND ${inventoryItems.itemType} != ''`)
-    .orderBy(inventoryItems.itemType);
-
-  return rows.map((row) => row.itemType).filter((value): value is string => Boolean(value?.trim()));
+  return [...inventoryItemKinds];
 }
 
 async function loadOverdueReminderItemIds(viewerUserId: string): Promise<Set<string>> {
@@ -253,7 +260,7 @@ async function loadOverdueReminderItemIds(viewerUserId: string): Promise<Set<str
 async function buildInventoryListConditions(
   filters: InventoryListFilters,
 ): Promise<{ empty: boolean; conditions: ReturnType<typeof and>[] }> {
-  const { q, tag, itemType } = filters;
+  const { q, tag, kind } = filters;
   const db = getDb();
   const conditions: ReturnType<typeof and>[] = [];
 
@@ -265,14 +272,13 @@ async function buildInventoryListConditions(
         sql`lower(coalesce(${inventoryItems.brand}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.model}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.serial}, '')) like ${pattern}`,
-        sql`lower(coalesce(${inventoryItems.location}, '')) like ${pattern}`,
         sql`lower(coalesce(${inventoryItems.notes}, '')) like ${pattern}`,
       ),
     );
   }
 
-  if (itemType) {
-    conditions.push(eq(inventoryItems.itemType, itemType));
+  if (kind) {
+    conditions.push(eq(inventoryItems.kind, kind as InventoryItemKind));
   }
 
   if (tag) {
@@ -382,7 +388,17 @@ export async function getInventoryItemById(id: string): Promise<InventoryDetail 
 
   const maintenanceReminders = await loadMaintenanceRemindersForItem(id, user.id);
 
-  return { ...item, tags, links, maintenanceReminders };
+  let space: { id: string; name: string } | null = null;
+  if (item.spaceId) {
+    const [spaceRow] = await db
+      .select({ id: homeSpaces.id, name: homeSpaces.name })
+      .from(homeSpaces)
+      .where(eq(homeSpaces.id, item.spaceId))
+      .limit(1);
+    space = spaceRow ?? null;
+  }
+
+  return { ...item, tags, links, maintenanceReminders, space };
 }
 
 export async function getInventoryHomeSummary(limit = 5): Promise<InventoryListItem[]> {
@@ -420,8 +436,12 @@ export async function create(
     brand: String(formData.get("brand") ?? "") || undefined,
     model: String(formData.get("model") ?? "") || undefined,
     serial: String(formData.get("serial") ?? "") || undefined,
-    itemType: String(formData.get("itemType") ?? "") || undefined,
-    location: String(formData.get("location") ?? "") || undefined,
+    kind: String(formData.get("kind") ?? "") || undefined,
+    spaceId: String(formData.get("spaceId") ?? "") || undefined,
+    colorName: String(formData.get("colorName") ?? "") || undefined,
+    colorHex: String(formData.get("colorHex") ?? "") || undefined,
+    finish: String(formData.get("finish") ?? "") || undefined,
+    productUrl: String(formData.get("productUrl") ?? "") || undefined,
     purchaseDate: String(formData.get("purchaseDate") ?? "") || undefined,
     store: String(formData.get("store") ?? "") || undefined,
     price: String(formData.get("price") ?? "") || undefined,
@@ -434,6 +454,17 @@ export async function create(
   }
 
   const data = parsed.data;
+  if (data.spaceId) {
+    const [space] = await getDb()
+      .select({ id: homeSpaces.id })
+      .from(homeSpaces)
+      .where(eq(homeSpaces.id, data.spaceId))
+      .limit(1);
+    if (!space) {
+      return { error: "Space not found" };
+    }
+  }
+
   const now = new Date();
   const id = crypto.randomUUID();
 
@@ -445,8 +476,12 @@ export async function create(
       brand: data.brand ?? null,
       model: data.model ?? null,
       serial: data.serial ?? null,
-      itemType: data.itemType ?? null,
-      location: data.location ?? null,
+      kind: data.kind ?? null,
+      spaceId: data.spaceId ?? null,
+      colorName: data.colorName ?? null,
+      colorHex: data.colorHex ? normalizeColorHex(data.colorHex) : null,
+      finish: data.finish ?? null,
+      productUrl: data.productUrl ?? null,
       purchaseDate: data.purchaseDate ?? null,
       store: data.store ?? null,
       price: data.price ?? null,
@@ -476,8 +511,6 @@ export async function create(
     });
   }
 
-  await maybeAutoLinkToHome(formData, INVENTORY_ENTITY_TYPE, id, user.id);
-
   revalidatePath("/inventory");
   revalidatePath("/");
 
@@ -499,8 +532,12 @@ export async function update(
     brand: String(formData.get("brand") ?? "") || undefined,
     model: String(formData.get("model") ?? "") || undefined,
     serial: String(formData.get("serial") ?? "") || undefined,
-    itemType: String(formData.get("itemType") ?? "") || undefined,
-    location: String(formData.get("location") ?? "") || undefined,
+    kind: String(formData.get("kind") ?? "") || undefined,
+    spaceId: String(formData.get("spaceId") ?? "") || undefined,
+    colorName: String(formData.get("colorName") ?? "") || undefined,
+    colorHex: String(formData.get("colorHex") ?? "") || undefined,
+    finish: String(formData.get("finish") ?? "") || undefined,
+    productUrl: String(formData.get("productUrl") ?? "") || undefined,
     purchaseDate: String(formData.get("purchaseDate") ?? "") || undefined,
     store: String(formData.get("store") ?? "") || undefined,
     price: String(formData.get("price") ?? "") || undefined,
@@ -524,6 +561,17 @@ export async function update(
     return { error: "Item not found." };
   }
 
+  if (data.spaceId) {
+    const [space] = await db
+      .select({ id: homeSpaces.id })
+      .from(homeSpaces)
+      .where(eq(homeSpaces.id, data.spaceId))
+      .limit(1);
+    if (!space) {
+      return { error: "Space not found" };
+    }
+  }
+
   const now = new Date();
   await db
     .update(inventoryItems)
@@ -532,8 +580,12 @@ export async function update(
       brand: data.brand ?? null,
       model: data.model ?? null,
       serial: data.serial ?? null,
-      itemType: data.itemType ?? null,
-      location: data.location ?? null,
+      kind: data.kind ?? null,
+      spaceId: data.spaceId ?? null,
+      colorName: data.colorName ?? null,
+      colorHex: data.colorHex ? normalizeColorHex(data.colorHex) : existing.colorHex,
+      finish: data.finish ?? null,
+      productUrl: data.productUrl ?? null,
       purchaseDate: data.purchaseDate ?? null,
       store: data.store ?? null,
       price: data.price ?? null,
@@ -823,8 +875,12 @@ export async function buildInventoryExport(): Promise<InventoryExportPayload> {
       brand: item.brand,
       model: item.model,
       serial: item.serial,
-      itemType: item.itemType,
-      location: item.location,
+      kind: item.kind,
+      spaceId: item.spaceId,
+      colorName: item.colorName,
+      colorHex: item.colorHex,
+      finish: item.finish,
+      productUrl: item.productUrl,
       purchaseDate: toIsoDate(item.purchaseDate),
       store: item.store,
       price: item.price,
@@ -860,8 +916,12 @@ const importItemSchema = z.object({
   brand: z.string().nullable().optional(),
   model: z.string().nullable().optional(),
   serial: z.string().nullable().optional(),
-  itemType: z.string().nullable().optional(),
-  location: z.string().nullable().optional(),
+  kind: z.enum(inventoryItemKinds).nullable().optional(),
+  spaceId: z.string().uuid().nullable().optional(),
+  colorName: z.string().nullable().optional(),
+  colorHex: z.string().nullable().optional(),
+  finish: z.string().nullable().optional(),
+  productUrl: z.string().nullable().optional(),
   purchaseDate: z.string().nullable().optional(),
   store: z.string().nullable().optional(),
   price: z.string().nullable().optional(),
@@ -934,8 +994,12 @@ export async function importInventoryData(
           brand: item.brand ?? null,
           model: item.model ?? null,
           serial: item.serial ?? null,
-          itemType: item.itemType ?? null,
-          location: item.location ?? null,
+          kind: item.kind ?? null,
+          spaceId: item.spaceId ?? null,
+          colorName: item.colorName ?? null,
+          colorHex: item.colorHex ? normalizeColorHex(item.colorHex) : null,
+          finish: item.finish ?? null,
+          productUrl: item.productUrl ?? null,
           purchaseDate: purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
           store: item.store ?? null,
           price: item.price ?? null,
@@ -957,8 +1021,12 @@ export async function importInventoryData(
         brand: item.brand ?? null,
         model: item.model ?? null,
         serial: item.serial ?? null,
-        itemType: item.itemType ?? null,
-        location: item.location ?? null,
+        kind: item.kind ?? null,
+        spaceId: item.spaceId ?? null,
+        colorName: item.colorName ?? null,
+        colorHex: item.colorHex ? normalizeColorHex(item.colorHex) : null,
+        finish: item.finish ?? null,
+        productUrl: item.productUrl ?? null,
         purchaseDate: purchaseDate && !Number.isNaN(purchaseDate.getTime()) ? purchaseDate : null,
         store: item.store ?? null,
         price: item.price ?? null,

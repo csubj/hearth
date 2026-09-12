@@ -7,7 +7,7 @@ import { AttachmentsPanel } from "@/lib/attachments/AttachmentsPanel";
 import { InventoryLinksPanel, InventoryTagsForm } from "@/components/inventory/InventoryLinksTags";
 import { MaintenanceRemindersPanel } from "@/components/inventory/MaintenanceRemindersPanel";
 import { UpdateInventoryForm } from "@/components/inventory/UpdateInventoryForm";
-import { HomeReferencesPanel } from "@/components/home/HomeReferencesPanel";
+import { listAllHomeSpaces } from "@/lib/actions/home";
 
 function formatDate(date: Date | null): string | null {
   if (!date) {
@@ -24,7 +24,8 @@ export async function InventoryDetailView({
   users?: MentionUser[];
 }) {
   const attachments = await listAttachmentsForEntity("inventory_item", item.id);
-  const subtitle = [item.brand, item.model, item.location].filter(Boolean).join(" · ");
+  const spaces = await listAllHomeSpaces();
+  const subtitle = [item.brand, item.model].filter(Boolean).join(" · ");
   const purchaseLabel = formatDate(item.purchaseDate);
 
   return (
@@ -52,7 +53,7 @@ export async function InventoryDetailView({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <UpdateInventoryForm item={item} users={users} />
+        <UpdateInventoryForm item={item} users={users} spaces={spaces} />
         <div className="space-y-6">
           <InventoryTagsForm item={item} />
           <InventoryLinksPanel item={item} />
@@ -65,7 +66,19 @@ export async function InventoryDetailView({
         users={users}
       />
 
-      <HomeReferencesPanel targetType="inventory_item" targetId={item.id} />
+      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+        <h2 className="text-sm font-medium text-text">Location</h2>
+        {item.space ? (
+          <p className="mt-1 text-sm text-text-muted">
+            Assigned to{" "}
+            <Link href={`/home-log/${item.space.id}`} className="text-accent hover:text-accent/80">
+              {item.space.name}
+            </Link>
+          </p>
+        ) : (
+          <p className="mt-1 text-sm text-text-muted">Not assigned to a space.</p>
+        )}
+      </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>

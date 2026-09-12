@@ -6,26 +6,23 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getDb } from "@/db";
 import {
-  homeItems,
   homeLinks,
   homeSpaces,
   inventoryItems,
   maintenanceLogs,
   projects,
-  type HomeItem,
-  type HomeItemKind,
   type HomeLink,
   type HomeLinkSourceType,
   type HomeLinkTargetType,
   type HomeSpace,
   type HomeSpaceKind,
+  type InventoryItem,
+  type InventoryItemKind,
 } from "@/db/schema";
 import { displayName, requireUser } from "@/lib/auth/session";
-import { normalizeColorHex } from "@/lib/home/item-presets";
 import { emitHouseholdActivity, emitMentions } from "@/lib/notifications/emit";
 
 const HOME_SPACE_ENTITY_TYPE = "home_space" as const;
-const HOME_ITEM_ENTITY_TYPE = "home_item" as const;
 
 export type HomeActionState = {
   error?: string;
@@ -35,29 +32,35 @@ export type HomeActionState = {
 
 export type HomeBreadcrumb = Pick<HomeSpace, "id" | "name" | "kind">;
 
+export type HomeSpaceInventoryItem = Pick<
+  InventoryItem,
+  | "id"
+  | "name"
+  | "kind"
+  | "brand"
+  | "model"
+  | "colorName"
+  | "colorHex"
+  | "finish"
+  | "productUrl"
+  | "notes"
+>;
+
 export type HomeSpaceWithChildren = HomeSpace & {
   children: HomeSpaceSummary[];
-  items: HomeItem[];
+  items: HomeSpaceInventoryItem[];
   links: HomeResolvedLink[];
   breadcrumb: HomeBreadcrumb[];
 };
 
-export type HomeItemDetail = HomeItem & {
-  space: HomeSpaceSummary;
-  links: HomeResolvedLink[];
-};
-
 export type HomeSpaceSummary = Pick<HomeSpace, "id" | "name" | "kind" | "sortOrder">;
-
-export type HomeTreeItem = Pick<HomeItem, "id" | "name" | "kind">;
 
 export type HomeTreeNode = {
   id: string;
   name: string;
   kind: HomeSpaceKind;
   children: HomeTreeNode[];
-  items: HomeTreeItem[];
-  inventory: { id: string; name: string }[];
+  inventoryCount: number;
   maintenance: { id: string; title: string }[];
   projects: { id: string; title: string }[];
 };
@@ -66,7 +69,7 @@ export type HomeReferenceTarget = {
   sourceType: HomeLinkSourceType;
   sourceId: string;
   sourceName: string;
-  sourceKind: HomeSpaceKind | HomeItemKind;
+  sourceKind: HomeSpaceKind | InventoryItemKind | null;
   spaceId: string | null;
 };
 
@@ -94,27 +97,16 @@ const optionalText = (max: number) =>
     .max(max)
     .optional()
     .transform((v) => v || undefined);
-const urlSchema = z
-  .string()
-  .trim()
-  .url("Valid URL is required")
-  .max(2000)
-  .or(z.literal("").transform(() => undefined))
-  .optional();
-
 function searchPattern(query: string): string {
   return `%${query.toLowerCase()}%`;
 }
 
-function revalidateHomePaths(spaceId?: string, itemId?: string): void {
+function revalidateHomePaths(spaceId?: string): void {
   revalidatePath("/home-log");
   revalidatePath("/");
   revalidatePath("/browse");
   if (spaceId) {
     revalidatePath(`/home-log/${spaceId}`);
-  }
-  if (itemId) {
-    revalidatePath(`/home-log/items/${itemId}`);
   }
 }
 
@@ -131,21 +123,29 @@ export async function getHomeRoots(): Promise<HomeSpace[]> {
     .orderBy(homeSpaces.sortOrder, homeSpaces.name);
 }
 
+export async function listAllHomeSpaces(): Promise<HomeSpaceSummary[]> {
+  await requireUser();
+  return getDb()
+    .select({
+      id: homeSpaces.id,
+      name: homeSpaces.name,
+      kind: homeSpaces.kind,
+      sortOrder: homeSpaces.sortOrder,
+    })
+    .from(homeSpaces)
+    .orderBy(homeSpaces.sortOrder, homeSpaces.name);
+}
+
 export async function getHomeTree(): Promise<HomeTreeNode[]> {
   await requireUser();
   const db = getDb();
 
-  const [spaces, items, rawLinks] = await Promise.all([
+  const [spaces, inventoryRows, rawLinks] = await Promise.all([
     db.select().from(homeSpaces).orderBy(homeSpaces.sortOrder, homeSpaces.name),
     db
-      .select({
-        id: homeItems.id,
-        spaceId: homeItems.spaceId,
-        name: homeItems.name,
-        kind: homeItems.kind,
-      })
-      .from(homeItems)
-      .orderBy(homeItems.kind, homeItems.name),
+      .select({ spaceId: inventoryItems.spaceId })
+      .from(inventoryItems)
+      .where(sql`${inventoryItems.spaceId} IS NOT NULL`),
     db
       .select()
       .from(homeLinks)
@@ -155,11 +155,11 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
 
   const resolvedLinks = await resolveLinks(rawLinks);
 
-  const itemsBySpace = new Map<string, HomeTreeItem[]>();
-  for (const item of items) {
-    const list = itemsBySpace.get(item.spaceId) ?? [];
-    list.push({ id: item.id, name: item.name, kind: item.kind });
-    itemsBySpace.set(item.spaceId, list);
+  const inventoryCountBySpace = new Map<string, number>();
+  for (const row of inventoryRows) {
+    if (row.spaceId) {
+      inventoryCountBySpace.set(row.spaceId, (inventoryCountBySpace.get(row.spaceId) ?? 0) + 1);
+    }
   }
 
   const nodeMap = new Map<string, HomeTreeNode>();
@@ -169,8 +169,7 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
       name: space.name,
       kind: space.kind,
       children: [],
-      items: itemsBySpace.get(space.id) ?? [],
-      inventory: [],
+      inventoryCount: inventoryCountBySpace.get(space.id) ?? 0,
       maintenance: [],
       projects: [],
     });
@@ -180,9 +179,6 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
     const node = nodeMap.get(link.sourceId);
     if (!node) continue;
     switch (link.targetType) {
-      case "inventory_item":
-        node.inventory.push({ id: link.targetId, name: link.targetName });
-        break;
       case "maintenance_log":
         node.maintenance.push({ id: link.targetId, title: link.targetName });
         break;
@@ -241,12 +237,9 @@ async function resolveLinks(rawLinks: HomeLink[]): Promise<HomeResolvedLink[]> {
   const maintenanceIds = rawLinks
     .filter((l) => l.targetType === "maintenance_log")
     .map((l) => l.targetId);
-  const inventoryIds = rawLinks
-    .filter((l) => l.targetType === "inventory_item")
-    .map((l) => l.targetId);
   const projectIds = rawLinks.filter((l) => l.targetType === "project").map((l) => l.targetId);
 
-  const [maintenanceRows, inventoryRows, projectRows] = await Promise.all([
+  const [maintenanceRows, projectRows] = await Promise.all([
     maintenanceIds.length > 0
       ? db
           .select({ id: maintenanceLogs.id, title: maintenanceLogs.title })
@@ -254,17 +247,6 @@ async function resolveLinks(rawLinks: HomeLink[]): Promise<HomeResolvedLink[]> {
           .where(
             sql`${maintenanceLogs.id} IN (${sql.join(
               maintenanceIds.map((id) => sql`${id}`),
-              sql`, `,
-            )})`,
-          )
-      : Promise.resolve([]),
-    inventoryIds.length > 0
-      ? db
-          .select({ id: inventoryItems.id, name: inventoryItems.name })
-          .from(inventoryItems)
-          .where(
-            sql`${inventoryItems.id} IN (${sql.join(
-              inventoryIds.map((id) => sql`${id}`),
               sql`, `,
             )})`,
           )
@@ -284,7 +266,6 @@ async function resolveLinks(rawLinks: HomeLink[]): Promise<HomeResolvedLink[]> {
 
   const nameMap = new Map<string, string>();
   for (const row of maintenanceRows) nameMap.set(row.id, row.title);
-  for (const row of inventoryRows) nameMap.set(row.id, row.name);
   for (const row of projectRows) nameMap.set(row.id, row.title);
 
   return rawLinks
@@ -316,10 +297,21 @@ export async function getHomeSpaceById(id: string): Promise<HomeSpaceWithChildre
       .where(eq(homeSpaces.parentId, id))
       .orderBy(homeSpaces.sortOrder, homeSpaces.name),
     db
-      .select()
-      .from(homeItems)
-      .where(eq(homeItems.spaceId, id))
-      .orderBy(homeItems.kind, homeItems.name),
+      .select({
+        id: inventoryItems.id,
+        name: inventoryItems.name,
+        kind: inventoryItems.kind,
+        brand: inventoryItems.brand,
+        model: inventoryItems.model,
+        colorName: inventoryItems.colorName,
+        colorHex: inventoryItems.colorHex,
+        finish: inventoryItems.finish,
+        productUrl: inventoryItems.productUrl,
+        notes: inventoryItems.notes,
+      })
+      .from(inventoryItems)
+      .where(eq(inventoryItems.spaceId, id))
+      .orderBy(inventoryItems.kind, inventoryItems.name),
     db
       .select()
       .from(homeLinks)
@@ -330,42 +322,6 @@ export async function getHomeSpaceById(id: string): Promise<HomeSpaceWithChildre
 
   const links = await resolveLinks(rawLinks);
   return { ...space, children, items, links, breadcrumb };
-}
-
-export async function getHomeItemById(id: string): Promise<HomeItemDetail | null> {
-  await requireUser();
-  const db = getDb();
-
-  const [item] = await db.select().from(homeItems).where(eq(homeItems.id, id)).limit(1);
-  if (!item) {
-    return null;
-  }
-
-  const [spaceRow, rawLinks] = await Promise.all([
-    db
-      .select({
-        id: homeSpaces.id,
-        name: homeSpaces.name,
-        kind: homeSpaces.kind,
-        sortOrder: homeSpaces.sortOrder,
-      })
-      .from(homeSpaces)
-      .where(eq(homeSpaces.id, item.spaceId))
-      .limit(1)
-      .then((rows) => rows[0]),
-    db
-      .select()
-      .from(homeLinks)
-      .where(and(eq(homeLinks.sourceType, "home_item"), eq(homeLinks.sourceId, id)))
-      .orderBy(homeLinks.createdAt),
-  ]);
-
-  if (!spaceRow) {
-    return null;
-  }
-
-  const links = await resolveLinks(rawLinks);
-  return { ...item, space: spaceRow, links };
 }
 
 export async function getHomeLogHomeSummary(limit = 5): Promise<HomeSpace[]> {
@@ -386,7 +342,10 @@ export async function getHomeLogHomeStats(): Promise<{
   const db = getDb();
   const [spacesRow, itemsRow] = await Promise.all([
     db.select({ count: sql<number>`count(*)` }).from(homeSpaces),
-    db.select({ count: sql<number>`count(*)` }).from(homeItems),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(inventoryItems)
+      .where(sql`${inventoryItems.spaceId} IS NOT NULL`),
   ]);
   return {
     totalSpaces: spacesRow[0]?.count ?? 0,
@@ -430,21 +389,24 @@ export async function listHomeReferencesForTarget(
     itemIds.length > 0
       ? db
           .select({
-            id: homeItems.id,
-            name: homeItems.name,
-            kind: homeItems.kind,
-            spaceId: homeItems.spaceId,
+            id: inventoryItems.id,
+            name: inventoryItems.name,
+            kind: inventoryItems.kind,
+            spaceId: inventoryItems.spaceId,
           })
-          .from(homeItems)
+          .from(inventoryItems)
           .where(
-            sql`${homeItems.id} IN (${sql.join(
+            sql`${inventoryItems.id} IN (${sql.join(
               itemIds.map((id) => sql`${id}`),
               sql`, `,
             )})`,
           )
           .then((rows) => new Map(rows.map((r) => [r.id, r])))
       : Promise.resolve(
-          new Map<string, { id: string; name: string; kind: HomeItemKind; spaceId: string }>(),
+          new Map<
+            string,
+            { id: string; name: string; kind: InventoryItemKind | null; spaceId: string | null }
+          >(),
         ),
   ]);
 
@@ -664,7 +626,7 @@ export async function updateHomeSpace(
     summary: `${displayName(user)} updated home space: ${patch.name ?? existing.name}`,
   });
 
-  revalidateHomePaths(id, undefined);
+  revalidateHomePaths(id);
   return { success: "Saved" };
 }
 
@@ -698,22 +660,6 @@ export async function deleteHomeSpace(
     await db
       .delete(homeLinks)
       .where(and(eq(homeLinks.sourceType, "home_space"), eq(homeLinks.sourceId, spaceId)));
-  }
-
-  // Also delete home_links for items within those spaces
-  const itemsInSpaces = await db
-    .select({ id: homeItems.id })
-    .from(homeItems)
-    .where(
-      sql`${homeItems.spaceId} IN (${sql.join(
-        allSpaceIds.map((id) => sql`${id}`),
-        sql`, `,
-      )})`,
-    );
-  for (const item of itemsInSpaces) {
-    await db
-      .delete(homeLinks)
-      .where(and(eq(homeLinks.sourceType, "home_item"), eq(homeLinks.sourceId, item.id)));
   }
 
   // Delete the space (cascades to children, items via DB FK)
@@ -793,293 +739,6 @@ export async function updateHomeSpaceNotes(
 }
 
 // ---------------------------------------------------------------------------
-// Item mutations
-// ---------------------------------------------------------------------------
-
-export async function createHomeItem(
-  _prev: HomeActionState,
-  formData: FormData,
-): Promise<HomeActionState> {
-  const { user } = await requireUser();
-  const parsed = z
-    .object({
-      spaceId: z.string().uuid(),
-      kind: z.enum([
-        "paint",
-        "appliance",
-        "electrical",
-        "plumbing",
-        "fixture",
-        "flooring",
-        "window_treatment",
-        "generic",
-      ] as const),
-      name: nameSchema,
-      manufacturer: optionalText(200),
-      modelNumber: optionalText(200),
-      serialNumber: optionalText(200),
-      colorName: optionalText(200),
-      colorHex: optionalText(20),
-      finish: optionalText(200),
-      productUrl: urlSchema,
-      notes: notesSchema,
-    })
-    .safeParse({
-      spaceId: formData.get("spaceId"),
-      kind: formData.get("kind") || "generic",
-      name: formData.get("name"),
-      manufacturer: formData.get("manufacturer") || undefined,
-      modelNumber: formData.get("modelNumber") || undefined,
-      serialNumber: formData.get("serialNumber") || undefined,
-      colorName: formData.get("colorName") || undefined,
-      colorHex: formData.get("colorHex") || undefined,
-      finish: formData.get("finish") || undefined,
-      productUrl: formData.get("productUrl") || undefined,
-      notes: formData.get("notes") || undefined,
-    });
-
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  const data = parsed.data;
-
-  // Validate space exists
-  const [space] = await getDb()
-    .select({ id: homeSpaces.id })
-    .from(homeSpaces)
-    .where(eq(homeSpaces.id, data.spaceId))
-    .limit(1);
-  if (!space) {
-    return { error: "Space not found" };
-  }
-
-  const normalizedHex = data.colorHex ? normalizeColorHex(data.colorHex) : null;
-
-  const now = new Date();
-  const id = crypto.randomUUID();
-
-  await getDb()
-    .insert(homeItems)
-    .values({
-      id,
-      spaceId: data.spaceId,
-      kind: data.kind,
-      name: data.name,
-      manufacturer: data.manufacturer ?? null,
-      modelNumber: data.modelNumber ?? null,
-      serialNumber: data.serialNumber ?? null,
-      colorName: data.colorName ?? null,
-      colorHex: normalizedHex,
-      finish: data.finish ?? null,
-      productUrl: data.productUrl ?? null,
-      purchasedAt: null,
-      notes: data.notes ?? null,
-      createdByUserId: user.id,
-      updatedByUserId: user.id,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-  if (data.notes) {
-    await emitMentions({
-      body: data.notes,
-      entityType: HOME_ITEM_ENTITY_TYPE,
-      entityId: id,
-      actorId: user.id,
-    });
-  }
-
-  await emitHouseholdActivity({
-    type: "home_log.item_created",
-    actorId: user.id,
-    entityType: HOME_ITEM_ENTITY_TYPE,
-    entityId: id,
-    summary: `${displayName(user)} added an item to the home log: ${data.name}`,
-  });
-
-  revalidateHomePaths(data.spaceId, id);
-
-  if (String(formData.get("redirect") ?? "detail") === "none") {
-    return { success: `Added ${data.name}`, id };
-  }
-  redirect(`/home-log/items/${id}`);
-}
-
-export async function updateHomeItem(
-  _prev: HomeActionState,
-  formData: FormData,
-): Promise<HomeActionState> {
-  const { user } = await requireUser();
-  const parsed = z
-    .object({
-      id: z.string().uuid(),
-      name: nameSchema.optional(),
-      kind: z
-        .enum([
-          "paint",
-          "appliance",
-          "electrical",
-          "plumbing",
-          "fixture",
-          "flooring",
-          "window_treatment",
-          "generic",
-        ] as const)
-        .optional(),
-      manufacturer: optionalText(200).nullable(),
-      modelNumber: optionalText(200).nullable(),
-      serialNumber: optionalText(200).nullable(),
-      colorName: optionalText(200).nullable(),
-      colorHex: optionalText(20).nullable(),
-      finish: optionalText(200).nullable(),
-      productUrl: urlSchema,
-      notes: notesSchema,
-    })
-    .safeParse({
-      id: formData.get("id"),
-      name: formData.get("name") || undefined,
-      kind: formData.get("kind") || undefined,
-      manufacturer: formData.has("manufacturer") ? formData.get("manufacturer") || null : undefined,
-      modelNumber: formData.has("modelNumber") ? formData.get("modelNumber") || null : undefined,
-      serialNumber: formData.has("serialNumber") ? formData.get("serialNumber") || null : undefined,
-      colorName: formData.has("colorName") ? formData.get("colorName") || null : undefined,
-      colorHex: formData.has("colorHex") ? formData.get("colorHex") || null : undefined,
-      finish: formData.has("finish") ? formData.get("finish") || null : undefined,
-      productUrl: formData.has("productUrl") ? formData.get("productUrl") || undefined : undefined,
-      notes: formData.has("notes") ? formData.get("notes") || "" : undefined,
-    });
-
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  const { id, ...updates } = parsed.data;
-  const db = getDb();
-  const [existing] = await db.select().from(homeItems).where(eq(homeItems.id, id)).limit(1);
-  if (!existing) {
-    return { error: "Item not found" };
-  }
-
-  const now = new Date();
-  const patch: Partial<typeof homeItems.$inferInsert> = {
-    updatedByUserId: user.id,
-    updatedAt: now,
-  };
-
-  if (updates.name !== undefined) patch.name = updates.name;
-  if (updates.kind !== undefined) patch.kind = updates.kind;
-  if (updates.manufacturer !== undefined) patch.manufacturer = updates.manufacturer;
-  if (updates.modelNumber !== undefined) patch.modelNumber = updates.modelNumber;
-  if (updates.serialNumber !== undefined) patch.serialNumber = updates.serialNumber;
-  if (updates.colorName !== undefined) patch.colorName = updates.colorName;
-  if (updates.colorHex !== undefined) {
-    patch.colorHex = updates.colorHex ? (normalizeColorHex(updates.colorHex) ?? null) : null;
-  }
-  if (updates.finish !== undefined) patch.finish = updates.finish;
-  if (updates.productUrl !== undefined) patch.productUrl = updates.productUrl ?? null;
-  if (updates.notes !== undefined) patch.notes = updates.notes || null;
-
-  await db.update(homeItems).set(patch).where(eq(homeItems.id, id));
-
-  if (updates.notes !== undefined) {
-    await emitMentions({
-      body: updates.notes ?? "",
-      entityType: HOME_ITEM_ENTITY_TYPE,
-      entityId: id,
-      actorId: user.id,
-    });
-  }
-
-  await emitHouseholdActivity({
-    type: "home_log.item_updated",
-    actorId: user.id,
-    entityType: HOME_ITEM_ENTITY_TYPE,
-    entityId: id,
-    summary: `${displayName(user)} updated home item: ${patch.name ?? existing.name}`,
-  });
-
-  revalidateHomePaths(existing.spaceId, id);
-  return { success: "Saved" };
-}
-
-export async function updateHomeItemNotes(
-  itemId: string,
-  notes: string,
-): Promise<{ error?: string }> {
-  const { user } = await requireUser();
-  const parsed = z
-    .object({ itemId: z.string().uuid(), notes: z.string().max(10_000) })
-    .safeParse({ itemId, notes });
-
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  const db = getDb();
-  const [existing] = await db.select().from(homeItems).where(eq(homeItems.id, itemId)).limit(1);
-  if (!existing) {
-    return { error: "Item not found" };
-  }
-
-  const now = new Date();
-  await db
-    .update(homeItems)
-    .set({ notes: notes.trim() ? notes : null, updatedByUserId: user.id, updatedAt: now })
-    .where(eq(homeItems.id, itemId));
-
-  await emitMentions({
-    body: notes,
-    entityType: HOME_ITEM_ENTITY_TYPE,
-    entityId: itemId,
-    actorId: user.id,
-  });
-
-  revalidateHomePaths(existing.spaceId, itemId);
-  return {};
-}
-
-export async function deleteHomeItem(
-  _prev: HomeActionState,
-  formData: FormData,
-): Promise<HomeActionState> {
-  const { user } = await requireUser();
-  const parsed = z.object({ id: z.string().uuid() }).safeParse({ id: formData.get("id") });
-
-  if (!parsed.success) {
-    return { error: "Invalid item" };
-  }
-
-  const db = getDb();
-  const [existing] = await db
-    .select()
-    .from(homeItems)
-    .where(eq(homeItems.id, parsed.data.id))
-    .limit(1);
-  if (!existing) {
-    return { error: "Item not found" };
-  }
-
-  // Clean up home_links (source side)
-  await db
-    .delete(homeLinks)
-    .where(and(eq(homeLinks.sourceType, "home_item"), eq(homeLinks.sourceId, parsed.data.id)));
-
-  await db.delete(homeItems).where(eq(homeItems.id, parsed.data.id));
-
-  await emitHouseholdActivity({
-    type: "home_log.item_deleted",
-    actorId: user.id,
-    entityType: HOME_ITEM_ENTITY_TYPE,
-    entityId: parsed.data.id,
-    summary: `${displayName(user)} deleted home item: ${existing.name}`,
-  });
-
-  revalidateHomePaths(existing.spaceId);
-  redirect(`/home-log/${existing.spaceId}`);
-}
-
-// ---------------------------------------------------------------------------
 // Cross-entity link mutations
 // ---------------------------------------------------------------------------
 
@@ -1092,7 +751,7 @@ export async function linkHomeEntity(
     .object({
       sourceType: z.enum(["home_space", "home_item"] as const),
       sourceId: z.string().uuid(),
-      targetType: z.enum(["maintenance_log", "inventory_item", "project"] as const),
+      targetType: z.enum(["maintenance_log", "project"] as const),
       targetId: z.string().uuid(),
     })
     .safeParse({
@@ -1146,7 +805,7 @@ export async function createHomeLink({
   if (sourceType === "home_space") {
     revalidateHomePaths(sourceId);
   } else {
-    revalidateHomePaths(undefined, sourceId);
+    revalidateHomePaths();
   }
   // Also revalidate the target page so back-links update
   revalidateTargetPath(targetType, targetId);
@@ -1161,7 +820,7 @@ export async function unlinkHomeEntity(
     .object({
       sourceType: z.enum(["home_space", "home_item"] as const),
       sourceId: z.string().uuid(),
-      targetType: z.enum(["maintenance_log", "inventory_item", "project"] as const),
+      targetType: z.enum(["maintenance_log", "project"] as const),
       targetId: z.string().uuid(),
     })
     .safeParse({
@@ -1191,7 +850,7 @@ export async function unlinkHomeEntity(
   if (sourceType === "home_space") {
     revalidateHomePaths(sourceId);
   } else {
-    revalidateHomePaths(undefined, sourceId);
+    revalidateHomePaths();
   }
   revalidateTargetPath(targetType, targetId);
   return { success: "Unlinked" };
@@ -1213,9 +872,6 @@ function revalidateTargetPath(targetType: HomeLinkTargetType, targetId: string):
   switch (targetType) {
     case "maintenance_log":
       revalidatePath(`/maintenance/${targetId}`);
-      break;
-    case "inventory_item":
-      revalidatePath(`/inventory/${targetId}`);
       break;
     case "project":
       revalidatePath(`/projects/${targetId}`);

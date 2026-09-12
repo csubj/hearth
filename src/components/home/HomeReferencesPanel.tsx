@@ -3,20 +3,21 @@ import type { HomeLinkTargetType } from "@/db/schema/home";
 import type { HomeReferenceTarget } from "@/lib/actions/home";
 import { listHomeReferencesForTarget } from "@/lib/actions/home";
 import { spaceKindLabel, itemKindLabel } from "./format";
-import type { HomeSpaceKind, HomeItemKind } from "@/db/schema/home";
+import type { HomeSpaceKind } from "@/db/schema/home";
+import type { InventoryItemKind } from "@/db/schema/inventory";
 
 function referenceHref(ref: HomeReferenceTarget): string {
   if (ref.sourceType === "home_space") {
     return `/home-log/${ref.sourceId}`;
   }
-  return `/home-log/items/${ref.sourceId}`;
+  return `/inventory/${ref.sourceId}`;
 }
 
 function referenceKindLabel(ref: HomeReferenceTarget): string {
   if (ref.sourceType === "home_space") {
     return spaceKindLabel(ref.sourceKind as HomeSpaceKind);
   }
-  return itemKindLabel(ref.sourceKind as HomeItemKind);
+  return itemKindLabel(ref.sourceKind as InventoryItemKind | null);
 }
 
 export async function HomeReferencesPanel({

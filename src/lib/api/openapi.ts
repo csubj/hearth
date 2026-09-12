@@ -364,12 +364,6 @@ export function registerHomeResources(): void {
     basePath: "/api/v1/home/spaces",
     entityName: "HomeSpace",
   });
-
-  registerResource({
-    tag: "HomeLog",
-    basePath: "/api/v1/home/items",
-    entityName: "HomeItem",
-  });
 }
 
 export function getOpenApiDocument() {

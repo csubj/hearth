@@ -11,22 +11,10 @@ import { users } from "./users";
 export const HOME_SPACE_KINDS = ["property", "structure", "room", "area"] as const;
 export type HomeSpaceKind = (typeof HOME_SPACE_KINDS)[number];
 
-export const HOME_ITEM_KINDS = [
-  "paint",
-  "appliance",
-  "electrical",
-  "plumbing",
-  "fixture",
-  "flooring",
-  "window_treatment",
-  "generic",
-] as const;
-export type HomeItemKind = (typeof HOME_ITEM_KINDS)[number];
-
 export const HOME_LINK_SOURCE_TYPES = ["home_space", "home_item"] as const;
 export type HomeLinkSourceType = (typeof HOME_LINK_SOURCE_TYPES)[number];
 
-export const HOME_LINK_TARGET_TYPES = ["maintenance_log", "inventory_item", "project"] as const;
+export const HOME_LINK_TARGET_TYPES = ["maintenance_log", "project"] as const;
 export type HomeLinkTargetType = (typeof HOME_LINK_TARGET_TYPES)[number];
 
 export const homeSpaces = sqliteTable(
@@ -57,40 +45,6 @@ export const homeSpaces = sqliteTable(
   ],
 );
 
-export const homeItems = sqliteTable(
-  "home_items",
-  {
-    id: text("id").primaryKey(),
-    spaceId: text("space_id")
-      .notNull()
-      .references(() => homeSpaces.id, { onDelete: "cascade" }),
-    kind: text("kind", { enum: HOME_ITEM_KINDS }).notNull().default("generic"),
-    name: text("name").notNull(),
-    manufacturer: text("manufacturer"),
-    modelNumber: text("model_number"),
-    serialNumber: text("serial_number"),
-    colorName: text("color_name"),
-    colorHex: text("color_hex"),
-    finish: text("finish"),
-    productUrl: text("product_url"),
-    purchasedAt: integer("purchased_at", { mode: "timestamp_ms" }),
-    notes: text("notes"),
-    createdByUserId: text("created_by_user_id")
-      .notNull()
-      .references(() => users.id),
-    updatedByUserId: text("updated_by_user_id")
-      .notNull()
-      .references(() => users.id),
-    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (table) => [
-    index("home_items_space_id_idx").on(table.spaceId),
-    index("home_items_kind_idx").on(table.kind),
-    index("home_items_updated_at_idx").on(table.updatedAt),
-  ],
-);
-
 export const homeLinks = sqliteTable(
   "home_links",
   {
@@ -118,6 +72,4 @@ export const homeLinks = sqliteTable(
 
 export type HomeSpace = typeof homeSpaces.$inferSelect;
 export type NewHomeSpace = typeof homeSpaces.$inferInsert;
-export type HomeItem = typeof homeItems.$inferSelect;
-export type NewHomeItem = typeof homeItems.$inferInsert;
 export type HomeLink = typeof homeLinks.$inferSelect;

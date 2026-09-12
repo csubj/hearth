@@ -13,7 +13,7 @@ import { createInventoryItemSchema } from "@/lib/api/schemas";
 const inventoryListQuerySchema = paginationQuerySchema.extend({
   q: z.string().optional(),
   tag: z.string().optional(),
-  type: z.string().optional(),
+  kind: z.string().optional(),
 });
 
 export async function GET(request: NextRequest) {

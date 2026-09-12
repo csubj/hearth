@@ -1,4 +1,4 @@
-import type { HomeItemKind } from "@/db/schema/home";
+import type { InventoryItemKind } from "@/db/schema/inventory";
 
 export type ItemFieldConfig = {
   manufacturer: boolean;
@@ -12,7 +12,7 @@ export type ItemFieldConfig = {
 };
 
 export type ItemKindPreset = {
-  kind: HomeItemKind;
+  kind: InventoryItemKind;
   label: string;
   /** Short label for display badges */
   shortLabel: string;
@@ -55,7 +55,7 @@ const genericFields: ItemFieldConfig = {
   purchasedAt: true,
 };
 
-export const ITEM_KIND_PRESETS: Record<HomeItemKind, ItemKindPreset> = {
+export const ITEM_KIND_PRESETS: Record<InventoryItemKind, ItemKindPreset> = {
   paint: {
     kind: "paint",
     label: "Paint",
@@ -105,6 +105,13 @@ export const ITEM_KIND_PRESETS: Record<HomeItemKind, ItemKindPreset> = {
     fields: genericFields,
     showSwatch: false,
   },
+  furniture: {
+    kind: "furniture",
+    label: "Furniture",
+    shortLabel: "Furniture",
+    fields: equipmentFields,
+    showSwatch: false,
+  },
   generic: {
     kind: "generic",
     label: "Other",
@@ -114,7 +121,7 @@ export const ITEM_KIND_PRESETS: Record<HomeItemKind, ItemKindPreset> = {
   },
 };
 
-export function getItemKindPreset(kind: HomeItemKind): ItemKindPreset {
+export function getItemKindPreset(kind: InventoryItemKind): ItemKindPreset {
   return ITEM_KIND_PRESETS[kind];
 }
 

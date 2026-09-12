@@ -8,7 +8,6 @@ import {
   linkHomeEntity,
   unlinkHomeEntity,
   searchMaintenanceForLink,
-  searchInventoryForHomeLink,
   searchProjectsForHomeLink,
   type HomeActionState,
   type HomeResolvedLink,
@@ -63,10 +62,8 @@ export function HomeRelatedPanel({
   only?: HomeLinkTargetType;
 }) {
   const [maintenanceQuery, setMaintenanceQuery] = useState("");
-  const [inventoryQuery, setInventoryQuery] = useState("");
   const [projectQuery, setProjectQuery] = useState("");
   const [maintenanceResults, setMaintenanceResults] = useState<{ id: string; title: string }[]>([]);
-  const [inventoryResults, setInventoryResults] = useState<{ id: string; name: string }[]>([]);
   const [projectResults, setProjectResults] = useState<{ id: string; title: string }[]>([]);
   const [isSearching, startTransition] = useTransition();
 
@@ -87,14 +84,6 @@ export function HomeRelatedPanel({
     });
   }
 
-  function searchInventory(value: string) {
-    setInventoryQuery(value);
-    startTransition(async () => {
-      const results = await searchInventoryForHomeLink(value);
-      setInventoryResults(results);
-    });
-  }
-
   function searchProjects(value: string) {
     setProjectQuery(value);
     startTransition(async () => {
@@ -104,7 +93,6 @@ export function HomeRelatedPanel({
   }
 
   const maintenanceLinks = links.filter((l) => l.targetType === "maintenance_log");
-  const inventoryLinks = links.filter((l) => l.targetType === "inventory_item");
   const projectLinks = links.filter((l) => l.targetType === "project");
 
   const categories: Array<{
@@ -124,15 +112,6 @@ export function HomeRelatedPanel({
       results: maintenanceResults,
       nameKey: "title",
       search: searchMaintenance,
-    },
-    {
-      targetType: "inventory_item",
-      title: "Inventory items",
-      items: inventoryLinks,
-      query: inventoryQuery,
-      results: inventoryResults,
-      nameKey: "name",
-      search: searchInventory,
     },
     {
       targetType: "project",

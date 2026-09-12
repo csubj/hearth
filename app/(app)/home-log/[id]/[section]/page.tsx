@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getHomeSpaceById } from "@/lib/actions/home";
+import { getHomeSpaceById, listAllHomeSpaces } from "@/lib/actions/home";
 import { CreateDialog } from "@/components/ui/CreateDialog";
-import { HomeItemCard } from "@/components/home/HomeItemCard";
-import { HomeItemCreateForm } from "@/components/home/HomeItemCreateForm";
+import type { HomeSpaceInventoryItem } from "@/lib/actions/home";
+import { decorativeInventoryKinds } from "@/db/schema/inventory";
 import { HomeRelatedPanel } from "@/components/home/HomeRelatedPanel";
 import { HOME_LOG_SECTIONS, type HomeLogSection } from "@/components/home/HomeSpaceSectionsNav";
 import { ProjectCreateForm } from "@/components/projects/ProjectCreateForm";
 import { MaintenanceCreateForm } from "@/components/maintenance/MaintenanceCreateForm";
 import { InventoryCreateForm } from "@/components/inventory/CreateInventoryForm";
+import { itemKindLabel } from "@/components/home/format";
+import type { InventoryItemKind } from "@/db/schema/inventory";
 import type { HomeLinkTargetType } from "@/db/schema/home";
 import { loadMentionUsers } from "@/lib/users/mention-users";
 
@@ -19,14 +21,61 @@ const SECTION_LABELS: Record<HomeLogSection, string> = {
   projects: "Projects",
 };
 
-const SECTION_TARGET: Record<Exclude<HomeLogSection, "materials">, HomeLinkTargetType> = {
-  inventory: "inventory_item",
+const SECTION_TARGET: Record<
+  Exclude<HomeLogSection, "materials" | "inventory">,
+  HomeLinkTargetType
+> = {
   maintenance: "maintenance_log",
   projects: "project",
 };
 
 function isHomeLogSection(value: string): value is HomeLogSection {
   return (HOME_LOG_SECTIONS as readonly string[]).includes(value);
+}
+
+function InventoryItemRow({ item }: { item: HomeSpaceInventoryItem }) {
+  return (
+    <li>
+      <Link
+        href={`/inventory/${item.id}`}
+        className="flex items-center justify-between rounded-md border border-border px-3 py-2 transition-colors hover:bg-background"
+      >
+        <span className="text-sm text-text">{item.name}</span>
+        <span className="text-xs text-text-muted">{itemKindLabel(item.kind)}</span>
+      </Link>
+    </li>
+  );
+}
+
+function InventoryList({ items }: { items: HomeSpaceInventoryItem[] }) {
+  if (items.length === 0) {
+    return <p className="text-sm text-text-muted">No items assigned to this space.</p>;
+  }
+
+  const groups = new Map<string, HomeSpaceInventoryItem[]>();
+  for (const item of items) {
+    const key = item.kind ?? "uncategorized";
+    const list = groups.get(key) ?? [];
+    list.push(item);
+    groups.set(key, list);
+  }
+
+  return (
+    <div className="space-y-4">
+      {[...groups.entries()].map(([kind, list]) => (
+        <section key={kind}>
+          <h2 className="text-sm font-medium text-text">
+            {kind === "uncategorized" ? "Uncategorized" : itemKindLabel(kind as InventoryItemKind)}
+          </h2>
+          <ul className="mt-2 space-y-2">
+            {list.map((item) => (
+              <InventoryItemRow key={item.id} item={item} />
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
 }
 
 export default async function HomeSpaceSectionPage({
@@ -40,13 +89,18 @@ export default async function HomeSpaceSectionPage({
     notFound();
   }
 
-  const space = await getHomeSpaceById(id);
+  const [space, spaces] = await Promise.all([getHomeSpaceById(id), listAllHomeSpaces()]);
   if (!space) {
     notFound();
   }
 
   const mentionUsers =
     section === "maintenance" || section === "projects" ? await loadMentionUsers() : [];
+
+  const decorateItems =
+    section === "materials"
+      ? space.items.filter((item) => item.kind && decorativeInventoryKinds.includes(item.kind))
+      : space.items;
 
   return (
     <div className="space-y-6">
@@ -66,15 +120,15 @@ export default async function HomeSpaceSectionPage({
             title="Add an item"
             description={`Add a material or piece of equipment to ${space.name}.`}
           >
-            <HomeItemCreateForm spaceId={space.id} />
+            <InventoryCreateForm spaces={spaces} initialSpaceId={space.id} />
           </CreateDialog>
         ) : section === "inventory" ? (
           <CreateDialog
             triggerLabel="New inventory item"
             title="New inventory item"
-            description={`Create an inventory item and link it to ${space.name}.`}
+            description={`Create an inventory item and assign it to ${space.name}.`}
           >
-            <InventoryCreateForm homeLinkSourceType="home_space" homeLinkSourceId={space.id} />
+            <InventoryCreateForm spaces={spaces} initialSpaceId={space.id} />
           </CreateDialog>
         ) : section === "maintenance" ? (
           <CreateDialog
@@ -103,20 +157,8 @@ export default async function HomeSpaceSectionPage({
         )}
       </header>
 
-      {section === "materials" ? (
-        <section className="space-y-4">
-          {space.items.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {space.items.map((item) => (
-                <HomeItemCard key={item.id} item={item} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-text-muted">
-              No items yet — use Add item to add paint colors, appliances, or other equipment.
-            </p>
-          )}
-        </section>
+      {section === "materials" || section === "inventory" ? (
+        <InventoryList items={decorateItems} />
       ) : (
         <HomeRelatedPanel
           sourceType="home_space"

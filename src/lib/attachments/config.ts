@@ -14,7 +14,6 @@ export const DOCUMENT_ENTITY_TYPES: readonly AttachmentEntityType[] = [
   "project",
   "maintenance_log",
   "home_space",
-  "home_item",
 ];
 
 /** @deprecated Use ALLOWED_IMAGE_MIME_TYPES */

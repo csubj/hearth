@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { InventoryListItem } from "@/lib/actions/inventory";
+import { itemKindLabel } from "@/components/home/format";
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString(undefined, { dateStyle: "medium" });
@@ -20,15 +21,14 @@ export function InventoryItemCard({ item }: { item: InventoryListItem }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-medium text-text">{item.name}</h2>
-            {item.itemType ? (
+            {item.kind ? (
               <span className="rounded-full border border-border px-2 py-0.5 text-xs text-text-muted">
-                {item.itemType}
+                {itemKindLabel(item.kind)}
               </span>
             ) : null}
           </div>
           <p className="mt-0.5 text-sm text-text-muted">
             {[item.brand, item.model].filter(Boolean).join(" · ") || "No model info"}
-            {item.location ? ` · ${item.location}` : ""}
           </p>
           {item.purchaseDate || item.price ? (
             <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-text-muted">

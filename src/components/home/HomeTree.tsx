@@ -4,28 +4,20 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Tree, TreeItem, TreeItemContent } from "react-aria-components";
 import type { HomeTreeNode } from "@/lib/actions/home";
-import { itemKindLabel, spaceKindLabel } from "./format";
+import { spaceKindLabel } from "./format";
 
 type TreeMaps = {
   spaceParent: Map<string, string | null>;
-  itemToSpace: Map<string, string>;
   linkMeta: Map<string, { spaceId: string; group: string }>;
 };
 
 function buildTreeMaps(tree: HomeTreeNode[]): TreeMaps {
   const spaceParent = new Map<string, string | null>();
-  const itemToSpace = new Map<string, string>();
   const linkMeta = new Map<string, { spaceId: string; group: string }>();
 
   function walk(nodes: HomeTreeNode[], parentId: string | null) {
     for (const node of nodes) {
       spaceParent.set(node.id, parentId);
-      for (const item of node.items) {
-        itemToSpace.set(item.id, node.id);
-      }
-      for (const inv of node.inventory) {
-        linkMeta.set(`inv:${inv.id}`, { spaceId: node.id, group: "inventory" });
-      }
       for (const m of node.maintenance) {
         linkMeta.set(`maint:${m.id}`, { spaceId: node.id, group: "maintenance" });
       }
@@ -37,20 +29,17 @@ function buildTreeMaps(tree: HomeTreeNode[]): TreeMaps {
   }
 
   walk(tree, null);
-  return { spaceParent, itemToSpace, linkMeta };
+  return { spaceParent, linkMeta };
 }
 
 function getActiveKey(pathname: string): string | null {
-  const itemMatch = pathname.match(/^\/home-log\/items\/([^/]+)$/);
-  if (itemMatch) return `item:${itemMatch[1]}`;
-
   const sectionMatch = pathname.match(
     /^\/home-log\/([^/]+)\/(materials|inventory|maintenance|projects)$/,
   );
   if (sectionMatch) return `space:${sectionMatch[1]}:${sectionMatch[2]}`;
 
   const spaceMatch = pathname.match(/^\/home-log\/([^/]+)$/);
-  if (spaceMatch && spaceMatch[1] !== "items") return `space:${spaceMatch[1]}`;
+  if (spaceMatch) return `space:${spaceMatch[1]}`;
 
   return null;
 }
@@ -75,16 +64,6 @@ function getExpandedKeys(activeKey: string | null, maps: TreeMaps): Set<string> 
     } else {
       const spaceId = rest.slice(0, colonIdx);
       keys.add(activeKey);
-      expandSpaceChain(spaceId);
-    }
-    return keys;
-  }
-
-  if (activeKey.startsWith("item:")) {
-    const itemId = activeKey.slice(5);
-    const spaceId = maps.itemToSpace.get(itemId);
-    if (spaceId) {
-      keys.add(`space:${spaceId}:materials`);
       expandSpaceChain(spaceId);
     }
     return keys;
@@ -175,6 +154,59 @@ function TreeItemRow({
   );
 }
 
+function renderGroupNode({
+  groupKey,
+  label,
+  items,
+  hrefByKey,
+  activeKey,
+  itemKeyPrefix,
+  itemHref,
+}: {
+  groupKey: string;
+  label: string;
+  items: { id: string; title: string }[];
+  hrefByKey: Map<string, string>;
+  activeKey: string | null;
+  itemKeyPrefix: string;
+  itemHref: (id: string) => string;
+}): ReactNode {
+  hrefByKey.set(groupKey, `/home-log/${hrefByKey.get("spaceId")}/${label.toLowerCase()}`);
+  return (
+    <TreeItem key={groupKey} id={groupKey} textValue={label}>
+      <TreeItemContent>
+        {({ hasChildItems, isExpanded }) => (
+          <TreeItemRow
+            label={label}
+            count={items.length}
+            isActive={activeKey === groupKey}
+            hasChildItems={hasChildItems}
+            isExpanded={isExpanded}
+          />
+        )}
+      </TreeItemContent>
+      {items.map((item) => {
+        const leafKey = `${itemKeyPrefix}:${item.id}`;
+        hrefByKey.set(leafKey, itemHref(item.id));
+        return (
+          <TreeItem key={leafKey} id={leafKey} textValue={item.title}>
+            <TreeItemContent>
+              {({ hasChildItems, isExpanded }) => (
+                <TreeItemRow
+                  label={item.title}
+                  isActive={activeKey === leafKey}
+                  hasChildItems={hasChildItems}
+                  isExpanded={isExpanded}
+                />
+              )}
+            </TreeItemContent>
+          </TreeItem>
+        );
+      })}
+    </TreeItem>
+  );
+}
+
 function renderSpaceNode(
   node: HomeTreeNode,
   activeKey: string | null,
@@ -184,118 +216,19 @@ function renderSpaceNode(
   hrefByKey.set(spaceKey, `/home-log/${node.id}`);
   const groups: ReactNode[] = [];
 
-  if (node.items.length > 0) {
-    const groupKey = `space:${node.id}:materials`;
-    hrefByKey.set(groupKey, `/home-log/${node.id}/materials`);
-    groups.push(
-      <TreeItem key={groupKey} id={groupKey} textValue="Materials">
-        <TreeItemContent>
-          {({ hasChildItems, isExpanded }) => (
-            <TreeItemRow
-              label="Materials"
-              count={node.items.length}
-              isActive={activeKey === groupKey}
-              hasChildItems={hasChildItems}
-              isExpanded={isExpanded}
-            />
-          )}
-        </TreeItemContent>
-        {node.items.map((item) => {
-          const itemKey = `item:${item.id}`;
-          hrefByKey.set(itemKey, `/home-log/items/${item.id}`);
-          return (
-            <TreeItem key={itemKey} id={itemKey} textValue={item.name}>
-              <TreeItemContent>
-                {({ hasChildItems, isExpanded }) => (
-                  <TreeItemRow
-                    label={item.name}
-                    detail={itemKindLabel(item.kind)}
-                    isActive={activeKey === itemKey}
-                    hasChildItems={hasChildItems}
-                    isExpanded={isExpanded}
-                  />
-                )}
-              </TreeItemContent>
-            </TreeItem>
-          );
-        })}
-      </TreeItem>,
-    );
-  }
-
-  if (node.inventory.length > 0) {
-    const groupKey = `space:${node.id}:inventory`;
-    hrefByKey.set(groupKey, `/home-log/${node.id}/inventory`);
-    groups.push(
-      <TreeItem key={groupKey} id={groupKey} textValue="Inventory">
-        <TreeItemContent>
-          {({ hasChildItems, isExpanded }) => (
-            <TreeItemRow
-              label="Inventory"
-              count={node.inventory.length}
-              isActive={activeKey === groupKey}
-              hasChildItems={hasChildItems}
-              isExpanded={isExpanded}
-            />
-          )}
-        </TreeItemContent>
-        {node.inventory.map((inv) => {
-          const leafKey = `inv:${inv.id}`;
-          hrefByKey.set(leafKey, `/inventory/${inv.id}`);
-          return (
-            <TreeItem key={leafKey} id={leafKey} textValue={inv.name}>
-              <TreeItemContent>
-                {({ hasChildItems, isExpanded }) => (
-                  <TreeItemRow
-                    label={inv.name}
-                    isActive={activeKey === leafKey}
-                    hasChildItems={hasChildItems}
-                    isExpanded={isExpanded}
-                  />
-                )}
-              </TreeItemContent>
-            </TreeItem>
-          );
-        })}
-      </TreeItem>,
-    );
-  }
-
   if (node.maintenance.length > 0) {
     const groupKey = `space:${node.id}:maintenance`;
     hrefByKey.set(groupKey, `/home-log/${node.id}/maintenance`);
     groups.push(
-      <TreeItem key={groupKey} id={groupKey} textValue="Maintenance">
-        <TreeItemContent>
-          {({ hasChildItems, isExpanded }) => (
-            <TreeItemRow
-              label="Maintenance"
-              count={node.maintenance.length}
-              isActive={activeKey === groupKey}
-              hasChildItems={hasChildItems}
-              isExpanded={isExpanded}
-            />
-          )}
-        </TreeItemContent>
-        {node.maintenance.map((m) => {
-          const leafKey = `maint:${m.id}`;
-          hrefByKey.set(leafKey, `/maintenance/${m.id}`);
-          return (
-            <TreeItem key={leafKey} id={leafKey} textValue={m.title}>
-              <TreeItemContent>
-                {({ hasChildItems, isExpanded }) => (
-                  <TreeItemRow
-                    label={m.title}
-                    isActive={activeKey === leafKey}
-                    hasChildItems={hasChildItems}
-                    isExpanded={isExpanded}
-                  />
-                )}
-              </TreeItemContent>
-            </TreeItem>
-          );
-        })}
-      </TreeItem>,
+      renderGroupNode({
+        groupKey,
+        label: "Maintenance",
+        items: node.maintenance,
+        hrefByKey,
+        activeKey,
+        itemKeyPrefix: "maint",
+        itemHref: (id) => `/maintenance/${id}`,
+      }),
     );
   }
 
@@ -303,37 +236,15 @@ function renderSpaceNode(
     const groupKey = `space:${node.id}:projects`;
     hrefByKey.set(groupKey, `/home-log/${node.id}/projects`);
     groups.push(
-      <TreeItem key={groupKey} id={groupKey} textValue="Projects">
-        <TreeItemContent>
-          {({ hasChildItems, isExpanded }) => (
-            <TreeItemRow
-              label="Projects"
-              count={node.projects.length}
-              isActive={activeKey === groupKey}
-              hasChildItems={hasChildItems}
-              isExpanded={isExpanded}
-            />
-          )}
-        </TreeItemContent>
-        {node.projects.map((p) => {
-          const leafKey = `proj:${p.id}`;
-          hrefByKey.set(leafKey, `/projects/${p.id}`);
-          return (
-            <TreeItem key={leafKey} id={leafKey} textValue={p.title}>
-              <TreeItemContent>
-                {({ hasChildItems, isExpanded }) => (
-                  <TreeItemRow
-                    label={p.title}
-                    isActive={activeKey === leafKey}
-                    hasChildItems={hasChildItems}
-                    isExpanded={isExpanded}
-                  />
-                )}
-              </TreeItemContent>
-            </TreeItem>
-          );
-        })}
-      </TreeItem>,
+      renderGroupNode({
+        groupKey,
+        label: "Projects",
+        items: node.projects,
+        hrefByKey,
+        activeKey,
+        itemKeyPrefix: "proj",
+        itemHref: (id) => `/projects/${id}`,
+      }),
     );
   }
 
@@ -344,6 +255,7 @@ function renderSpaceNode(
           <TreeItemRow
             label={node.name}
             detail={spaceKindLabel(node.kind)}
+            count={node.inventoryCount > 0 ? node.inventoryCount : undefined}
             isActive={activeKey === spaceKey}
             hasChildItems={hasChildItems}
             isExpanded={isExpanded}

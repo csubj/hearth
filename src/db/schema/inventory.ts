@@ -8,9 +8,30 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { metricReminderUnits } from "./metrics";
 import { users } from "./users";
+import { homeSpaces } from "./home";
 
 export const maintenanceReminderUnits = metricReminderUnits;
 export type MaintenanceReminderUnit = (typeof maintenanceReminderUnits)[number];
+
+export const inventoryItemKinds = [
+  "paint",
+  "fixture",
+  "flooring",
+  "window_treatment",
+  "electrical",
+  "plumbing",
+  "appliance",
+  "furniture",
+  "generic",
+] as const;
+export type InventoryItemKind = (typeof inventoryItemKinds)[number];
+
+export const decorativeInventoryKinds: readonly InventoryItemKind[] = [
+  "paint",
+  "fixture",
+  "flooring",
+  "window_treatment",
+];
 
 export const inventoryItems = sqliteTable(
   "inventory_items",
@@ -20,8 +41,12 @@ export const inventoryItems = sqliteTable(
     brand: text("brand"),
     model: text("model"),
     serial: text("serial"),
-    itemType: text("item_type"),
-    location: text("location"),
+    kind: text("kind", { enum: inventoryItemKinds }),
+    spaceId: text("space_id").references(() => homeSpaces.id, { onDelete: "set null" }),
+    colorName: text("color_name"),
+    colorHex: text("color_hex"),
+    finish: text("finish"),
+    productUrl: text("product_url"),
     purchaseDate: integer("purchase_date", { mode: "timestamp_ms" }),
     store: text("store"),
     price: text("price"),
@@ -38,8 +63,8 @@ export const inventoryItems = sqliteTable(
   },
   (table) => [
     index("inventory_items_name_idx").on(table.name),
-    index("inventory_items_item_type_idx").on(table.itemType),
-    index("inventory_items_location_idx").on(table.location),
+    index("inventory_items_kind_idx").on(table.kind),
+    index("inventory_items_space_id_idx").on(table.spaceId),
     index("inventory_items_updated_at_idx").on(table.updatedAt),
   ],
 );

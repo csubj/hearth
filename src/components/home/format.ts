@@ -1,4 +1,5 @@
-import type { HomeSpaceKind, HomeItemKind } from "@/db/schema/home";
+import type { HomeSpaceKind } from "@/db/schema/home";
+import type { InventoryItemKind } from "@/db/schema/inventory";
 
 export function spaceKindLabel(kind: HomeSpaceKind): string {
   const labels: Record<HomeSpaceKind, string> = {
@@ -10,15 +11,19 @@ export function spaceKindLabel(kind: HomeSpaceKind): string {
   return labels[kind] ?? kind;
 }
 
-export function itemKindLabel(kind: HomeItemKind): string {
-  const labels: Record<HomeItemKind, string> = {
+export function itemKindLabel(kind: InventoryItemKind | null): string {
+  if (!kind) {
+    return "Uncategorized";
+  }
+  const labels: Record<InventoryItemKind, string> = {
     paint: "Paint",
-    appliance: "Appliance",
-    electrical: "Electrical",
-    plumbing: "Plumbing",
     fixture: "Fixture",
     flooring: "Flooring",
     window_treatment: "Window Treatment",
+    electrical: "Electrical",
+    plumbing: "Plumbing",
+    appliance: "Appliance",
+    furniture: "Furniture",
     generic: "Other",
   };
   return labels[kind] ?? kind;

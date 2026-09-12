@@ -49,8 +49,7 @@ export async function InventorySection() {
                   </div>
                 </div>
                 <p className="mt-0.5 text-sm text-text-muted">
-                  {[item.brand, item.model, item.location].filter(Boolean).join(" · ") ||
-                    "No details"}
+                  {[item.brand, item.model].filter(Boolean).join(" · ") || "No details"}
                 </p>
               </Link>
             </li>

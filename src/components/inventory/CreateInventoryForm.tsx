@@ -4,6 +4,9 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useCreateDialogSuccess } from "@/components/ui/CreateDialog";
 import { create, type InventoryActionState } from "@/lib/actions/inventory";
+import { inventoryItemKinds } from "@/db/schema/inventory";
+import { itemKindLabel } from "@/components/home/format";
+import type { HomeSpaceSummary } from "@/lib/actions/home";
 
 function ActionMessage({ state }: { state: InventoryActionState }) {
   if (state.error) {
@@ -19,12 +22,19 @@ function ActionMessage({ state }: { state: InventoryActionState }) {
 export function InventoryCreateForm({
   homeLinkSourceType,
   homeLinkSourceId,
+  spaces = [],
+  initialSpaceId,
 }: {
   homeLinkSourceType?: string;
   homeLinkSourceId?: string;
+  spaces?: HomeSpaceSummary[];
+  initialSpaceId?: string;
 }) {
   const [state, action, pending] = useActionState<InventoryActionState, FormData>(create, {});
   useCreateDialogSuccess(Boolean(state.success));
+
+  const defaultSpaceId =
+    initialSpaceId ?? (homeLinkSourceType === "home_space" ? homeLinkSourceId : "");
 
   return (
     <form action={action} className="grid gap-3 sm:grid-cols-2">
@@ -77,25 +87,39 @@ export function InventoryCreateForm({
         />
       </div>
       <div>
-        <label htmlFor="inventory-type" className="block text-sm font-medium text-text">
-          Type
+        <label htmlFor="inventory-kind" className="block text-sm font-medium text-text">
+          Kind
         </label>
-        <input
-          id="inventory-type"
-          name="itemType"
-          placeholder="appliance, electronics…"
+        <select
+          id="inventory-kind"
+          name="kind"
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-        />
+        >
+          <option value="">Uncategorized</option>
+          {inventoryItemKinds.map((kind) => (
+            <option key={kind} value={kind}>
+              {itemKindLabel(kind)}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
-        <label htmlFor="inventory-location" className="block text-sm font-medium text-text">
-          Location
+        <label htmlFor="inventory-space" className="block text-sm font-medium text-text">
+          Space
         </label>
-        <input
-          id="inventory-location"
-          name="location"
+        <select
+          id="inventory-space"
+          name="spaceId"
+          defaultValue={defaultSpaceId}
           className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-        />
+        >
+          <option value="">No space</option>
+          {spaces.map((space) => (
+            <option key={space.id} value={space.id}>
+              {space.name}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label htmlFor="inventory-purchase-date" className="block text-sm font-medium text-text">

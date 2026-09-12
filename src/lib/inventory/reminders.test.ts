@@ -97,8 +97,6 @@ describe("processInventoryMaintenanceReminders", () => {
         brand: null,
         model: null,
         serial: null,
-        itemType: null,
-        location: null,
         purchaseDate: null,
         store: null,
         price: null,
