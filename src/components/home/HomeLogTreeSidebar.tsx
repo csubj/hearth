@@ -22,11 +22,11 @@ export function HomeLogTreeSidebar({ tree }: { tree: HomeTreeNode[] }) {
     <>
       <div className="md:hidden">
         <Collapsible open={open} onOpenChange={setOpen}>
-          <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text shadow-card">
+          <CollapsibleTrigger className="flex w-full items-center justify-between border-b border-border py-2 text-sm font-medium text-text">
             Browse spaces
             <span className="text-xs text-text-muted">{open ? "Hide" : "Show"}</span>
           </CollapsibleTrigger>
-          <CollapsibleContent className="mt-2 rounded-lg border border-border bg-surface p-2 shadow-card">
+          <CollapsibleContent className="mt-2 border-t border-border pt-2">
             {treePanel}
           </CollapsibleContent>
         </Collapsible>

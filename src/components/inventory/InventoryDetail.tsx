@@ -66,7 +66,7 @@ export async function InventoryDetailView({
         users={users}
       />
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <h2 className="text-sm font-medium text-text">Location</h2>
         {item.space ? (
           <p className="mt-1 text-sm text-text-muted">
@@ -80,7 +80,7 @@ export async function InventoryDetailView({
         )}
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
           <AttachmentsPanel
             entityType="inventory_item"

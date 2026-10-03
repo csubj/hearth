@@ -11,7 +11,7 @@ export default function AppError({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-lg space-y-4 rounded-lg border border-border bg-surface p-6 shadow-card">
+    <div className="mx-auto max-w-lg space-y-4 border-t border-border pt-6">
       <h1 className="font-serif text-2xl text-text">Couldn&apos;t load this page</h1>
       <p className="text-sm text-text-muted">
         {error.message || "Something went wrong while loading this section."}

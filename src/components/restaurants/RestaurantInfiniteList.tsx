@@ -26,7 +26,7 @@ export function RestaurantInfiniteList({
       loadMore={loadMore}
       renderItem={(restaurant) => <RestaurantCard restaurant={restaurant} />}
       emptyState={
-        <p className="rounded-lg border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">
+        <p className="rounded-sm border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">
           No restaurants yet. Use <span className="font-medium text-text">Add restaurant</span>{" "}
           above to get started.
         </p>

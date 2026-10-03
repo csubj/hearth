@@ -31,7 +31,7 @@ export function ProjectFilters({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card">
+    <div className="space-y-3 border-t border-border pt-4">
       <div>
         <label htmlFor="project-search" className="block text-sm font-medium text-text">
           Search
@@ -141,7 +141,7 @@ function FilterChip({
       onClick={onClick}
       className={`rounded-full px-3 py-1 text-sm transition-colors ${
         active
-          ? "bg-accent text-white"
+          ? "border-accent/60 bg-accent-soft text-accent"
           : "border border-border bg-background text-text-muted hover:bg-accent-soft hover:text-text"
       }`}
     >

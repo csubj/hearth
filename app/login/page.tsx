@@ -17,12 +17,14 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-6 rounded-lg border border-border bg-surface p-6 shadow-card">
-        <header className="text-center">
-          <h1 className="font-serif text-3xl text-text">hearth</h1>
-          <p className="mt-2 text-sm text-text-muted">Sign in to your household</p>
+      <div className="w-full max-w-sm">
+        <header className="mb-8 text-center">
+          <h1 className="font-serif text-4xl text-text">hearth</h1>
+          <p className="mt-2 font-serif text-text-muted">Sign in to the household record</p>
         </header>
-        <LoginForm returnTo={returnTo} />
+        <div className="border-t border-border pt-8">
+          <LoginForm returnTo={returnTo} />
+        </div>
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ export async function HomeReferencesPanel({
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">Referenced from Home Log</h2>
       <ul className="mt-3 space-y-2">
         {references.map((ref) => (

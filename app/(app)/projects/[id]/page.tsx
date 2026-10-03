@@ -54,7 +54,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </p>
       </header>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <ProjectStatusActions projectId={project.id} currentStatus={project.status} />
       </section>
 
@@ -73,13 +73,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
       <HomeReferencesPanel targetType="project" targetId={project.id} />
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
           <Attachments entityType="project" entityId={project.id} />
         </Suspense>
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <ProjectDeleteButton
           projectId={project.id}
           projectTitle={project.title}

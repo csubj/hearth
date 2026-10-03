@@ -68,7 +68,7 @@ export default async function MetricDetailPage({ params }: { params: Promise<{ i
         <EntryHistoryList metric={metric} entries={entries} />
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <h2 className="text-lg font-medium text-text">Metric settings</h2>
         <div className="mt-4">
           <UpdateMetricForm metric={metric} users={mentionUsers} />

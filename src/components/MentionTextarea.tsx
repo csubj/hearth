@@ -162,7 +162,7 @@ export function MentionTextarea({
       </Popover.Anchor>
       <Popover.Portal>
         <Popover.Content
-          className="z-50 max-h-48 w-56 overflow-y-auto rounded-md border border-border bg-surface p-1 shadow-card"
+          className="z-50 max-h-48 w-56 overflow-y-auto rounded-md border border-border bg-surface p-1"
           sideOffset={4}
           align="start"
           onOpenAutoFocus={(event) => event.preventDefault()}

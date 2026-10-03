@@ -13,22 +13,14 @@ export type AppNavUser = {
 export function AppNav({ user, unreadCount = 0 }: { user: AppNavUser; unreadCount?: number }) {
   return (
     <div className="flex items-center gap-2">
-      {user.role === "admin" ? (
-        <Link
-          href="/admin/users"
-          className="hidden rounded-md px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-accent-soft hover:text-text sm:inline-flex"
-        >
-          Admin
-        </Link>
-      ) : null}
       <Link
         href="/notifications"
-        className="relative inline-flex h-11 w-11 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-accent-soft hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+        className="relative inline-flex h-11 w-11 items-center justify-center rounded-sm text-text-muted transition-colors hover:text-accent focus-visible:outline-none"
         aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
       >
         <BellIcon />
         {unreadCount > 0 ? (
-          <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+          <span className="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-sm bg-accent px-1 text-[10px] font-semibold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         ) : null}
@@ -36,8 +28,8 @@ export function AppNav({ user, unreadCount = 0 }: { user: AppNavUser; unreadCoun
       <HoverDetailsMenu
         className="relative"
         panelAlign="right"
-        panelClassName="min-w-[10rem] rounded-md border border-border bg-surface p-1 shadow-card"
-        summaryClassName="inline-flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-md px-3 text-sm font-medium text-text transition-colors hover:bg-accent-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none [&::-webkit-details-marker]:hidden"
+        panelClassName="min-w-[10rem] rounded-sm border border-border bg-surface p-1"
+        summaryClassName="inline-flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-sm px-3 text-xs tracking-[0.14em] text-text-muted uppercase transition-colors hover:text-accent focus-visible:outline-none [&::-webkit-details-marker]:hidden"
         summary={
           <>
             <UserIcon />
@@ -45,6 +37,14 @@ export function AppNav({ user, unreadCount = 0 }: { user: AppNavUser; unreadCoun
           </>
         }
       >
+        {user.role === "admin" ? (
+          <Link
+            href="/admin/users"
+            className="flex select-none items-center rounded-sm px-3 py-2 text-sm text-text hover:bg-accent-soft"
+          >
+            Admin
+          </Link>
+        ) : null}
         <Link
           href="/settings"
           className="flex select-none items-center rounded-sm px-3 py-2 text-sm text-text hover:bg-accent-soft"

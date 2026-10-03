@@ -29,7 +29,7 @@ export function HomeSpaceSectionsNav({ space }: { space: HomeSpaceWithChildren }
   return (
     <nav
       aria-label="Space sections"
-      className="rounded-lg border border-border bg-surface p-3 shadow-card"
+      className="border-t border-border pt-3"
     >
       <h2 className="text-sm font-medium text-text">Sections</h2>
       <ul className="mt-2 grid gap-1 sm:grid-cols-2">

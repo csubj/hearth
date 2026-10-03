@@ -14,16 +14,11 @@ export async function ProjectsSection() {
   ]);
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-3 shadow-card">
-      <div className="flex items-center justify-between gap-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="font-serif text-base text-text">Projects</h2>
-            <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-medium text-text-muted">
-              {stats.active} active
-            </span>
-          </div>
-          <p className="text-xs text-text-muted">High priority & in progress</p>
+    <section className="border-t border-border pt-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="flex items-baseline gap-3">
+          <h2 className="font-serif text-lg text-text">Projects</h2>
+          <span className="text-xs uppercase tracking-[0.1em] text-text-muted">{stats.active} active</span>
         </div>
         <div className="flex items-center gap-3">
           <CreateDialog
@@ -37,7 +32,7 @@ export async function ProjectsSection() {
           </CreateDialog>
           <Link
             href="/projects"
-            className="text-sm font-medium text-accent hover:text-accent/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            className="text-xs uppercase tracking-[0.1em] text-accent hover:text-accent/80 focus-visible:outline-none"
           >
             View all
           </Link>
@@ -47,15 +42,19 @@ export async function ProjectsSection() {
       {filtered.length === 0 ? (
         <p className="mt-3 text-sm text-text-muted">Nothing active right now.</p>
       ) : (
-        <ul className="mt-3 space-y-1">
+        <ul className="mt-3">
           {filtered.map((project) => (
             <li key={project.id}>
               <Link
                 href={`/projects/${project.id}`}
-                className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent-soft/50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                className="flex items-center justify-between gap-3 border-b border-border py-2 transition-colors hover:text-accent focus-visible:outline-none"
               >
                 <div className="min-w-0">
-                  <span className="truncate text-sm font-medium text-text">{project.title}</span>
+                  <span
+                    className={`truncate text-sm font-medium ${project.status === "done" ? "text-text-muted line-through" : "text-text"}`}
+                  >
+                    {project.title}
+                  </span>
                   {project.estimatedCostCents > 0 ? (
                     <span className="ml-2 text-xs text-text-muted">
                       {formatCents(project.estimatedCostCents)} est.

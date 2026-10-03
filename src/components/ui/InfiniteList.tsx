@@ -73,7 +73,7 @@ export function InfiniteList<T extends { id: string }>({
     return (
       <>
         {emptyState ?? (
-          <p className="rounded-lg border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">
+          <p className="rounded-sm border border-dashed border-border bg-surface p-6 text-center text-sm text-text-muted">
             Nothing here yet.
           </p>
         )}

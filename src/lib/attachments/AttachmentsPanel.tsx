@@ -210,7 +210,7 @@ export function AttachmentsPanel({
       <Dialog.Root open={lightboxId !== null} onOpenChange={(open) => !open && setLightboxId(null)}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-[min(90vw,48rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg bg-surface shadow-card focus:outline-none">
+          <Dialog.Content className="fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-[min(90vw,48rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-sm bg-surface focus:outline-none">
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <Dialog.Title className="truncate text-sm font-medium text-text">
                 {lightboxItem?.filename ?? "Photo"}

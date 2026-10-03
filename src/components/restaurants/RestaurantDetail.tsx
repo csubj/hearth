@@ -53,7 +53,7 @@ export function RestaurantDetail({
           </div>
         ) : null}
         {restaurant.visitNote ? (
-          <blockquote className="mt-4 rounded-lg border border-border bg-accent-soft/40 p-4 text-sm text-text">
+          <blockquote className="mt-4 rounded-sm border border-border bg-accent-soft/40 p-4 text-sm text-text">
             {restaurant.visitNote}
           </blockquote>
         ) : null}
@@ -68,7 +68,7 @@ export function RestaurantDetail({
         )}
       </div>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading photos…</p>}>
           <Attachments entityType="restaurant" entityId={restaurant.id} />
         </Suspense>

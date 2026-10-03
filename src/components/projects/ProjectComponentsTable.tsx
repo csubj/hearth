@@ -42,7 +42,7 @@ function ActionMessage({ state }: { state: ProjectActionState }) {
 function KindChip({ kind }: { kind: ProjectDetail["components"][number]["kind"] }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${componentKindChipClass(kind)}`}
+      className={`inline-flex items-center border px-2 py-0.5 text-xs uppercase tracking-[0.06em] ${componentKindChipClass(kind)}`}
     >
       {componentKindLabel(kind)}
     </span>
@@ -82,7 +82,7 @@ function ComponentRow({
 
   return (
     <Collapsible
-      className={`rounded-md border border-border border-l-4 ${componentKindRowClass(component.kind)}`}
+      className={`rounded-sm border border-border ${componentKindRowClass(component.kind)}`}
     >
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <KindChip kind={component.kind} />
@@ -340,7 +340,7 @@ function AddComponentForm({ projectId }: { projectId: string }) {
 
 export function ProjectComponentsTable({ project }: { project: ProjectDetail }) {
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-medium text-text">Budget</h2>

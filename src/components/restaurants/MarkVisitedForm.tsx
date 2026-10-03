@@ -20,7 +20,7 @@ export function MarkVisitedForm({
   return (
     <form
       action={formAction}
-      className="space-y-3 rounded-lg border border-border bg-surface p-4 shadow-card"
+      className="space-y-3 border-t border-border pt-4"
     >
       <h2 className="text-sm font-medium text-text">Mark as visited</h2>
       <input type="hidden" name="id" value={restaurant.id} />

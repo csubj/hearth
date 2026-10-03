@@ -39,7 +39,7 @@ export async function HomeSpaceDetail({
         <HomeSpaceMetadataForm space={space} />
         <div className="space-y-6">
           {/* Child spaces */}
-          <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <section className="border-t border-border pt-4">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-sm font-medium text-text">Nested spaces</h2>
               {addSpaceTrigger}
@@ -68,7 +68,7 @@ export async function HomeSpaceDetail({
       </div>
 
       {space.items.length > 0 ? (
-        <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+        <section className="border-t border-border pt-4">
           <h2 className="text-sm font-medium text-text">Inventory</h2>
           {(() => {
             const groups = new Map<string, typeof space.items>();
@@ -114,7 +114,7 @@ export async function HomeSpaceDetail({
 
       <HomeSpaceSectionsNav space={space} />
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
           <AttachmentsPanel
             entityType="home_space"
@@ -124,7 +124,7 @@ export async function HomeSpaceDetail({
         </Suspense>
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <HomeSpaceDeleteButton
           spaceId={space.id}
           spaceName={space.name}

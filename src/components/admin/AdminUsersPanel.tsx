@@ -125,7 +125,7 @@ export function AdminUsersPanel({ users }: { users: AdminUserRow[] }) {
         </CreateDialog>
       </div>
 
-      <section className="overflow-x-auto rounded-lg border border-border bg-surface shadow-card">
+      <section className="overflow-x-auto border-t border-border">
         <table className="min-w-full text-sm">
           <thead className="border-b border-border bg-accent-soft/50 text-left text-text-muted">
             <tr>

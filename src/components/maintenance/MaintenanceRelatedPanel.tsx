@@ -69,7 +69,7 @@ export function MaintenanceRelatedPanel({ log }: { log: MaintenanceDetail }) {
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">Related items</h2>
 
       <div className="mt-4 space-y-4">

@@ -30,7 +30,7 @@ export function InventoryLinksPanel({ item }: { item: InventoryDetail }) {
   );
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">Links</h2>
       {item.links.length > 0 ? (
         <ul className="mt-3 space-y-2">
@@ -97,7 +97,7 @@ export function InventoryTagsForm({ item }: { item: InventoryDetail }) {
   const tagValue = item.tags.map((tag) => tag.name).join(", ");
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">Tags</h2>
       <form action={action} className="mt-3 space-y-2">
         <input type="hidden" name="inventoryItemId" value={item.id} />

@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -48,6 +48,33 @@ export async function markAllRead(): Promise<void> {
     .update(notifications)
     .set({ readAt: now })
     .where(and(eq(notifications.recipientUserId, user.id), isNull(notifications.readAt)));
+
+  revalidateNotificationPaths();
+}
+
+export async function deleteNotification(formData: FormData): Promise<void> {
+  const { user } = await requireUser();
+
+  const parsed = idSchema.safeParse({ id: formData.get("id") });
+  if (!parsed.success) {
+    return;
+  }
+
+  await getDb()
+    .delete(notifications)
+    .where(and(eq(notifications.id, parsed.data.id), eq(notifications.recipientUserId, user.id)));
+
+  revalidateNotificationPaths();
+}
+
+export async function clearReadNotifications(): Promise<void> {
+  const { user } = await requireUser();
+
+  await getDb()
+    .delete(notifications)
+    .where(
+      and(eq(notifications.recipientUserId, user.id), isNotNull(notifications.readAt)),
+    );
 
   revalidateNotificationPaths();
 }

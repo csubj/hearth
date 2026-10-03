@@ -119,7 +119,7 @@ export function AdminApiTokensPanel({
 
   return (
     <div className="space-y-8">
-      <section className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="flex flex-wrap items-start justify-between gap-3 border-t border-border pt-4">
         <div>
           <h2 className="text-lg font-medium text-text">API tokens</h2>
           <p className="mt-1 text-sm text-text-muted">
@@ -137,7 +137,7 @@ export function AdminApiTokensPanel({
         </CreateDialog>
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <h2 className="text-lg font-medium text-text">Existing tokens</h2>
         <ActionMessage state={revokeState} />
         <div className="mt-4 overflow-x-auto">

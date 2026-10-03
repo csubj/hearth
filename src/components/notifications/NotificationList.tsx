@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { markAllRead, markRead, openNotification } from "@/lib/actions/notifications";
+import {
+  clearReadNotifications,
+  deleteNotification,
+  markAllRead,
+  markRead,
+  openNotification,
+} from "@/lib/actions/notifications";
 import type { NotificationRow } from "@/lib/notifications/queries";
 import { FormSubmitButton } from "@/components/ui/FormSubmitButton";
 
@@ -12,8 +18,18 @@ function formatWhen(date: Date): string {
   });
 }
 
+function sizeButtonClass(className = ""): string {
+  return [
+    "inline-flex h-9 min-h-9 items-center justify-center rounded-sm bg-transparent px-3",
+    "text-sm font-medium text-text transition-colors hover:bg-accent-soft",
+    "focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:opacity-50",
+    className,
+  ].join(" ");
+}
+
 export function NotificationList({ items }: { items: NotificationRow[] }) {
   const unreadCount = items.filter((item) => !item.readAt).length;
+  const readCount = items.length - unreadCount;
 
   return (
     <div className="space-y-4">
@@ -21,28 +37,35 @@ export function NotificationList({ items }: { items: NotificationRow[] }) {
         <p className="text-sm text-text-muted">
           {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
         </p>
-        {unreadCount > 0 ? (
-          <form action={markAllRead}>
-            <FormSubmitButton
-              pendingLabel="Marking…"
-              className="inline-flex h-9 min-h-9 items-center justify-center rounded-md bg-transparent px-3 text-sm font-medium text-text transition-colors hover:bg-accent-soft focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:opacity-50"
-            >
-              Mark all read
-            </FormSubmitButton>
-          </form>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {readCount > 0 ? (
+            <form action={clearReadNotifications}>
+              <FormSubmitButton
+                pendingLabel="Clearing…"
+                className={sizeButtonClass("text-text-muted hover:text-accent")}
+              >
+                Clear read
+              </FormSubmitButton>
+            </form>
+          ) : null}
+          {unreadCount > 0 ? (
+            <form action={markAllRead}>
+              <FormSubmitButton pendingLabel="Marking…" className={sizeButtonClass()}>
+                Mark all read
+              </FormSubmitButton>
+            </form>
+          ) : null}
+        </div>
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-border bg-surface p-6 text-center text-sm text-text-muted shadow-card">
+        <p className="border-t border-border pt-6 text-center text-sm text-text-muted">
           No notifications yet. Household activity will show up here.
         </p>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface shadow-card">
+        <ul className="divide-y divide-border border-t border-border">
           {items.map((item) => (
-            <li key={item.id}>
-              <NotificationItem item={item} />
-            </li>
+            <NotificationItem key={item.id} item={item} />
           ))}
         </ul>
       )}
@@ -53,40 +76,31 @@ export function NotificationList({ items }: { items: NotificationRow[] }) {
 function NotificationItem({ item }: { item: NotificationRow }) {
   const unread = !item.readAt;
   const content = (
-    <>
-      <div className="flex items-start gap-2">
-        {unread ? (
-          <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden />
-        ) : (
-          <span className="mt-2 h-2 w-2 shrink-0" aria-hidden />
-        )}
-        <div className="min-w-0 flex-1">
-          <p
-            className={`text-sm leading-relaxed ${unread ? "font-medium text-text" : "text-text"}`}
-          >
-            {item.summary}
-          </p>
-          <p className="mt-1 text-xs text-text-muted">{formatWhen(item.createdAt)}</p>
-        </div>
+    <div className="flex items-start gap-2">
+      <span
+        className={`mt-2 h-2 w-2 shrink-0 rounded-full ${unread ? "bg-accent" : "bg-transparent"}`}
+        aria-hidden
+      />
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm leading-relaxed ${unread ? "font-medium text-text" : "text-text"}`}>
+          {item.summary}
+        </p>
+        <p className="mt-1 text-xs text-text-muted">{formatWhen(item.createdAt)}</p>
       </div>
-    </>
+    </div>
   );
 
-  if (item.href) {
-    return (
-      <form action={openNotification.bind(null, item.id)} className="block w-full">
-        <FormSubmitButton
-          pendingLabel="Opening…"
-          className="w-full px-4 py-3 text-left transition-colors hover:bg-accent-soft focus-visible:bg-accent-soft focus-visible:outline-none disabled:opacity-50"
-        >
-          {content}
-        </FormSubmitButton>
-      </form>
-    );
-  }
-
-  return (
-    <form action={markRead} className="block w-full">
+  const openForm = item.href ? (
+    <form action={openNotification.bind(null, item.id)} className="min-w-0 flex-1">
+      <FormSubmitButton
+        pendingLabel="Opening…"
+        className="w-full px-4 py-3 text-left transition-colors hover:bg-accent-soft focus-visible:bg-accent-soft focus-visible:outline-none disabled:opacity-50"
+      >
+        {content}
+      </FormSubmitButton>
+    </form>
+  ) : (
+    <form action={markRead} className="min-w-0 flex-1">
       <input type="hidden" name="id" value={item.id} />
       <FormSubmitButton
         pendingLabel="…"
@@ -96,6 +110,24 @@ function NotificationItem({ item }: { item: NotificationRow }) {
       </FormSubmitButton>
     </form>
   );
+
+  return (
+    <li>
+      <div className="flex items-start">
+        {openForm}
+        <form action={deleteNotification}>
+          <input type="hidden" name="id" value={item.id} />
+          <FormSubmitButton
+            pendingLabel="…"
+            aria-label="Delete notification"
+            className="flex h-full items-center justify-center px-3 text-text-muted transition-colors hover:text-accent focus-visible:outline-none disabled:opacity-50"
+          >
+            <TrashIcon />
+          </FormSubmitButton>
+        </form>
+      </div>
+    </li>
+  );
 }
 
 export function SinceLastVisitList({ items }: { items: NotificationRow[] }) {
@@ -104,7 +136,7 @@ export function SinceLastVisitList({ items }: { items: NotificationRow[] }) {
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card md:col-span-2">
+    <section className="border-t border-border pt-4 md:col-span-2">
       <div className="mb-4 flex items-center justify-between gap-2">
         <h2 className="text-lg font-medium text-text">Since you last visited</h2>
         <Link
@@ -134,5 +166,28 @@ export function SinceLastVisitList({ items }: { items: NotificationRow[] }) {
         ))}
       </ul>
     </section>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
+    </svg>
   );
 }

@@ -26,7 +26,7 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-import { markAllRead } from "@/lib/actions/notifications";
+import { clearReadNotifications, deleteNotification, markAllRead } from "@/lib/actions/notifications";
 
 function resetTestDb(): void {
   resetDbForTests();
@@ -87,5 +87,107 @@ describe("notification actions", () => {
     expect(unreadRows).toHaveLength(0);
     expect(mockRevalidatePath).toHaveBeenCalledWith("/notifications");
     expect(mockRevalidatePath).toHaveBeenCalledWith("/");
+  });
+
+  it("deleteNotification removes only the recipient's notification", async () => {
+    const user = await createTestUser({ username: "me" });
+    const other = await createTestUser({ username: "other" });
+    mockRequireUser.mockResolvedValue({ user: { id: user.id } });
+
+    const now = new Date();
+    const mine = {
+      id: crypto.randomUUID(),
+      recipientUserId: user.id,
+      actorUserId: other.id,
+      type: "project.created",
+      summary: "Mine",
+      readAt: null,
+      createdAt: now,
+    };
+    const theirs = {
+      id: crypto.randomUUID(),
+      recipientUserId: other.id,
+      actorUserId: user.id,
+      type: "project.created",
+      summary: "Theirs",
+      readAt: null,
+      createdAt: now,
+    };
+    await getDb().insert(notifications).values([mine, theirs]);
+
+    const fd = new FormData();
+    fd.append("id", mine.id);
+    await deleteNotification(fd);
+
+    const remaining = await getDb().select().from(notifications);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].id).toBe(theirs.id);
+  });
+
+  it("deleteNotification is a no-op for another user's id", async () => {
+    const user = await createTestUser({ username: "me" });
+    const other = await createTestUser({ username: "other" });
+    mockRequireUser.mockResolvedValue({ user: { id: user.id } });
+
+    const now = new Date();
+    const theirs = {
+      id: crypto.randomUUID(),
+      recipientUserId: other.id,
+      actorUserId: user.id,
+      type: "mention",
+      summary: "Theirs",
+      readAt: null,
+      createdAt: now,
+    };
+    await getDb().insert(notifications).values(theirs);
+
+    const fd = new FormData();
+    fd.append("id", theirs.id);
+    await deleteNotification(fd);
+
+    const remaining = await getDb().select().from(notifications);
+    expect(remaining).toHaveLength(1);
+  });
+
+  it("clearReadNotifications removes only read notifications", async () => {
+    const user = await createTestUser({ username: "me" });
+    const other = await createTestUser({ username: "other" });
+    mockRequireUser.mockResolvedValue({ user: { id: user.id } });
+
+    const now = new Date();
+    const read = {
+      id: crypto.randomUUID(),
+      recipientUserId: user.id,
+      actorUserId: other.id,
+      type: "mention",
+      summary: "Read",
+      readAt: now,
+      createdAt: now,
+    };
+    const unread = {
+      id: crypto.randomUUID(),
+      recipientUserId: user.id,
+      actorUserId: other.id,
+      type: "project.created",
+      summary: "Unread",
+      readAt: null,
+      createdAt: now,
+    };
+    const theirsUnread = {
+      id: crypto.randomUUID(),
+      recipientUserId: other.id,
+      actorUserId: user.id,
+      type: "mention",
+      summary: "Theirs",
+      readAt: null,
+      createdAt: now,
+    };
+    await getDb().insert(notifications).values([read, unread, theirsUnread]);
+
+    await clearReadNotifications();
+
+    const remaining = await getDb().select().from(notifications);
+    expect(remaining).toHaveLength(2);
+    expect(remaining.map((r) => r.id).sort()).toEqual([theirsUnread.id, unread.id].sort());
   });
 });

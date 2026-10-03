@@ -48,7 +48,7 @@ export function ThemePicker({ currentTheme }: { currentTheme: Theme }) {
               <label
                 key={theme.id}
                 className={[
-                  "cursor-pointer rounded-lg border-2 p-3 transition-all",
+                  "cursor-pointer rounded-sm border-2 p-3 transition-all",
                   isSelected
                     ? "border-accent bg-accent-soft"
                     : "border-border bg-surface hover:border-accent/50",

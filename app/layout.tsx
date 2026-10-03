@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
-import { DM_Sans, Lora } from "next/font/google";
+import { Instrument_Serif, Spectral } from "next/font/google";
 import { Suspense } from "react";
 import { FlashToast } from "@/components/FlashToast";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { validateRequest } from "@/lib/auth/session";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const instrument = Instrument_Serif({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument",
 });
 
-const dmSerif = Lora({
+const spectral = Spectral({
   subsets: ["latin"],
-  variable: "--font-dm-serif",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-spectral",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { user } = await validateRequest();
   const theme = user?.theme ?? "default";
   return (
-    <html lang="en" data-theme={theme} className={`${dmSans.variable} ${dmSerif.variable}`}>
+    <html lang="en" data-theme={theme} className={`${instrument.variable} ${spectral.variable}`}>
       <body>
         <ToastProvider>
           {children}

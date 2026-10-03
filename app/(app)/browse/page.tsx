@@ -94,7 +94,7 @@ export default async function BrowsePage() {
           <Link
             key={area.href}
             href={area.href}
-            className="rounded-lg border border-border bg-surface p-4 shadow-card transition-colors hover:bg-accent-soft/30 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            className="border-t border-border pt-4 transition-colors hover:bg-accent-soft/30 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
           >
             <div className="flex items-start justify-between gap-3">
               <h2 className="font-serif text-lg text-text">{area.title}</h2>

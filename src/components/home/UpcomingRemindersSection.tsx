@@ -10,17 +10,15 @@ export async function UpcomingRemindersSection({ limit = 5 }: { limit?: number }
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-3 shadow-card">
-      <div className="flex items-center justify-between gap-3">
+    <section className="border-t border-border pt-4">
+      <div className="flex items-baseline justify-between gap-3">
         <div>
           <h2 className="font-serif text-lg text-text">Upcoming reminders</h2>
-          <p className="text-xs text-text-muted">
-            Maintenance and metrics due in the next two weeks
-          </p>
+          <p className="text-xs text-text-muted">Maintenance and metrics due in the next two weeks</p>
         </div>
         <Link
           href="/reminders"
-          className="text-sm font-medium text-accent hover:text-accent/80 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+          className="text-xs uppercase tracking-[0.1em] text-accent hover:text-accent/80 focus-visible:outline-none"
         >
           View all
         </Link>

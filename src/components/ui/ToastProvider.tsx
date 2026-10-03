@@ -50,7 +50,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={item.id}
             role="status"
-            className={`rounded-lg border px-4 py-3 text-sm shadow-card ${
+            className={`rounded-sm border px-4 py-3 text-sm ${
               item.type === "error"
                 ? "border-red-200 bg-red-50 text-red-800"
                 : "border-border bg-surface text-text"

@@ -6,17 +6,15 @@ export async function RestaurantsSection() {
   const [items, stats] = await Promise.all([getWantToTryPreview(5), getRestaurantsHomeStats()]);
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-3 shadow-card">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h2 className="font-serif text-base text-text">Restaurants to try</h2>
-          <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-medium text-text-muted">
-            {stats.wantToTry}
-          </span>
+    <section className="border-t border-border pt-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="flex items-baseline gap-3">
+          <h2 className="font-serif text-lg text-text">Restaurants to try</h2>
+          <span className="text-xs uppercase tracking-[0.1em] text-text-muted">{stats.wantToTry}</span>
         </div>
         <Link
           href="/restaurants"
-          className="text-sm font-medium text-accent transition-colors hover:text-accent/80"
+          className="text-xs uppercase tracking-[0.1em] text-accent transition-colors hover:text-accent/80"
         >
           View all
         </Link>
@@ -24,12 +22,12 @@ export async function RestaurantsSection() {
       {items.length === 0 ? (
         <p className="mt-2 text-sm text-text-muted">No restaurants on the list yet.</p>
       ) : (
-        <ul className="mt-2 space-y-1">
+        <ul className="mt-2">
           {items.map((restaurant) => (
             <li key={restaurant.id}>
               <Link
                 href={`/restaurants/${restaurant.id}`}
-                className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 transition-colors hover:bg-accent-soft/50"
+                className="flex items-center justify-between gap-3 border-b border-border py-2 transition-colors hover:text-accent"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-text">{restaurant.name}</p>

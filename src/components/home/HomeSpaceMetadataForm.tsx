@@ -27,7 +27,7 @@ export function HomeSpaceMetadataForm({ space }: { space: HomeSpace }) {
   const [state, action, pending] = useActionState<HomeActionState, FormData>(updateHomeSpace, {});
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">Details</h2>
       <form action={action} className="mt-4 space-y-4">
         <input type="hidden" name="id" value={space.id} />

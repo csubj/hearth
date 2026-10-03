@@ -63,7 +63,7 @@ export function RestaurantFilters({
             <Link
               key={option.value}
               href={filterHref(filters, { status: option.value })}
-              className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(status === option.value)}`}
+              className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(status === option.value)}`}
             >
               {option.label}
             </Link>
@@ -75,7 +75,7 @@ export function RestaurantFilters({
             <Link
               key={option.value}
               href={filterHref(filters, { sort: option.value })}
-              className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(sort === option.value)}`}
+              className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(sort === option.value)}`}
             >
               {option.label}
             </Link>
@@ -88,7 +88,7 @@ export function RestaurantFilters({
             <span className="text-sm text-text-muted">Neighborhood</span>
             <Link
               href={filterHref(filters, { neighborhood: undefined })}
-              className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(!neighborhood)}`}
+              className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(!neighborhood)}`}
             >
               All
             </Link>
@@ -96,7 +96,7 @@ export function RestaurantFilters({
               <Link
                 key={value}
                 href={filterHref(filters, { neighborhood: value })}
-                className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(neighborhood === value)}`}
+                className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(neighborhood === value)}`}
               >
                 {value}
               </Link>
@@ -108,7 +108,7 @@ export function RestaurantFilters({
             <span className="text-sm text-text-muted">Added by</span>
             <Link
               href={filterHref(filters, { addedBy: undefined })}
-              className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(!addedBy)}`}
+              className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(!addedBy)}`}
             >
               Anyone
             </Link>
@@ -116,7 +116,7 @@ export function RestaurantFilters({
               <Link
                 key={user.id}
                 href={filterHref(filters, { addedBy: user.id })}
-                className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${chipClass(addedBy === user.id)}`}
+                className={`rounded-sm border px-3 py-1 text-xs uppercase tracking-[0.06em] font-medium transition-colors ${chipClass(addedBy === user.id)}`}
               >
                 {user.displayName ?? user.username}
               </Link>

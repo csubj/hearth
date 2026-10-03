@@ -22,7 +22,7 @@ export function EntryHistoryList({ metric, entries }: { metric: Metric; entries:
 
   return (
     <>
-      <div className="hidden overflow-hidden rounded-lg border border-border md:block">
+      <div className="hidden overflow-hidden rounded-sm border border-border md:block">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-border bg-accent-soft/50 text-text-muted">
             <tr>
@@ -54,7 +54,7 @@ export function EntryHistoryList({ metric, entries }: { metric: Metric; entries:
 
       <ul className="space-y-3 md:hidden">
         {entries.map((entry) => (
-          <li key={entry.id} className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <li key={entry.id} className="border-t border-border pt-4">
             <div className="flex items-start justify-between gap-3">
               <p className="font-medium text-text">{formatValue(entry.value, metric.unit)}</p>
               <time className="shrink-0 text-xs text-text-muted">

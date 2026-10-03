@@ -15,7 +15,7 @@ export function InventoryItemCard({ item }: { item: InventoryListItem }) {
   return (
     <Link
       href={`/inventory/${item.id}`}
-      className="block rounded-lg border border-border bg-surface p-4 shadow-card transition-colors hover:bg-accent-soft/30 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+      className="block border-b border-border py-3 transition-colors hover:text-accent focus-visible:outline-none"
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">

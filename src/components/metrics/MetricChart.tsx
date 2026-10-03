@@ -31,7 +31,7 @@ export function MetricChart({ unit, entries }: MetricChartProps) {
 
   return (
     <section
-      className="rounded-lg border border-border bg-surface p-4 shadow-card"
+      className="border-t border-border pt-4"
       aria-label="Metric trend chart"
     >
       <div className="h-60 w-full md:h-80">
@@ -72,7 +72,7 @@ export function MetricChart({ unit, entries }: MetricChartProps) {
                   return null;
                 }
                 return (
-                  <div className="rounded-md border border-border bg-surface px-3 py-2 text-sm shadow-card">
+                  <div className="rounded-md border border-border bg-surface px-3 py-2 text-sm">
                     <p className="font-medium text-text">{formatTooltipValue(point.value, unit)}</p>
                     <p className="text-text-muted">{point.label}</p>
                     {point.note ? <p className="mt-1 text-text-muted">{point.note}</p> : null}

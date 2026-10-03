@@ -70,17 +70,17 @@ export function componentKindLabel(kind: ProjectComponentKind): string {
 }
 
 const componentKindChipStyles: Record<ProjectComponentKind, string> = {
-  item: "border-sky-200 bg-sky-50 text-sky-800",
-  labor: "border-accent/30 bg-accent-soft text-accent",
-  fee: "border-amber-200 bg-amber-50 text-amber-900",
-  other: "border-stone-300 bg-stone-100 text-stone-700",
+  item: "border-border text-text-muted",
+  labor: "border-accent/30 text-accent",
+  fee: "border-border text-text-muted",
+  other: "border-border text-text-muted",
 };
 
 const componentKindRowStyles: Record<ProjectComponentKind, string> = {
-  item: "border-l-sky-400",
-  labor: "border-l-accent",
-  fee: "border-l-amber-400",
-  other: "border-l-stone-400",
+  item: "",
+  labor: "",
+  fee: "",
+  other: "",
 };
 
 export function componentKindChipClass(kind: ProjectComponentKind): string {

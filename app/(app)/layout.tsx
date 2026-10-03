@@ -1,17 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
-import { BrowseMenu } from "@/components/BrowseMenu";
-import { HomeLogNavMenu } from "@/components/HomeLogNavMenu";
+import { DesktopSectionNav, MobileSectionLinks } from "@/components/SectionNav";
 import { displayName, touchLastSeen, validateRequest } from "@/lib/auth/session";
-import { getHomeLogHomeSummary } from "@/lib/actions/home";
 import { processMetricReminders } from "@/lib/metrics/reminders";
 import { getPreviousLastSeenAt, getUnreadNotificationCount } from "@/lib/notifications/queries";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/reminders", label: "Reminders" },
-] as const;
+const mobileIndexLink =
+  "shrink-0 px-3 py-2 text-xs uppercase tracking-[0.14em] text-text-muted transition-colors hover:text-accent focus-visible:outline-none";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, session } = await validateRequest();
@@ -44,81 +40,62 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     role: user.role,
   };
 
-  const homeLogProperties = await getHomeLogHomeSummary(100);
-
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 md:px-6">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="font-serif text-2xl text-text">
+      <header className="border-b border-border">
+        <div className="mx-auto max-w-5xl px-4 md:px-6">
+          <div className="flex items-center justify-between gap-4 py-4">
+            <Link href="/" className="font-serif text-3xl leading-none text-text">
               hearth
             </Link>
-            <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-              <Link
-                href="/"
-                className="rounded-md px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-accent-soft hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-              >
-                Home
-              </Link>
-              <BrowseMenu />
-              <HomeLogNavMenu
-                variant="desktop"
-                properties={homeLogProperties.map((p) => ({
-                  id: p.id,
-                  name: p.name,
-                  address: p.address,
-                }))}
-              />
-              {navLinks.slice(1).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-accent-soft hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+            <div className="flex items-center gap-1">
+              <div className="hidden md:block">
+                <DesktopSectionNav />
+              </div>
+              <AppNav user={navUser} unreadCount={unreadCount} />
+            </div>
           </div>
-          <AppNav user={navUser} unreadCount={unreadCount} />
         </div>
         <nav
-          className="flex gap-1 overflow-x-auto border-t border-border px-4 py-2 md:hidden"
+          className="flex flex-wrap items-center gap-1 border-t border-border px-4 py-2 md:hidden"
           aria-label="Main mobile"
         >
-          <Link
-            href="/"
-            className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-text-muted hover:bg-accent-soft hover:text-text"
-          >
-            Home
-          </Link>
-          <Link
-            href="/browse"
-            className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-text-muted hover:bg-accent-soft hover:text-text"
-          >
-            Browse
-          </Link>
-          <HomeLogNavMenu
-            variant="mobile"
-            properties={homeLogProperties.map((p) => ({
-              id: p.id,
-              name: p.name,
-              address: p.address,
-            }))}
-          />
-          {navLinks.slice(1).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-text-muted hover:bg-accent-soft hover:text-text"
+          <details className="relative shrink-0">
+            <summary
+              className={`${mobileIndexLink} inline-flex cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden`}
             >
-              {link.label}
-            </Link>
-          ))}
+              Sections
+              <ChevronIcon />
+            </summary>
+            <div className="absolute top-full left-0 z-50 pt-1">
+              <div className="min-w-52 rounded-sm border border-border bg-surface p-1">
+                <MobileSectionLinks />
+              </div>
+            </div>
+          </details>
         </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 py-8 md:px-6 md:py-10">{children}</main>
     </div>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="ml-1"
+      aria-hidden
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }

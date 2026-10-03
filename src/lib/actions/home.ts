@@ -3,6 +3,7 @@
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { z } from "zod";
 import { getDb } from "@/db";
 import {
@@ -55,12 +56,23 @@ export type HomeSpaceWithChildren = HomeSpace & {
 
 export type HomeSpaceSummary = Pick<HomeSpace, "id" | "name" | "kind" | "sortOrder">;
 
+export type HomeTreeItem = {
+  id: string;
+  name: string;
+  kind: InventoryItemKind | null;
+  colorHex: string | null;
+  colorName: string | null;
+  finish: string | null;
+};
+
 export type HomeTreeNode = {
   id: string;
   name: string;
   kind: HomeSpaceKind;
+  address: string | null;
   children: HomeTreeNode[];
   inventoryCount: number;
+  items: HomeTreeItem[];
   maintenance: { id: string; title: string }[];
   projects: { id: string; title: string }[];
 };
@@ -136,14 +148,22 @@ export async function listAllHomeSpaces(): Promise<HomeSpaceSummary[]> {
     .orderBy(homeSpaces.sortOrder, homeSpaces.name);
 }
 
-export async function getHomeTree(): Promise<HomeTreeNode[]> {
+export const getHomeTree = cache(async (): Promise<HomeTreeNode[]> => {
   await requireUser();
   const db = getDb();
 
   const [spaces, inventoryRows, rawLinks] = await Promise.all([
     db.select().from(homeSpaces).orderBy(homeSpaces.sortOrder, homeSpaces.name),
     db
-      .select({ spaceId: inventoryItems.spaceId })
+      .select({
+        id: inventoryItems.id,
+        spaceId: inventoryItems.spaceId,
+        name: inventoryItems.name,
+        kind: inventoryItems.kind,
+        colorHex: inventoryItems.colorHex,
+        colorName: inventoryItems.colorName,
+        finish: inventoryItems.finish,
+      })
       .from(inventoryItems)
       .where(sql`${inventoryItems.spaceId} IS NOT NULL`),
     db
@@ -155,11 +175,21 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
 
   const resolvedLinks = await resolveLinks(rawLinks);
 
-  const inventoryCountBySpace = new Map<string, number>();
+  const itemsBySpace = new Map<string, HomeTreeItem[]>();
   for (const row of inventoryRows) {
-    if (row.spaceId) {
-      inventoryCountBySpace.set(row.spaceId, (inventoryCountBySpace.get(row.spaceId) ?? 0) + 1);
+    if (!row.spaceId) {
+      continue;
     }
+    const list = itemsBySpace.get(row.spaceId) ?? [];
+    list.push({
+      id: row.id,
+      name: row.name,
+      kind: row.kind,
+      colorHex: row.colorHex,
+      colorName: row.colorName,
+      finish: row.finish,
+    });
+    itemsBySpace.set(row.spaceId, list);
   }
 
   const nodeMap = new Map<string, HomeTreeNode>();
@@ -168,8 +198,10 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
       id: space.id,
       name: space.name,
       kind: space.kind,
+      address: space.address,
       children: [],
-      inventoryCount: inventoryCountBySpace.get(space.id) ?? 0,
+      inventoryCount: itemsBySpace.get(space.id)?.length ?? 0,
+      items: itemsBySpace.get(space.id) ?? [],
       maintenance: [],
       projects: [],
     });
@@ -203,7 +235,7 @@ export async function getHomeTree(): Promise<HomeTreeNode[]> {
   }
 
   return roots;
-}
+});
 
 async function walkBreadcrumb(spaceId: string): Promise<HomeBreadcrumb[]> {
   const db = getDb();

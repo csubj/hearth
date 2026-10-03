@@ -58,7 +58,7 @@ export function ProjectNotesEditor({
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-medium text-text">Notes</h2>
         <div className="flex items-center gap-2">
@@ -66,14 +66,14 @@ export function ProjectNotesEditor({
             <button
               type="button"
               onClick={() => setMode("edit")}
-              className={`rounded px-2 py-1 ${mode === "edit" ? "bg-accent text-white" : "text-text-muted"}`}
+              className={`rounded px-2 py-1 ${mode === "edit" ? "border-accent/60 bg-accent-soft text-accent" : "text-text-muted"}`}
             >
               Edit
             </button>
             <button
               type="button"
               onClick={() => setMode("preview")}
-              className={`rounded px-2 py-1 ${mode === "preview" ? "bg-accent text-white" : "text-text-muted"}`}
+              className={`rounded px-2 py-1 ${mode === "preview" ? "border-accent/60 bg-accent-soft text-accent" : "text-text-muted"}`}
             >
               Preview
             </button>

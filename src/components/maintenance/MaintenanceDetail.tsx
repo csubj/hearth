@@ -71,7 +71,7 @@ export async function MaintenanceDetailView({
 
       <HomeReferencesPanel targetType="maintenance_log" targetId={log.id} />
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <Suspense fallback={<p className="text-sm text-text-muted">Loading files…</p>}>
           <AttachmentsPanel
             entityType="maintenance_log"
@@ -81,7 +81,7 @@ export async function MaintenanceDetailView({
         </Suspense>
       </section>
 
-      <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+      <section className="border-t border-border pt-4">
         <MaintenanceDeleteButton
           logId={log.id}
           logTitle={log.title}

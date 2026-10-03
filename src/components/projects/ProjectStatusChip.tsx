@@ -1,9 +1,9 @@
 import type { ProjectStatus } from "@/db/schema";
 
 const statusStyles: Record<ProjectStatus, string> = {
-  idea: "border-border bg-surface text-text-muted",
-  in_progress: "border-accent/30 bg-accent-soft text-accent",
-  done: "border-success/30 bg-success/10 text-success",
+  idea: "border-border text-text-muted",
+  in_progress: "border-accent/30 text-accent",
+  done: "border-success/40 text-success",
 };
 
 const statusLabels: Record<ProjectStatus, string> = {
@@ -15,7 +15,7 @@ const statusLabels: Record<ProjectStatus, string> = {
 export function ProjectStatusChip({ status }: { status: ProjectStatus }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${statusStyles[status]}`}
+      className={`inline-flex items-center border px-2 py-0.5 text-xs uppercase tracking-[0.1em] ${statusStyles[status]}`}
     >
       {statusLabels[status]}
     </span>

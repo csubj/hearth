@@ -298,7 +298,7 @@ export function MaintenanceRemindersPanel({
   users: MentionUser[];
 }) {
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-medium text-text">Maintenance reminders</h2>

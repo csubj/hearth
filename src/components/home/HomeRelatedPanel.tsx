@@ -194,7 +194,7 @@ export function HomeRelatedPanel({
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4 shadow-card">
+    <section className="border-t border-border pt-4">
       <h2 className="text-sm font-medium text-text">{only ? targetLabel(only) : "Linked items"}</h2>
       <p className="mt-1 text-xs text-text-muted">
         Connect this {sourceType === "home_space" ? "space" : "item"} to{" "}

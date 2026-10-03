@@ -1,64 +1,88 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #faf8f5;
-  --color-surface: #ffffff;
-  --color-border: #e8e4df;
-  --color-text: #1c1917;
-  --color-text-muted: #78716c;
-  --color-accent: #c2410c;
-  --color-accent-soft: #fff7ed;
-  --color-success: #4d7c0f;
+  --color-background: #f2ecdf;
+  --color-surface: #f7f2e8;
+  --color-border: #d9d0bf;
+  --color-text: #211b12;
+  --color-text-muted: #5e574a;
+  --color-accent: #9c2f1d;
+  --color-accent-soft: #f0e2d7;
+  --color-success: #5e574a;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.25rem;
 
-  --shadow-card: 0 1px 3px 0 rgb(28 25 23 / 0.06), 0 1px 2px -1px rgb(28 25 23 / 0.06);
+  --shadow-card: 0 1px 2px 0 rgb(33 27 18 / 0.05), 0 1px 1px -1px rgb(33 27 18 / 0.04);
 
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-dm-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-spectral), ui-serif, Georgia, serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 @layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
   body {
-    @apply bg-background text-text font-sans antialiased;
+    @apply bg-background text-text font-sans;
+  }
+  /* Interactive chrome uses the neutral grotesk; record content stays serif. */
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    font-family: var(--font-ui);
+  }
+  ::selection {
+    background: rgb(156 47 29 / 0.16);
+  }
+  /* Theme the caret and focus ring from the palette. */
+  input,
+  textarea {
+    caret-color: var(--color-accent);
+  }
+  :focus-visible {
+    outline: 1px solid var(--color-accent);
+    outline-offset: 2px;
   }
 }
 
 [data-theme="warm"] {
-  --color-background: #efe6da;
-  --color-surface: #f7f1e8;
-  --color-border: #d8c9b6;
-  --color-text: #2b211a;
-  --color-text-muted: #6f5d4c;
-  --color-accent: #a8531f;
-  --color-accent-soft: #f0e2d0;
-  --color-success: #5c6b1f;
+  --color-background: #ece1cd;
+  --color-surface: #f2e9d8;
+  --color-border: #d3c3a6;
+  --color-text: #2a2119;
+  --color-text-muted: #6b5a42;
+  --color-accent: #94351d;
+  --color-accent-soft: #ecdfc9;
+  --color-success: #6b5a42;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-background: #1a1816;
-  --color-surface: #24211e;
-  --color-border: #3a352f;
-  --color-text: #f0ece6;
-  --color-text-muted: #a8a097;
-  --color-accent: #e07a45;
-  --color-accent-soft: #2e241c;
-  --color-success: #9bbf4a;
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+  --color-background: #17120d;
+  --color-surface: #211b14;
+  --color-border: #3a3226;
+  --color-text: #efe6d5;
+  --color-text-muted: #a99b83;
+  --color-accent: #d2644a;
+  --color-accent-soft: #2c211a;
+  --color-success: #a99b83;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35), 0 1px 1px -1px rgb(0 0 0 / 0.3);
 }
 
 [data-theme="gamer"] {
   color-scheme: dark;
-  --color-background: #0b0e14;
-  --color-surface: #131825;
-  --color-border: #273043;
-  --color-text: #e6f1ff;
-  --color-text-muted: #8aa0c0;
-  --color-accent: #b026ff;
-  --color-accent-soft: #1b1430;
-  --color-success: #00e5a0;
-  --shadow-card: 0 0 0 1px rgb(176 38 255 / 0.15), 0 2px 12px -2px rgb(176 38 255 / 0.25);
+  --color-background: #0c0f16;
+  --color-surface: #131826;
+  --color-border: #273044;
+  --color-text: #e9eef6;
+  --color-text-muted: #8a9ab0;
+  --color-accent: #a24bf0;
+  --color-accent-soft: #1c1730;
+  --color-success: #8a9ab0;
 }
