@@ -1,0 +1,509 @@
+$ next build
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 16ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1074ms
+  Running TypeScript ...
+  Finished TypeScript in 2.5s ...
+  Collecting page data using 9 workers ...
+[2m2026-10-05T09:43:21.257Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.262Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.267Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.270Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.272Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.300Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.300Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.308Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.313Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.372Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.378Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.378Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.381Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+[2m2026-10-05T09:43:21.387Z[0m [33mWARN[0m [1m[Better Auth]:[0m [better-auth] Base URL is not set. Set the baseURL option or BETTER_AUTH_URL env, or use a dynamic baseURL with allowedHosts for multi-host setups. Without it the origin is derived from the incoming request, and callbacks and redirects may not work correctly.
+  Generating static pages using 9 workers (0/14) ...
+  Generating static pages using 9 workers (3/14) 
+  Generating static pages using 9 workers (6/14) 
+  Generating static pages using 9 workers (10/14) 
+✓ Generating static pages using 9 workers (14/14) in 174ms
+Turbopack build encountered 11 warnings:
+./src/server/attachments.ts:423:8
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m421 |[0m   }
+  [90m422 |[0m
+[33m[1m>[0m [90m423 |[0m   [36mif[0m (!existsSync(path)) {
+  [90m    |[0m        [33m[1m^^^^^^^^^^^^^^^^[0m
+  [90m424 |[0m     [36mthrow[0m [36mnew[0m [33mORPCError[0m([32m"not_found"[0m, {
+  [90m425 |[0m       status: [33mERROR_STATUS_MAP[0m.not_found,
+  [90m426 |[0m       message: [32m"Attachment file is missing."[0m,
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:530:7
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m528 |[0m   );
+  [90m529 |[0m
+[33m[1m>[0m [90m530 |[0m   [36mif[0m (existsSync(uploadsDir())) {
+  [90m    |[0m       [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m531 |[0m     [36mfor[0m ([36mconst[0m entry [36mof[0m readdirSafe(uploadsDir())) {
+  [90m532 |[0m       [36mif[0m (entry.endsWith([32m".thumb.webp"[0m)) {
+  [90m533 |[0m         [36mif[0m (!idParts.has(entry.slice([35m0[0m, -[32m".thumb.webp"[0m.length))) {
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:547:10
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m545 |[0m   [90m// 4. Log rows whose file is missing.[0m
+  [90m546 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m rows) {
+[33m[1m>[0m [90m547 |[0m     [36mif[0m (!existsSync(join(uploadsDir(), row.storage_key))) {
+  [90m    |[0m          [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m548 |[0m       console.error(
+  [90m549 |[0m         [32m`[attachment-sweep] missing file for attachment row [0m${row.storage_key[32m}`[0m,
+  [90m550 |[0m       );
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:430:19
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m428 |[0m   }
+  [90m429 |[0m
+[33m[1m>[0m [90m430 |[0m   [36mreturn[0m { bytes: readFileSync(path), mime, filename: row.filename };
+  [90m    |[0m                   [33m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m431 |[0m }
+  [90m432 |[0m
+  [90m433 |[0m [90m/** Soft-delete an attachment (undoable, restorable for 30 days). */[0m
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.readFileSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:322:40
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m320 |[0m         afterCommit: [36masync[0m (_ctx, _result, prepared) => {
+  [90m321 |[0m           mkdirSync(uploadsDir(), { recursive: [36mtrue[0m });
+[33m[1m>[0m [90m322 |[0m           renameSync(prepared.tmpPath, join(uploadsDir(), [32m`[0m${id[32m}.[0m${meta.ext[32m}`[0m));
+  [90m    |[0m                                        [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m323 |[0m           [36mif[0m (prepared.tmpThumbPath) {
+  [90m324 |[0m             renameSync(prepared.tmpThumbPath, join(uploadsDir(), [32m`[0m${id[32m}.thumb.webp`[0m));
+  [90m325 |[0m           }
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:420:12
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m418 |[0m     mime = [32m"image/webp"[0m;
+  [90m419 |[0m   } [36melse[0m {
+[33m[1m>[0m [90m420 |[0m     path = join(uploadsDir(), row.storage_key);
+  [90m    |[0m            [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m421 |[0m   }
+  [90m422 |[0m
+  [90m423 |[0m   [36mif[0m (!existsSync(path)) {
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:512:12
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m510 |[0m
+  [90m511 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m expired) {
+[33m[1m>[0m [90m512 |[0m     rmSafe(join(uploadsDir(), row.storage_key));
+  [90m    |[0m            [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m513 |[0m     [36mif[0m (row.has_thumb === [35m1[0m) {
+  [90m514 |[0m       [36mconst[0m idPart = row.storage_key.slice([35m0[0m, row.storage_key.lastIndexOf([32m"."[0m));
+  [90m515 |[0m       rmSafe(join(uploadsDir(), [32m`[0m${idPart[32m}.thumb.webp`[0m));
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:534:18
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m532 |[0m       [36mif[0m (entry.endsWith([32m".thumb.webp"[0m)) {
+  [90m533 |[0m         [36mif[0m (!idParts.has(entry.slice([35m0[0m, -[32m".thumb.webp"[0m.length))) {
+[33m[1m>[0m [90m534 |[0m           rmSafe(join(uploadsDir(), entry));
+  [90m    |[0m                  [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m535 |[0m         }
+  [90m536 |[0m       } [36melse[0m [36mif[0m (entry.includes([32m"."[0m) && !entry.startsWith([32m"tmp"[0m)) {
+  [90m537 |[0m         [90m// A full file (id.ext). If its row is gone, delete it.[0m
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:539:18
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m537 |[0m         [90m// A full file (id.ext). If its row is gone, delete it.[0m
+  [90m538 |[0m         [36mif[0m (!knownKeys.has(entry) && !idParts.has(entry.slice([35m0[0m, entry.lastIndexOf([32m"."[0m)))) {
+[33m[1m>[0m [90m539 |[0m           rmSafe(join(uploadsDir(), entry));
+  [90m    |[0m                  [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m540 |[0m         }
+  [90m541 |[0m       }
+  [90m542 |[0m     }
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/attachments.ts:547:21
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m545 |[0m   [90m// 4. Log rows whose file is missing.[0m
+  [90m546 |[0m   [36mfor[0m ([36mconst[0m row [36mof[0m rows) {
+[33m[1m>[0m [90m547 |[0m     [36mif[0m (!existsSync(join(uploadsDir(), row.storage_key))) {
+  [90m    |[0m                     [33m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m548 |[0m       console.error(
+  [90m549 |[0m         [32m`[attachment-sweep] missing file for attachment row [0m${row.storage_key[32m}`[0m,
+  [90m550 |[0m       );
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: path.join(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  #1 [App Route]:
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/[id]/route.ts
+
+  #2 [App Route]:
+    ./src/server/attachments.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  #3 [Instrumentation]:
+    ./src/server/attachments.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+  #4 [Server Component]:
+    ./src/server/attachments.ts
+    ./src/server/procedures/attachments.ts
+    ./src/server/router.ts
+    ./src/lib/orpc-server-client.ts
+    ./src/app/(app)/[module]/page.tsx
+
+
+./src/server/backup.ts:227:9
+Warning: Dynamic filesystem access causes tracing of the whole project
+  [90m225 |[0m   [90m// Remove WAL and SHM sidecars — they are no longer valid for the restored DB[0m
+  [90m226 |[0m   [36mfor[0m ([36mconst[0m sidecar [36mof[0m [[32m`[0m${destPath[32m}-wal`[0m, [32m`[0m${destPath[32m}-shm`[0m]) {
+[33m[1m>[0m [90m227 |[0m     [36mif[0m (existsSync(sidecar)) {
+  [90m    |[0m         [33m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m228 |[0m       [36mawait[0m unlink(sidecar);
+  [90m229 |[0m     }
+  [90m230 |[0m   }
+
+Static analysis determined that this filesystem access causes the whole project to be traced and included in the output.
+This is usually unintentional and leads to all source files (including the public folder) to be deployed as part of the server code.
+This can slow down deployments or lead to failures when size limits are exceeded.
+To resolve this, you can
+- make sure the path is statically scoped to some subfolder, for example path.join(process.cwd(), 'data', bar), or
+- only use them in development, or
+- opt out by adding an ignore comment to the highlighted call: fs.existsSync(/*turbopackIgnore: true*/ ...), or
+- remove them.
+
+Import traces:
+  App Route:
+    ./src/server/backup.ts
+    ./src/server/attachments.ts
+    ./src/app/api/attachments/route.ts
+
+  Instrumentation:
+    ./src/server/backup.ts
+    ./src/server/jobs.ts
+    ./src/instrumentation.ts
+
+
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /[module]
+├ ƒ /[module]/[id]
+├ ƒ /admin/users
+├ ƒ /api-keys
+├ ƒ /api/attachments
+├ ƒ /api/attachments/[id]
+├ ƒ /api/auth/[...all]
+├ ƒ /api/docs
+├ ƒ /api/health
+├ ƒ /api/openapi.json
+├ ƒ /api/test-setup
+├ ƒ /api/v1/[[...rest]]
+├ ƒ /api/v1/entities/[id]/attachments
+├ ƒ /inbox
+├ ƒ /login
+├ ƒ /places
+└ ƒ /settings
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.9.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      # Task 14.2/14.3 headless smoke: API smoke, E2E flow, EXPLAIN query
+      # plan (fails on a full scan of entities/activity/attention), reduced
+      # perf budget check, and the restore drill all run under `pnpm test`.
+      - name: Seed + perf CLI smoke
+        run: |
+          pnpm db:seed
+          pnpm perf
+
+      - name: Build
+        run: pnpm build
+
+      # The Playwright end-to-end scenario (e2e/) needs a browser and a
+      # running dev server; install deps and run it here when browsers are
+      # available (e.g. `pnpm exec playwright install --with-deps chromium`).
+      #- name: E2E
+      #  run: |
+      #    pnpm exec playwright install --with-deps chromium
+      #    pnpm e2e
